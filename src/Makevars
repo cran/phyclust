@@ -1,0 +1,16 @@
+# -*- Makefile -*-
+# Makefile suggested by Dr. Dorman
+
+PKG_CFLAGS = -D__HAVE_R_
+
+SRCS = $(wildcard *.c)
+PC_SRCS = $(wildcard phyclust/*.c)
+MS_SRCS = $(wildcard msdir/*.c)
+SG_SRCS = $(wildcard seq-gen/*.c)
+OBJECTS = $(SRCS:.c=.o) $(PC_SRCS:.c=.o) $(MS_SRCS:.c=.o) $(SG_SRCS:.c=.o)
+
+all: $(SHLIB)
+$(SHLIB): $(OBJECTS)
+
+clean:
+	@-rm -f *.d $(OBJECTS) $(SHLIB) Makedeps

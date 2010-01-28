@@ -1,0 +1,11 @@
+citHeader("To cite phyclust in a publication use:")
+
+citEntry(entry="Article",
+	title = "",
+        author = personList(),
+	journal = "",
+  	year = "",
+	volume = "",
+	pages = "",
+        textVersion = ""
+)

@@ -1,0 +1,71 @@
+\name{plotdots}
+\alias{plotdots}
+\title{Dots plots of sequences for visual comparisons}
+\description{
+  This function provides dots plots of data set given an idea how diverse
+  the sequences are by drawing dots with different colors for all mutations.
+}
+\usage{
+plotdots(X, X.class = NULL, diff.only = TRUE, fill = FALSE,
+    label = TRUE, xlim = NULL, main = "Dots Plot",
+    xlab = "Sites", ylab = "Sequences", ...)
+}
+\arguments{
+  \item{X}{numerical data matrix with \eqn{N}{N} rows/sequences and \eqn{L}{L} columns/sites.}
+  \item{X.class}{class ids indicated for all sequences.}
+  \item{diff.only}{draw the segregating sites only, default = TRUE.}
+  \item{fill}{fill in all dots, default = FALSE.}
+  \item{label}{indicate segregating sites, default = TRUE.}
+  \item{xlim}{limit of x-axis.}
+  \item{main}{main label, default = "Dots Plot".}
+  \item{xlab}{x-axis label, default = "Sites". }
+  \item{ylab}{y-axis label, default = "Sequences". }
+  \item{\dots}{other options passed to \code{plot}.}
+}
+\details{
+  The first sequences/rows in \code{X} will be drawn entirely on dots plots
+  in colors which are "green3", "blue2", "\#CC00CC", "red2", and "white",
+  according the ids + 1. If \code{fill} is FALSE, other sequences will be
+  drawn by the mutation sites comparing to the first sequences. Otherwise,
+  they be drawn entirely.
+
+  If \code{X.class} is set, the sequences will be drawn in cluster order.
+
+  If \code{label} is TRUE, the bottom row will be drawn in color "orange"
+  to indicate segregating sites.
+}
+\value{
+  A dot plot will be drawn.
+}
+\references{
+  Phylogenetic Clustering Website:
+  \url{http://thirteen-01.stat.iastate.edu/snoweye/phyclust/}
+}
+\author{
+  Wei-Chen Chen \email{phyclust@gmail.com}
+}
+\seealso{
+  \code{\link{seqgen}},
+  \code{\link{plothist}}.
+}
+\examples{
+\dontrun{
+# For nucleotide
+X <- seq.data.toy$org
+par(mfrow = c(2, 2))
+plotdots(X)
+plotdots(X, diff.only = FALSE)
+plotdots(X, diff.only = FALSE, label = FALSE)
+plotdots(X, fill = TRUE, diff.only = FALSE, label = FALSE)
+
+# With class ids
+X.class <- as.numeric(gsub(".*-(.)", "\\1",
+                           seq.data.toy$seqname))
+plotdots(X, X.class)
+
+# For SNP
+X.SNP <- nid2sid(X)
+plotdots(X.SNP, X.class)
+}
+}
+\keyword{programming}

@@ -1,0 +1,12 @@
+useDynLib(phyclust)
+
+exportPattern("^[[:alpha:]]+")
+exportPattern("^[\\.]")
+
+S3method(print, ms)
+S3method(print, phyclust)
+S3method(print, Pt)
+S3method(print, RRand)
+S3method(print, seq.data)
+S3method(print, seqgen)
+S3method(summary, phyclust)

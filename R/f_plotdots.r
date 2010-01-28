@@ -1,0 +1,70 @@
+### This file contains the function for the dots plot.
+### Plot the difference for all sequences based on the first sequence.
+
+plotdots <- function(X, X.class = NULL,
+    diff.only = TRUE, fill = FALSE, label = TRUE, xlim = NULL,
+    main = "Dots Plot", xlab = "Sites", ylab = "Sequences", ...){
+  if(! is.null(X.class)){
+    id.X <- order(X.class)
+    X <- X[id.X,]
+    K <- max(X.class)
+    X.nc.cum <- rep(0, K)
+    for(k in 1:K) X.nc.cum[k] <- sum(X.class %in% 1:k)
+    header <- which(id.X == 1)
+  } else{
+    header <- 1
+  }
+  if(diff.only){
+    tl.diff <- apply(X, 2, function(x) length(unique(x)))
+    X <- X[, tl.diff > 1]
+  }
+
+  N <- nrow(X)
+  L <- ncol(X)
+
+  if(is.null(xlim)) xlim <- c(1, L + 1)
+  if(label){
+    ylim <- c(N + 3, 1)
+  } else{
+    ylim <- c(N + 1, 1)
+  }
+
+  plot(NULL, NULL, type = "n", xlim = xlim, ylim = ylim,
+       main = main, xlab = xlab, ylab = ylab)
+
+  my.col <- c("green3", "blue2", "#CC00CC", "red2", "white")
+  flag.diff <- rowSums(t(X[-header,]) != X[header,]) > 0
+
+  for(i in 1:N){
+    for(j in 1:L){
+      if(diff.only){
+         if(! flag.diff[j]) next
+      }
+      x.left <- j
+      y.top <- i
+      if(X[i, j] != X[header, j] || i == header){
+        rect(x.left, y.top + 1, x.left + 1, y.top,
+             col = my.col[X[i, j] + 1], border = NA)
+      } else{
+        if(fill & flag.diff[j]){
+          rect(x.left, y.top + 1, x.left + 1, y.top,
+               col = my.col[X[i, j] + 1], border = NA)
+        }
+      }
+    }
+  }
+
+  if(label){
+    i <- N + 1
+    for(j in 1:L){
+      x.left <- j
+      y.top <- i
+      if(flag.diff[j]){
+        rect(x.left, y.top + 2, x.left + 1, y.top, col = "orange", border = NA)
+      }
+    }
+    abline(h = y.top, lty = 3, lwd = 0.5)
+  }
+
+  if(! is.null(X.class)) abline(h = X.nc.cum + 1, lty = 3, lwd = 0.5)
+} # End of plotdots().

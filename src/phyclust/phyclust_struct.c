@@ -1,0 +1,266 @@
+/* This file contains functions for initialization and memory deallocation. */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+#include "phyclust_constant.h"
+#include "phyclust_struct.h"
+#include "phyclust_em.h"
+#include "phyclust_tool.h"
+#include "phyclust_edist.h"
+
+
+/* Initial a phyclust structure without assigning data X.
+ * Assign X later by calling update_phyclust_struct() to update pcs. */
+phyclust_struct* initialize_phyclust_struct(int code_type, int N_X_org, int L, int K){
+	int i;
+	phyclust_struct *pcs = NULL;
+
+	pcs = (phyclust_struct*) malloc(sizeof(phyclust_struct));
+	pcs->code_type = code_type;
+	pcs->ncode = NCODE[code_type];
+	pcs->n_param = K - 1 + K * L;
+	pcs->compress_method = 1;
+	pcs->N_X_org = N_X_org;
+	pcs->N_X_unique = 0;				/* Assigned by update_phyclust_struct(). */
+	pcs->N_X = 0;					/* Assigned by update_phyclust_struct(). */
+	pcs->N_seg_site = 0;				/* Assigned by update_phyclust_struct(). */
+	pcs->L = L;
+	pcs->K = K;
+	pcs->X_org = allocate_int_2D_AP(N_X_org);	/* Assigned by ins or R. */
+	pcs->X_unique = NULL;				/* Assigned by update_phyclust_struct(). */
+	pcs->X = NULL;					/* Assigned by update_phyclust_struct(). */
+	pcs->map_X_org_to_X_unique = NULL;		/* Assigned by update_phyclust_struct(). */
+	pcs->map_X_unique_to_X_org = NULL;		/* Assigned by update_phyclust_struct(). */
+	pcs->replication_X_unique = NULL;		/* Assigned by update_phyclust_struct(). */
+	pcs->map_X_org_to_X = NULL;			/* Assigned by update_phyclust_struct(). */
+	pcs->map_X_to_X_org = NULL;			/* Assigned by update_phyclust_struct(). */
+	pcs->replication_X = NULL;			/* Assigned by update_phyclust_struct(). */
+	pcs->seg_site_id = NULL;			/* Assigned by update_phyclust_struct(). */
+
+	pcs->Mu = allocate_int_2D_AP(K); 
+	for(i = 0; i < K; i++){
+		pcs->Mu[i] = allocate_int_1D(L);
+	}
+	pcs->Eta = allocate_double_1D(K); 
+	/* For report, so use original dimensions. */
+	pcs->Z_normalized = allocate_double_2D_AP(N_X_org);
+	for(i = 0; i < N_X_org; i++){
+		pcs->Z_normalized[i] = allocate_double_1D(K); 
+	}
+	
+	pcs->logL_observed = 0.0;
+	pcs->logL_entropy = 0.0;
+	pcs->bic = 0.0;
+	pcs->aic = 0.0;
+	pcs->icl = 0.0;
+	pcs->class_id = allocate_int_1D(N_X_org); 
+	pcs->n_class = allocate_int_1D(K); 
+
+	return(pcs);
+} /* End of initialize_phyclust_struct(). */
+
+void free_phyclust_struct(phyclust_struct *pcs){
+	free(pcs->X_org);
+	free(pcs->X_unique);
+	free(pcs->map_X_org_to_X_unique);
+	free(pcs->map_X_unique_to_X_org);
+	free(pcs->replication_X_unique);
+	if(pcs->compress_method == 0){
+		free(pcs->X);
+		free(pcs->map_X_org_to_X);
+		free(pcs->replication_X);
+	}
+	free(pcs->seg_site_id);
+	free_int_RT(pcs->K, pcs->Mu);
+	free(pcs->Eta);
+	free_double_RT(pcs->N_X_org, pcs->Z_normalized);
+	free(pcs->class_id);
+	free(pcs->n_class);
+	free(pcs);
+} /* End of free_phyclust_struct(). */
+
+
+/* After assigning the data X_org, this function will extract the information
+ * and update the pcs including: N_X_unique, N_X, X, map_X_to_X_org, replication_X, map_X_unique_to_X_org,
+ * seg_site_id, and N_seg_site.
+ * If compress_method = 0, then no compress_method for X. */
+void update_phyclust_struct(phyclust_struct *pcs, int compress_method){
+	int i, n_X_org, l, flag, N_X_org = pcs->N_X_org, N_X_unique, L = pcs->L;
+	int map_X_unique_to_X_org[N_X_org], replication_X_unique[N_X_org], seg_site_id[L], N_seg_site = 0;
+
+	pcs->compress_method = compress_method;
+	pcs->map_X_org_to_X_unique = allocate_int_1D(N_X_org);
+
+	/* Assign N_X_unique and map_X_unique_to_X_org. */
+	for(i = 0; i < N_X_org; i++){
+		replication_X_unique[i] = 0;
+	}
+	pcs->map_X_org_to_X_unique[0] = 0;
+	map_X_unique_to_X_org[0] = 0;
+	replication_X_unique[0] = 1;
+	N_X_unique = 1;
+	for(n_X_org = 1; n_X_org < N_X_org; n_X_org++){
+		flag = 1;
+		for(i = 0; i < N_X_unique; i++){
+			if(!(edist_D_HAMMING(L, pcs->X_org[n_X_org], pcs->X_org[map_X_unique_to_X_org[i]]) > 0)){
+				flag = 0;
+				break;
+			}
+		}
+		pcs->map_X_org_to_X_unique[n_X_org] = i;
+		if(flag){
+			map_X_unique_to_X_org[N_X_unique++] = n_X_org;
+		}
+		replication_X_unique[i]++;
+	}
+	/* Copy to pcs. */
+	pcs->X_unique = allocate_int_2D_AP(N_X_unique);
+	pcs->map_X_unique_to_X_org = allocate_int_1D(N_X_unique);
+	pcs->replication_X_unique = allocate_int_1D(N_X_unique);
+	for(i = 0; i < N_X_unique; i++){
+		pcs->X_unique[i] = pcs->X_org[map_X_unique_to_X_org[i]];
+		pcs->map_X_unique_to_X_org[i] = map_X_unique_to_X_org[i];
+		pcs->replication_X_unique[i] = replication_X_unique[i];
+	}
+	pcs->N_X_unique = N_X_unique;
+
+	/* Copy to pcs. */
+	if(compress_method == 1){
+		pcs->N_X = pcs->N_X_unique;
+		pcs->X = pcs->X_unique;
+		pcs->map_X_org_to_X = pcs->map_X_org_to_X_unique;
+		pcs->map_X_to_X_org = pcs->map_X_unique_to_X_org;
+		pcs->replication_X = pcs->replication_X_unique;
+	} else if(compress_method == 0){
+		pcs->N_X = N_X_org;
+		pcs->X = allocate_int_2D_AP(N_X_org);
+		pcs->map_X_org_to_X = allocate_int_1D(N_X_org);
+		pcs->map_X_to_X_org = pcs->map_X_org_to_X; 
+		pcs->replication_X = allocate_int_1D(N_X_org);
+		for(i = 0; i < N_X_org; i++){
+			pcs->X[i] = pcs->X_org[i];
+			pcs->map_X_org_to_X[i] = i;
+			pcs->replication_X[i] = 1;
+		}
+	} else{
+		fprintf(stderr, "PE: The compress method is not found.\n");
+		exit(1);
+	}
+
+
+	/* Assign seg_site_id, and N_seg_site. */
+	for(l = 0; l < L; l++){
+		flag = 0;
+		for(n_X_org = 1; n_X_org < pcs->N_X_org; n_X_org++){
+			if(pcs->X_org[n_X_org][l] != pcs->X_org[0][l]){
+				flag |= 1;
+				break;
+			}
+		}
+		if(flag){
+			seg_site_id[N_seg_site++] = l;
+		}
+	}
+	/* Copy to pcs. */
+	pcs->seg_site_id = allocate_int_1D(N_seg_site);
+	for(i = 0; i < N_seg_site; i++){
+		pcs->seg_site_id[i] = seg_site_id[i];
+	}
+	pcs->N_seg_site = N_seg_site;
+} /* End of update_phyclust_struct(). */
+
+
+
+
+/* ----- For summary. ----- */
+void assign_class(phyclust_struct *pcs){
+	int n_X_org, k, tmp_k;
+	double org_Z_normalized;
+
+	for(k = 0; k < pcs->K; k++){
+		pcs->n_class[k] = 0;
+	}
+	for(n_X_org = 0; n_X_org < pcs->N_X_org; n_X_org++){
+		tmp_k = 0;
+		org_Z_normalized = pcs->Z_normalized[n_X_org][0];
+		for(k = 1; k < pcs->K; k++){
+			if(org_Z_normalized < pcs->Z_normalized[n_X_org][k]){
+				org_Z_normalized = pcs->Z_normalized[n_X_org][k];
+				tmp_k = k;
+			}
+		}
+		pcs->class_id[n_X_org] = tmp_k;
+		pcs->n_class[tmp_k]++;
+	}
+} /* End of assign_class(). */
+
+void update_ic(phyclust_struct *pcs, Q_matrix_array *QA){
+	pcs->bic = -2 * pcs->logL_observed + (pcs->n_param + QA->total_n_param) * log(pcs->N_X_org);
+	pcs->aic = -2 * pcs->logL_observed + 2 * (pcs->n_param + QA->total_n_param);
+	pcs->icl = -2 * pcs->logL_entropy + (pcs->n_param + QA->total_n_param) * log(pcs->N_X_org);
+} /* End of update_ic(). */
+
+
+
+
+/* ----- For debug. ----- */
+void print_X(phyclust_struct *pcs){
+	int n_X, l;
+
+	printf("X:\n");
+	for(n_X = 0; n_X < pcs->N_X; n_X++){
+		printf("    ");
+		for(l = 0; l < pcs->L; l++){
+		#if PRINT_CODE_TYPE == 0
+			if(pcs->code_type == NUCLEOTIDE){
+				printf("%c ", NUCLEOTIDE_CODE[pcs->X[n_X][l]]);
+			} else if(pcs->code_type == SNP){
+				printf("%c ", SNP_CODE[pcs->X[n_X][l]]);
+			}
+		#else
+			if(pcs->code_type == NUCLEOTIDE){
+				printf("%c ", NUCLEOTIDE_ID[pcs->X[n_X][l]]);
+			} else if(pcs->code_type == SNP){
+				printf("%c ", SNP_ID[pcs->X[n_X][l]]);
+			}
+		#endif
+		}
+		printf("\n");
+	}
+} /* End of print_X(). */
+
+void print_Mu(phyclust_struct *pcs){
+	int k, l;
+
+	printf("Mu:\n");
+	for(k = 0; k < pcs->K; k++){
+		printf("    ");
+		for(l = 0; l < pcs->L; l++){
+		#if PRINT_CODE_TYPE == 0
+			if(pcs->code_type == NUCLEOTIDE){
+				printf("%c ", NUCLEOTIDE_CODE[pcs->Mu[k][l]]);
+			} else if(pcs->code_type == SNP){
+				printf("%c ", SNP_CODE[pcs->Mu[k][l]]);
+			}
+		#else
+			if(pcs->code_type == NUCLEOTIDE){
+				printf("%c ", NUCLEOTIDE_ID[pcs->Mu[k][l]]);
+			} else if(pcs->code_type == T_SNP){
+				printf("%c ", SNP_ID[pcs->Mu[k][l]]);
+			}
+		#endif
+		}
+		printf("\n");
+	}
+} /* End of print_Mu(). */
+
+void print_class_id(phyclust_struct *pcs){
+	int n_X_org;
+	printf("Class id:");
+	for(n_X_org = 0; n_X_org < pcs->N_X_org; n_X_org++){
+		printf(" %d", pcs->class_id[n_X_org]);
+	}
+	printf("\n");
+} /* End of print_class_id(). */
+
