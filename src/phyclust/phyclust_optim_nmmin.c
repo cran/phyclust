@@ -9,7 +9,7 @@
 
 nm_struct* initialize_nm_struct(int n){
 	int i;
-	nm_struct *nms = NULL;
+	nm_struct *nms;
 
 	nms = (nm_struct*) malloc(sizeof(nm_struct));
 	nms->n_param = n;
@@ -114,7 +114,7 @@ static double** matrix(int nrh, int nch){
     int i;
     double **m;
 
-    m = (double **) malloc((nrh + 1) * sizeof(double *));
+    m = (double**) malloc((nrh + 1) * sizeof(double*));
     if(m == NULL){
         printf("Memory allocation fails!\n");
         exit(1);

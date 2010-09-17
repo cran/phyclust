@@ -33,19 +33,19 @@ void print_pam(int N, int K, int *center_id, int *class_id){
 	printf("\n");
 } /* End of print_pam(). */
 
-void assign_class_by_pam(int N_X_unique, int K, double **EDM_LT_pam, int *center_id, int *class_id){
+void assign_class_by_pam(int N_X, int K, double **EDM_LT_pam, int *center_id, int *class_id){
 	int i;
 	double *dys, *radus, *damer, *avsyl, *ttsyl, *obj;
 	int *nsend, *nrepr, *nelem, /* *med, *ncluv, */ *nisol;
 
-	radus = allocate_double_1D(N_X_unique);
-	damer = allocate_double_1D(N_X_unique);
-	avsyl = allocate_double_1D(N_X_unique);
+	radus = allocate_double_1D(N_X);
+	damer = allocate_double_1D(N_X);
+	avsyl = allocate_double_1D(N_X);
 	ttsyl = allocate_double_1D(1);	/* set ttsyl = 0. */
 	obj = allocate_double_1D(2);	/* set obj = c(0, 0). */
-	nsend = allocate_int_1D(N_X_unique);
-	nrepr = allocate_int_1D(N_X_unique);
-	nelem = allocate_int_1D(N_X_unique);
+	nsend = allocate_int_1D(N_X);
+	nrepr = allocate_int_1D(N_X);
+	nelem = allocate_int_1D(N_X);
 	/* med = center_id; */		/* set med[...] = 0 for non initial, and store center id. */
 	/* ncluv = class_id; */		/* store class id. (1,...,kk) */
 	nisol = allocate_int_1D(1);	/* set nisol = 1 for swap, 0 o/w. */
@@ -58,7 +58,7 @@ void assign_class_by_pam(int N_X_unique, int K, double **EDM_LT_pam, int *center
 	 * ...			 due to the f2c code.
 	 */
 	dys = EDM_LT_pam[0] - 1;
-	for(i = 0; i < N_X_unique; i++){
+	for(i = 0; i < N_X; i++){
 		nsend[i] = nrepr[i] = nelem[i] = class_id[i] /* ncluv[i] */ = 0;
 		radus[i] = damer[i] = avsyl[i] = 0;
 	}
@@ -69,10 +69,10 @@ void assign_class_by_pam(int N_X_unique, int K, double **EDM_LT_pam, int *center
 	obj[0] = obj[1] = 0;
 	nisol[0] = 1;
 
-	phyclust_pam(N_X_unique, K, dys, nsend, nrepr, nelem, radus, damer, avsyl,
+	phyclust_pam(N_X, K, dys, nsend, nrepr, nelem, radus, damer, avsyl,
 			ttsyl, obj, center_id, class_id, /* med, ncluv, */ nisol);
 
-	for(i = 0; i < N_X_unique; i++){
+	for(i = 0; i < N_X; i++){
 		class_id[i]--;
 	}
 	for(i = 0; i < K; i++){

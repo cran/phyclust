@@ -20,15 +20,15 @@ em_control* initialize_em_control(){
 	EMC->short_iter = 100;
 	EMC->EM_iter = 1000;
 	EMC->short_eps = 1e-2;
-	EMC->EM_eps = 1e-8;
+	EMC->EM_eps = 1e-6;
 
-	EMC->cm_reltol = 1e-10;
+	EMC->cm_reltol = 1e-8;
 	EMC->cm_maxit = 5000;
 
-	EMC->nm_abstol_Mu_given_QA = 1e-10;	/* for update_flag = 0. */
-	EMC->nm_abstol_QA_given_Mu = 1e-10;	/* for update_flag = 1. */
-	EMC->nm_reltol_Mu_given_QA = 1e-10;
-	EMC->nm_reltol_QA_given_Mu = 1e-10;
+	EMC->nm_abstol_Mu_given_QA = 1e-8;	/* for update_flag = 0. */
+	EMC->nm_abstol_QA_given_Mu = 1e-8;	/* for update_flag = 1. */
+	EMC->nm_reltol_Mu_given_QA = 1e-8;
+	EMC->nm_reltol_QA_given_Mu = 1e-8;
 	EMC->nm_maxit_Mu_given_QA = 500;
 	EMC->nm_maxit_QA_given_Mu = 5000;
 	EMC->est_non_seg_site = 0;		/* 1 for original case, 0 for skip. */
@@ -44,7 +44,7 @@ em_control* initialize_em_control(){
 	EMC->em_method = EM;
 	EMC->boundary_method = ADJUST;
 
-	EMC->Eta_lower_bound = 1e-16;		/* The default value should be 1 / N_X_org. */
+	EMC->Eta_lower_bound = 1e-8;		/* The default value should be 1 / N_X_org. */
 	EMC->Eta_upper_bound = 1.0;		/* The default value should be 1 - 1 / N_X_org. */
 
 	EMC->converge_eps = 0.0;

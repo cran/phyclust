@@ -18,6 +18,7 @@ double** allocate_double_SQ(int n_X);			/* double square array. */
 double** allocate_double_UT(int n_X);			/* double upper triangular array, n/(n-1) for w/o diagonal. */
 double** allocate_double_RT(int nrow, int ncol);	/* double rectangle array. */
 int** allocate_int_RT(int nrow, int ncol);		/* int rectangle array. */
+char** allocate_char_RT(int nrow, int ncol);		/* char rectangle array. */
 void free_double_RT(int nrow, double **RT);		/* free double RT. */
 void free_int_RT(int nrow, int **RT);			/* free int RT. */
 void free_char_RT(int nrow, char **RT);			/* free char RT. */

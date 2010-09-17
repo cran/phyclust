@@ -7,16 +7,16 @@
     short.iter = 100,
     EM.iter = 1000,
     short.eps = 1e-2,
-    EM.eps = 1e-8,
+    EM.eps = 1e-6,
 
-    cm.reltol = 1e-10,
+    cm.reltol = 1e-8,
     cm.maxit = 5000,
 
-    nm.abstol.Mu.given.QA = 1e-10,
-    nm.reltol.Mu.given.QA = 1e-10,
+    nm.abstol.Mu.given.QA = 1e-8,
+    nm.reltol.Mu.given.QA = 1e-8,
     nm.maxit.Mu.given.QA = 500,
-    nm.abstol.QA.given.Mu = 1e-10,
-    nm.reltol.QA.given.Mu = 1e-10,
+    nm.abstol.QA.given.Mu = 1e-8,
+    nm.reltol.QA.given.Mu = 1e-8,
     nm.maxit.QA.given.Mu = 5000,
     est.non.seg.site = FALSE,
 

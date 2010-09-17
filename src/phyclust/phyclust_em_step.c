@@ -85,7 +85,44 @@ void e_step_with_stable_exp(int *K, double *a_Z_normalized, double *total_sum, d
 } /* End of e_step_with_stable_exp(); */
 
 
-void E_step_and_logL_observed(em_phyclust_struct *empcs, Q_matrix_array *QA){
+
+
+/* This is a original version of E-step, and has some numerical problems such as overflow or underflow. */
+void E_step_original(em_phyclust_struct *empcs, Q_matrix_array *QA){
+	int n_X, k, K = empcs->K;
+	double total_sum;
+
+	update_Z_modified(empcs, QA);	/* Update empcs->Z_modified (log and unnormalized). */
+	for(n_X = 0; n_X < empcs->N_X; n_X++){	/* Update Z_normalized. */
+		total_sum = 0.0;
+		for(k = 0; k < K; k++){
+			empcs->Z_normalized[n_X][k] = exp(empcs->Z_modified[n_X][k] + empcs->log_Eta[k]);
+			total_sum += empcs->Z_normalized[n_X][k];
+		}
+
+		for(k = 0; k < K; k++){
+			empcs->Z_normalized[n_X][k] = empcs->Z_normalized[n_X][k] / total_sum;
+		}
+	}
+} /* End of E_step_original(). */
+
+/* E-steps simple verion. */
+void E_step_simple(em_phyclust_struct *empcs, Q_matrix_array *QA){
+	int n_X, k, K = empcs->K, flag_out_range;
+	double total_sum, scale_exp;
+
+	update_Z_modified(empcs, QA);	/* Update empcs->Z_modified (log and unnormalized). */
+	for(n_X = 0; n_X < empcs->N_X; n_X++){	/* Update Z_normalized. */
+		for(k = 0; k < K; k++){
+			empcs->Z_normalized[n_X][k] = empcs->Z_modified[n_X][k] + empcs->log_Eta[k];
+		}
+
+		e_step_with_stable_exp(&K, empcs->Z_normalized[n_X], &total_sum, &scale_exp, &flag_out_range);
+	}
+} /* End of E_step_simple(). */
+
+/* E-steps with none labels. */
+void E_step_logL_observed(em_phyclust_struct *empcs, Q_matrix_array *QA){
 	int n_X, k, K = empcs->K, flag_out_range;
 	double total_sum, scale_exp;
 
@@ -108,40 +145,55 @@ void E_step_and_logL_observed(em_phyclust_struct *empcs, Q_matrix_array *QA){
 			empcs->logL_observed += scale_exp;
 		}
 	}
-} /* End of E_step_and_logL_observed(). */
+} /* End of E_step_logL_observed(). */
 
-void E_step_simple(em_phyclust_struct *empcs, Q_matrix_array *QA){
+/* E-steps with simple labels. */
+void E_step_logL_observed_label_semi(em_phyclust_struct *empcs, Q_matrix_array *QA){
 	int n_X, k, K = empcs->K, flag_out_range;
 	double total_sum, scale_exp;
 
 	update_Z_modified(empcs, QA);	/* Update empcs->Z_modified (log and unnormalized). */
-	for(n_X = 0; n_X < empcs->N_X; n_X++){	/* Update Z_normalized. */
+	empcs->logL_observed = 0.0;
+
+	/* For unlabeled part. */
+	for(n_X = 0; n_X < empcs->N_X_unlabeled; n_X++){	/* Update Z_normalized and logL_observed. */
 		for(k = 0; k < K; k++){
-			empcs->Z_normalized[n_X][k] = empcs->Z_modified[n_X][k] + empcs->log_Eta[k];
+			empcs->Z_normalized_unlabeled[n_X][k] = empcs->Z_modified_unlabeled[n_X][k] + empcs->log_Eta[k];
 		}
 
-		e_step_with_stable_exp(&K, empcs->Z_normalized[n_X], &total_sum, &scale_exp, &flag_out_range);
-	}
-} /* End of E_step_simple(). */
+		e_step_with_stable_exp(&K, empcs->Z_normalized_unlabeled[n_X], &total_sum, &scale_exp, &flag_out_range);
 
-/* This is a original version of E-step, and has some numerical problems such as overflow or underflow. */
-void E_step_original(em_phyclust_struct *empcs, Q_matrix_array *QA){
-	int n_X, k, K = empcs->K;
-	double total_sum;
-
-	update_Z_modified(empcs, QA);	/* Update empcs->Z_modified (log and unnormalized). */
-	for(n_X = 0; n_X < empcs->N_X; n_X++){	/* Update Z_normalized. */
-		total_sum = 0.0;
-		for(k = 0; k < K; k++){
-			empcs->Z_normalized[n_X][k] = exp(empcs->Z_modified[n_X][k] + empcs->log_Eta[k]);
-			total_sum += empcs->Z_normalized[n_X][k];
+		/* Update logL_observed. */
+		if(empcs->replication_X[n_X] == 1){
+			empcs->logL_observed += log(total_sum);
+		} else{
+			empcs->logL_observed += log(total_sum) * empcs->replication_X[n_X];
 		}
-
-		for(k = 0; k < K; k++){
-			empcs->Z_normalized[n_X][k] = empcs->Z_normalized[n_X][k] / total_sum;
+		if(flag_out_range){
+			empcs->logL_observed += scale_exp;
 		}
 	}
-} /* End of E_step_original(). */
+
+	/* For labeled part, semi_unique stores the k-th cluster which the sequence belongs to.
+	 * The logL is equal to the log complete-data likelihood. */
+	for(n_X = 0; n_X < empcs->N_X_labeled; n_X++){
+		k = empcs->label_semi[n_X];
+		total_sum = empcs->Z_modified_labeled[n_X][k] + empcs->log_Eta[k];
+
+		/* Update logL_observed. */
+		if(empcs->replication_X[n_X] == 1){
+			empcs->logL_observed += total_sum;
+		} else{
+			empcs->logL_observed += total_sum * empcs->replication_X[n_X];
+		}
+	}
+} /* End of E_step_logL_observed_label_semi(). */
+
+/* E-steps with general labels. */
+void E_step_logL_observed_label_general(em_phyclust_struct *empcs, Q_matrix_array *QA){
+} /* End of E_step_logL_observed_label_general(). */
+
+
 
 
 /* The original M-step:
@@ -449,7 +501,7 @@ void Em_step(em_phyclust_struct *org_empcs, Q_matrix_array *org_QA, em_control *
 	#endif
 
 	EMC->update_flag = (EMC->em_method == EM) ? 0 : 1;
-	EMFP->E_step_and_logL_observed(new_empcs, new_QA);
+	EMFP->E_step_logL_observed(new_empcs, new_QA);
 	#if (EMDEBUG & 1) == 1
 		double tmp_logL;
 		printf("iter: %d, update_flag: %d\n", EMC->converge_iter - 1, EMC->update_flag);
@@ -490,7 +542,7 @@ void Em_step(em_phyclust_struct *org_empcs, Q_matrix_array *org_QA, em_control *
 			printf("    conv.: R = %.6f, Q = %.6f, Obs = %.6f. [indep fcn]\n", tmp_R, tmp_Q, tmp_obs);
 		#endif
 
-		EMFP->E_step_and_logL_observed(new_empcs, new_QA);
+		EMFP->E_step_logL_observed(new_empcs, new_QA);
 
 		EMC->converge_eps = fabs(new_empcs->logL_observed / org_empcs->logL_observed - 1.0);
 		EMC->converge_iter++;
@@ -567,7 +619,7 @@ void Short_em_step(em_phyclust_struct *org_empcs, Q_matrix_array *org_QA, em_con
 	#endif
 
 	EMC->update_flag = (EMC->em_method == EM) ? 0 : 1;
-	EMFP->E_step_and_logL_observed(new_empcs, new_QA);
+	EMFP->E_step_logL_observed(new_empcs, new_QA);
 	logL_0 = new_empcs->logL_observed;
 	#if (EMDEBUG & 1) == 1
 		printf("iter: %d, update_flag: %d\n", EMC->converge_iter - 1, EMC->update_flag);
@@ -605,7 +657,7 @@ void Short_em_step(em_phyclust_struct *org_empcs, Q_matrix_array *org_QA, em_con
 			printf("    conv.: R = %.6f, Q = %.6f, Obs = %.6f. [indep fcn]\n", tmp_R, tmp_Q, tmp_obs);
 		#endif
 
-		EMFP->E_step_and_logL_observed(new_empcs, new_QA);
+		EMFP->E_step_logL_observed(new_empcs, new_QA);
 
 		EMC->converge_eps = (org_empcs->logL_observed - new_empcs->logL_observed) /
 			(logL_0 - new_empcs->logL_observed);

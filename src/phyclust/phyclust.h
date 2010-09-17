@@ -6,8 +6,9 @@
 /* Define constants. */
 #include "phyclust_constant.h"
 
-/* Define phyclus structures. */
+/* Define phyclust structures. */
 #include "phyclust_struct.h"
+#include "phyclust_label.h"
 #include "phyclust_tool.h"
 
 /* Define Q matrix and distance. */

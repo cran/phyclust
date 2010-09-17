@@ -30,14 +30,8 @@ Q_matrix_array* initialize_Q_matrix_array(int code_type, int K, int substitution
 	/* Allocate QA as a template. */
 	QA->Q[0] = (Q_matrix*) malloc(sizeof(Q_matrix));
 	QA->Q[0]->check_param = allocate_int_1D(1);
-	QA->Q[0]->Pt = allocate_double_2D_AP(QA->ncode);
-	for(i = 0; i < QA->ncode; i++){
-		QA->Q[0]->Pt[i] = allocate_double_1D(QA->ncode);
-	}
-	QA->Q[0]->log_Pt = allocate_double_2D_AP(QA->ncode);
-	for(i = 0; i < QA->ncode; i++){
-		QA->Q[0]->log_Pt[i] = allocate_double_1D(QA->ncode);
-	}
+	QA->Q[0]->Pt = allocate_double_SQ(QA->ncode);
+	QA->Q[0]->log_Pt = allocate_double_SQ(QA->ncode);
 	QA->Q[0]->H = allocate_double_1D(QA->ncode);
 	QA->Q[0]->pi = allocate_double_1D(QA->ncode);
 	QA->Q[0]->kappa = allocate_double_1D(1);
@@ -80,12 +74,8 @@ Q_matrix_array* initialize_Q_matrix_array(int code_type, int K, int substitution
 			QA->Copy_Q_matrix_array = &Copy_Q_matrix_array_EV;
 			for(k = 1; k < K; k++){
 				QA->Q[k] = repoint_Q_matrix(QA->Q[0]);
-				QA->Q[k]->Pt = allocate_double_2D_AP(*QA->Q[0]->ncode);
-				QA->Q[k]->log_Pt = allocate_double_2D_AP(*QA->Q[0]->ncode);
-				for(i = 0; i < QA->ncode; i++){
-					QA->Q[k]->Pt[i] = allocate_double_1D(QA->ncode);
-					QA->Q[k]->log_Pt[i] = allocate_double_1D(QA->ncode);
-				}
+				QA->Q[k]->Pt = allocate_double_SQ(*QA->Q[0]->ncode);
+				QA->Q[k]->log_Pt = allocate_double_SQ(*QA->Q[0]->ncode);
 				QA->Q[k]->H = allocate_double_1D(QA->ncode);
 				QA->Q[k]->Tt = allocate_double_1D(1);
 				QA->Q[k]->check_param = allocate_int_1D(1);
@@ -102,12 +92,8 @@ Q_matrix_array* initialize_Q_matrix_array(int code_type, int K, int substitution
 			QA->Copy_Q_matrix_array = &Copy_Q_matrix_array_VE;
 			for(k = 1; k < K; k++){
 				QA->Q[k] = repoint_Q_matrix(QA->Q[0]);
-				QA->Q[k]->Pt = allocate_double_2D_AP(*QA->Q[0]->ncode);
-				QA->Q[k]->log_Pt = allocate_double_2D_AP(*QA->Q[0]->ncode);
-				for(i = 0; i < QA->ncode; i++){
-					QA->Q[k]->Pt[i] = allocate_double_1D(QA->ncode);
-					QA->Q[k]->log_Pt[i] = allocate_double_1D(QA->ncode);
-				}
+				QA->Q[k]->Pt = allocate_double_SQ(*QA->Q[0]->ncode);
+				QA->Q[k]->log_Pt = allocate_double_SQ(*QA->Q[0]->ncode);
 				QA->Q[k]->H = allocate_double_1D(QA->ncode);
 				QA->Q[k]->pi = allocate_double_1D(QA->ncode);
 				QA->Q[k]->kappa = allocate_double_1D(1);
@@ -128,12 +114,8 @@ Q_matrix_array* initialize_Q_matrix_array(int code_type, int K, int substitution
 			QA->Copy_Q_matrix_array = &Copy_Q_matrix_array_VV;
 			for(k = 1; k < K; k++){
 				QA->Q[k] = repoint_Q_matrix(QA->Q[0]);
-				QA->Q[k]->Pt = allocate_double_2D_AP(*QA->Q[0]->ncode);
-				QA->Q[k]->log_Pt = allocate_double_2D_AP(*QA->Q[0]->ncode);
-				for(i = 0; i < QA->ncode; i++){
-					QA->Q[k]->Pt[i] = allocate_double_1D(QA->ncode);
-					QA->Q[k]->log_Pt[i] = allocate_double_1D(QA->ncode);
-				}
+				QA->Q[k]->Pt = allocate_double_SQ(*QA->Q[0]->ncode);
+				QA->Q[k]->log_Pt = allocate_double_SQ(*QA->Q[0]->ncode);
 				QA->Q[k]->H = allocate_double_1D(QA->ncode);
 				QA->Q[k]->pi = allocate_double_1D(QA->ncode);
 				QA->Q[k]->kappa = allocate_double_1D(1);

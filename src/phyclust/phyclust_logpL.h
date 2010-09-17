@@ -1,7 +1,7 @@
 /* This file contains declarations for em steps. */
 
-#ifndef __PHYCLSUT_LOGPL_
-#define __PHYCLSUT_LOGPL_
+#ifndef __PHYCLUST_LOGPL_
+#define __PHYCLUST_LOGPL_
 
 #include "phyclust_em.h"
 #include "phyclust_struct.h"
@@ -43,4 +43,4 @@ double Compute_R_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix
 /* ----- For debug. ----- */
 void print_vect(int m, double *vect);
 
-#endif	/* End of __PHYCLSUT_LOGPL_. */
+#endif	/* End of __PHYCLUST_LOGPL_. */

@@ -154,14 +154,14 @@ void assign_class_by_k_medoids(int N_X, int K, double **EDM, int *center_id, int
 
 
 
-void classify_unique_by_EDM(int N_X_org, int K, double **EDM, int N_X_unique, int *map_X_unique_to_X_org,
+void classify_unique_by_EDM(int N_X_org, int K, double **EDM, int N_X, int *map_X_to_X_org,
 		int *center_id, int *class_id, int *new_center_id){
-	int i, n_X_org, n_X_unique, k, tmp_X_org[N_X_unique];
+	int i, n_X_org, n_X, k, tmp_X_org[N_X];
 	double dist, min_cost, class_cost[N_X_org];
 
 	/* Compute pairwised cost within cluster. */
-	for(n_X_unique = 0; n_X_unique < N_X_unique; n_X_unique++){
-		tmp_X_org[n_X_unique] = map_X_unique_to_X_org[n_X_unique];
+	for(n_X = 0; n_X < N_X; n_X++){
+		tmp_X_org[n_X] = map_X_to_X_org[n_X];
 	}
 	for(n_X_org = 0; n_X_org < N_X_org; n_X_org++){
 		class_cost[n_X_org] = 0.0;
@@ -180,32 +180,32 @@ void classify_unique_by_EDM(int N_X_org, int K, double **EDM, int N_X_unique, in
 	for(k = 0; k < K; k++){
 		new_center_id[k] = center_id[k];
 		min_cost = Inf;
-		for(n_X_unique = 0; n_X_unique < N_X_unique; n_X_unique++){
-			if(class_id[tmp_X_org[n_X_unique]] == center_id[k]){
-				if(class_cost[n_X_unique] < min_cost){
-					min_cost = class_cost[n_X_unique];
-					new_center_id[k] = n_X_unique;
+		for(n_X = 0; n_X < N_X; n_X++){
+			if(class_id[tmp_X_org[n_X]] == center_id[k]){
+				if(class_cost[n_X] < min_cost){
+					min_cost = class_cost[n_X];
+					new_center_id[k] = n_X;
 				}
 			}
 		}
 	}
 } /* End of classify_unique_by_EDM(). */
 
-void assign_class_unique_by_k_medoids(int N_X_org, int K, double **EDM, int N_X_unique, int *map_X_unique_to_X_org,
+void assign_class_unique_by_k_medoids(int N_X_org, int K, double **EDM, int N_X, int *map_X_to_X_org,
 		int *center_id, int *class_id){
 	int max_kmed_iter = 1000;
 	int i, n_X_org, k;
 	int new_center_id[K], new_class_id[N_X_org];
 	double total_cost = 0.0, new_total_cost = 0.0;
 
-	srswor(N_X_unique, K, center_id);
+	srswor(N_X, K, center_id);
 	for(k = 0; k < K; k++){
-		center_id[k] = map_X_unique_to_X_org[center_id[k]];
+		center_id[k] = map_X_to_X_org[center_id[k]];
 	}
 	assign_class_id_compute_total_cost(N_X_org, K, EDM, center_id, class_id, &total_cost);
 
 	for(i = 0; i < max_kmed_iter; i++){
-		classify_unique_by_EDM(N_X_org, K, EDM, N_X_unique, map_X_unique_to_X_org, center_id, class_id,
+		classify_unique_by_EDM(N_X_org, K, EDM, N_X, map_X_to_X_org, center_id, class_id,
 				new_center_id);
 		#if INITDEBUG > 0
 			printf("iter = %d\n", i);

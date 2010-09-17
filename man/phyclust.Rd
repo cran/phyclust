@@ -8,13 +8,14 @@
   evolution processes based on Continuous Time Markov Chain theory.
 }
 \usage{
-  phyclust(X, K, EMC = .EMC, manual.id = NULL, byrow = TRUE)
+phyclust(X, K, EMC = .EMC, manual.id = NULL, label = NULL, byrow = TRUE)
 }
 \arguments{
   \item{X}{nid/sid matrix with \eqn{N}{N} rows/sequences and \eqn{L}{L} columns/sites.}
   \item{K}{number of clusters.}
   \item{EMC}{EM control.}
   \item{manual.id}{manually input class ids.}
+  \item{label}{label of sequences for semi-supervised clustering}
   \item{byrow}{advanced option for \code{X}, default = TRUE.}
 }
 \details{
@@ -25,6 +26,12 @@
 
   \code{manual.id} manually input class ids as an initialization only for
   the initialization method, 'manualMu'.
+
+  \code{label} indicates the known clusters for labeled sequences which is a
+  vector with length \code{N} and has values from \code{0} to \code{K}.
+  \code{0} indicates clusters are unknown. \code{label = NULL} is for
+  unsupervised clustering. Only un- and semi-supervised clustering are
+  implemented.
 
   \code{byrow} used in bootstraps to avoid transposing matrix 'X'. If
   FALSE, then the 'X' should be have the dimension \eqn{L\times K}{L*K}.
@@ -73,6 +80,7 @@
   \item{'code.type'}{code type.}
   \item{'em.method'}{EM algorithm.}
   \item{'boundary.method'}{boundary method.}
+  \item{'label.method'}{labele method.}
 }
 \section{ToDo(s)}{
   \itemize{
@@ -103,6 +111,11 @@ EMC.2$substitution.model <- "HKY85"
 # the same as EMC.2 <- .EMControl(substitution.model = "HKY85")
 
 (ret.2 <- phyclust(X, 3, EMC = EMC.2))
+
+# for semi-supervised clustering
+semi.label <- rep(0, nrow(X))
+semi.label[1:3] <- 1
+(ret.3 <- phyclust(X, 3, EMC = EMC.2, label = semi.label))
 }
 }
 \keyword{programming}

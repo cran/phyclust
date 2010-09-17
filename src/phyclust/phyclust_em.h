@@ -2,8 +2,8 @@
  * em function points. */
 
 
-#ifndef __PHYCLSUT_EM_
-#define __PHYCLSUT_EM_
+#ifndef __PHYCLUST_EM_
+#define __PHYCLUST_EM_
 
 #include "phyclust_struct.h"
 #include "phyclust_qmatrix_array.h"
@@ -80,17 +80,12 @@ struct _em_phyclust_struct{
 	int		missing_flag;		/* = 0 or 1 for data without missing or with missing. */
 	/* Constant points to phylcust_struct *pcs. */
 	int		N_X_org;		/* Number of original sequences. */
-	int		N_X_unique;		/* Number of unique sequnces, used for initialization only*/
 	int		N_X;			/* Number of sequences. */
 	int		N_seg_site;		/* Total segregating sites. */
 	int		L;			/* Number of loci. */
 	int		K;			/* Number of clusters. */
 	int		**X_org;		/* Original data pointer, dim = N_X_org * L. */
-	int		**X_unique;		/* Unique data pointer, dim = N_X_unique * L. */
 	int		**X;			/* Data pointer, dim = N_X * L if compress = 1, dim = N_X_org * L otherwise. */
-	int		*map_X_org_to_X_unique;	/* Map indexes from X_org to X_unique, dim = N_X_org, used for initialization only. */
-	int		*map_X_unique_to_X_org;	/* Map indexes from X_unique to X_org, dim = N_X_unique, used for initialization only. */
-	int		*replication_X_unique;	/* Count replications of each unique sequence, dim = N_X_unique. */
 	int		*map_X_org_to_X;	/* Map indexes from X_org to X, dim = N_X_org. */
 	int		*map_X_to_X_org;	/* Map indexes from X to X_org, dim = N_X. */
 	int		*replication_X;		/* Count replications of each unique sequence, dim = N_X. */
@@ -98,13 +93,12 @@ struct _em_phyclust_struct{
 	int		*seg_site_id;		/* Segregating site id, dim = N_seg_site. */
 	int		*class_id;		/* For manually initialization, dim = N_X_org. */
 
-/* Dynamical variables, used in copy functions only, owned memory and need to be freeed. */
+/* Dynamical variables, used in copy functions only, owned memory and need to be freed. */
 	/* For EM. */
 	int		*n_class;		/* Number of sequences for each class, dim = K. */
 	int		**Mu;			/* Centers, dim = K * L. */
 	double		**Z_modified;		/* unnormalized log Z, dim = N_X * K. */
 	double		**Z_normalized;		/* Normalized Z, dim = N_X * K. */
-	double		*Z_total;		/* Total posterior given k, dim = K. */
 	double		*Eta;			/* Proportion, dim = K. */
 	double		*log_Eta;		/* Log of proportion, dim = K. */
 	double		logL_observed;		/* Observed logL. */
@@ -112,16 +106,36 @@ struct _em_phyclust_struct{
 	/* Computing storage. */
 	int		****count_Mu_X;		/* Used in update_Z_modified(), logL_observed(), initialize_count_Mu_X_and_missing(). */
 	int		***count_Mu_X_missing;	/* Used in update_Z_modified(), logL_observed(), initialize_count_Mu_X_and_missing(). */
+
+	/* For labels, only owned pointers memory and need to be freed.
+	 * This can be an independent object, em_phyclust_label. */
+	int		K_labeled;			/* Total of clusters with labeled sequences. */
+	int		N_X_labeled;			/* Total of unique labeled sequences. */
+	int		N_X_unlabeled;			/* Total of unique unlabeled sequences. */
+	int		**X_labeled;			/* (Pointer) Point to empcs->X, length = N_X_labeled. */
+	int		**X_unlabeled;			/* (Pointer) Point to empcs->X, length = N_X_unlabeled. */
+	int		*label_semi;			/* (Pointer) Point to pcl->label->smple, length = N_X. */
+	int		*label_index;			/* (Pointer) Point to pcl->label->index, length = N_X_labeled. */
+	double		**Z_modified_labeled;		/* (Pointer) Point to empcs->Z_modified, dim = N_X_labeled. */
+	double		**Z_modified_unlabeled;		/* (Pointer) Point to empcs->Z_modified, dim = N_X_unlabeled. */
+	double		**Z_normalized_labeled;		/* (Pointer) Point to empcs->Z_normalized, dim = N_X_labeled. */
+	double		**Z_normalized_unlabeled;	/* (Pointer) Point to empcs->Z_normalized, dim = N_X_unlabeled. */
 };
 
 em_phyclust_struct* initialize_em_phyclust_struct(phyclust_struct *pcs);
 void free_em_phyclust_struct(em_phyclust_struct *empcs);
 em_phyclust_struct* duplicate_em_phyclust_struct(em_phyclust_struct *org_empcs);
 
+void initialize_em_phyclust_label(em_phyclust_struct *empcs, phyclust_struct *pcs);
+void free_em_phyclust_label(em_phyclust_struct *empcs);
+void duplicate_em_phyclust_label(em_phyclust_struct *org_empcs, em_phyclust_struct *new_empcs);
+
 /* E_step's. */
 void e_step_with_stable_exp(int *K, double *a_Z_normalized, double *total_sum, double *scale_exp, int *flag_out_range);
-void E_step_and_logL_observed(em_phyclust_struct *empcs, Q_matrix_array *QA);
 void E_step_simple(em_phyclust_struct *empcs, Q_matrix_array *QA);
+void E_step_logL_observed(em_phyclust_struct *empcs, Q_matrix_array *QA);
+void E_step_logL_observed_label_semi(em_phyclust_struct *empcs, Q_matrix_array *QA);
+void E_step_logL_observed_label_general(em_phyclust_struct *empcs, Q_matrix_array *QA);
 
 /* m_step's. */
 int M_step_simple(em_phyclust_struct *empcs, Q_matrix_array *new_QA, Q_matrix_array *QA_H, em_control *EMC, em_fp *EMFP,
@@ -166,7 +180,7 @@ struct _em_fp{
 			Q_matrix_array*, em_control*);						/* Check convergence. */
 	void	(*Em_step)(em_phyclust_struct*, Q_matrix_array*, em_control*, em_fp*);		/* Em_step. */
 	void	(*Short_em_step)(em_phyclust_struct*, Q_matrix_array*, em_control*, em_fp*);	/* Short_em_step. */
-	void	(*E_step_and_logL_observed)(em_phyclust_struct*, Q_matrix_array*);		/* LogL by E_step. */
+	void	(*E_step_logL_observed)(em_phyclust_struct*, Q_matrix_array*);		/* LogL by E_step. */
 	int	(*Update_Eta_given_Z)(em_phyclust_struct*, em_control*);			/* Update Eta given Z. */
 	/* In "phyclust_em_tool.h". */
 	double	(*LogL_observed)(em_phyclust_struct*, Q_matrix_array*);				/* Observed logL. */
@@ -184,4 +198,4 @@ struct _em_fp{
 em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs);
 void free_em_fp(em_fp *EMFP);
 
-#endif	/* End of __PHYCLSUT_EM_. */
+#endif	/* End of __PHYCLUST_EM_. */

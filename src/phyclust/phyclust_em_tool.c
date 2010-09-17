@@ -9,6 +9,34 @@
 
 
 /* ----- Independent summary tool. ----- */
+/* This is a original version of LogL_observed, and has some numerical problems such as overflow or underflow. */
+double LogL_observed_original(em_phyclust_struct *empcs, Q_matrix_array *QA){
+	int s_from, s_to, n_X, k;
+	double logL_observed, total_sum, a_Z_modified;
+
+	logL_observed = 0.0;
+	for(n_X = 0; n_X < empcs->N_X; n_X++){
+		total_sum = 0.0;
+		for(k = 0; k < empcs->K; k++){
+			a_Z_modified = empcs->log_Eta[k];
+			for(s_from = 0; s_from < empcs->ncode; s_from++){
+				for(s_to = 0; s_to < empcs->ncode; s_to++){
+					a_Z_modified += QA->Q[k]->log_Pt[s_from][s_to] *
+						empcs->count_Mu_X[n_X][k][s_from][s_to];
+				}
+			}
+			total_sum += exp(a_Z_modified);
+		}
+		if(empcs->replication_X[n_X] == 1){
+			logL_observed += log(total_sum);
+		} else{
+			logL_observed += log(total_sum) * empcs->replication_X[n_X];
+		}
+	}
+	
+	return(logL_observed);
+} /* End of LogL_observed_original(). */
+
 double LogL_observed(em_phyclust_struct *empcs, Q_matrix_array *QA){
 	int s_from, s_to, n_X, k;
 	int K = empcs->K, flag_out_range;
@@ -42,36 +70,68 @@ double LogL_observed(em_phyclust_struct *empcs, Q_matrix_array *QA){
 	return(logL_observed);
 } /* End of LogL_observed(). */
 
-/* This is a original version of LogL_observed, and has some numerical problems such as overflow or underflow. */
-double LogL_observed_original(em_phyclust_struct *empcs, Q_matrix_array *QA){
+double LogL_observed_label_semi(em_phyclust_struct *empcs, Q_matrix_array *QA){
 	int s_from, s_to, n_X, k;
-	double logL_observed, total_sum, a_Z_modified;
+	int K = empcs->K, flag_out_range;
+	double logL_observed, a_Z_normalized[empcs->K], total_sum, scale_exp;
 
 	logL_observed = 0.0;
-	for(n_X = 0; n_X < empcs->N_X; n_X++){
-		total_sum = 0.0;
-		for(k = 0; k < empcs->K; k++){
-			a_Z_modified = empcs->log_Eta[k];
+	for(n_X = 0; n_X < empcs->N_X_unlabeled; n_X++){
+		for(k = 0; k < K; k++){
+			a_Z_normalized[k] = empcs->log_Eta[k];
 			for(s_from = 0; s_from < empcs->ncode; s_from++){
 				for(s_to = 0; s_to < empcs->ncode; s_to++){
-					a_Z_modified += QA->Q[k]->log_Pt[s_from][s_to] *
+					a_Z_normalized[k] += QA->Q[k]->log_Pt[s_from][s_to] *
 						empcs->count_Mu_X[n_X][k][s_from][s_to];
 				}
 			}
-			total_sum += exp(a_Z_modified);
 		}
+
+		e_step_with_stable_exp(&K, a_Z_normalized, &total_sum, &scale_exp, &flag_out_range);
+
+		/* Update logL_observed. */
 		if(empcs->replication_X[n_X] == 1){
 			logL_observed += log(total_sum);
 		} else{
 			logL_observed += log(total_sum) * empcs->replication_X[n_X];
 		}
+		if(flag_out_range){
+			logL_observed += scale_exp;
+		}
+	}
+
+	/* For labeled part, semi_unique stores the k-th cluster which the sequence belongs to.
+	 * The logL is equal to the log complete-data likelihood. */
+	for(n_X = 0; n_X < empcs->N_X_labeled; n_X++){
+		k = empcs->label_semi[n_X];
+		total_sum = empcs->log_Eta[k];
+		for(s_from = 0; s_from < empcs->ncode; s_from++){
+			for(s_to = 0; s_to < empcs->ncode; s_to++){
+				total_sum += QA->Q[k]->log_Pt[s_from][s_to] *
+					empcs->count_Mu_X[n_X][k][s_from][s_to];
+			}
+		}
+
+		/* Update logL_observed. */
+		if(empcs->replication_X[n_X] == 1){
+			logL_observed += total_sum;
+		} else{
+			logL_observed += total_sum * empcs->replication_X[n_X];
+		}
 	}
 	
 	return(logL_observed);
-} /* End of LogL_observed_original(). */
+} /* End of LogL_observed_label_semi(). */
+
+double LogL_observed_label_general(em_phyclust_struct *empcs, Q_matrix_array *QA){
+	/* Need to be implemented with solving a system of linear equations. */
+	return(0.0);
+} /* End of LogL_observed_label_general(). */
 
 
-/* log complete-data likelihood. */
+
+
+/* log complete-data likelihood, for debuging only. */
 double LogL_complete(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H){		/* QA_H == QA */
 	int s_from, s_to, n_X, k;
 	double logL_complete, total_sum, a_Z_modified;
@@ -131,7 +191,9 @@ double LogL_complete_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_ma
 } /* End of LogL_complete_missing(). */
 
 
-/* log complete-data profile likelihood. */
+
+
+/* log complete-data profile likelihood, used in M-steps. */
 double LogL_profile(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H){		/* QA_H == QA */
 	int s_from, s_to, n_X, k;
 	double logL_complete, total_sum, a_Z_modified;
@@ -188,7 +250,7 @@ double LogL_profile_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_mat
 	}
 
 	return(logL_complete);
-} /* End of LogL_profile(). */
+} /* End of LogL_profile_missing(). */
 
 
 
@@ -261,14 +323,32 @@ void copy_EMC(em_control *EMC_from, em_control *EMC_to){
 	EMC_to->update_flag = EMC_from->update_flag;
 } /* End of copy_EMC(). */
 
+void reassign_label_pointer(em_phyclust_struct *empcs){
+	int n_X, n_X_labeled = 0, n_X_unlabeled = 0, N_X_labeled = empcs->N_X_labeled;
+
+	for(n_X = 0; n_X < empcs->N_X; n_X++){
+		if(n_X_labeled >= N_X_labeled || empcs->label_index[n_X_labeled] != n_X){
+			empcs->X_unlabeled[n_X_unlabeled] = empcs->X[n_X];
+			empcs->Z_modified_unlabeled[n_X_unlabeled] = empcs->Z_modified[n_X];
+			empcs->Z_normalized_unlabeled[n_X_unlabeled] = empcs->Z_normalized[n_X];
+			n_X_unlabeled++;
+		} else{
+			empcs->X_labeled[n_X_labeled] = empcs->X[n_X];
+			empcs->Z_modified_labeled[n_X_labeled] = empcs->Z_modified[n_X];
+			empcs->Z_normalized_labeled[n_X_labeled] = empcs->Z_normalized[n_X];
+			n_X_labeled++;
+		}
+	}
+} /* End of reassign_label_pointer(). */
+
 void copy_empcs(em_phyclust_struct *empcs_from, em_phyclust_struct *empcs_to){
 	int N_X = empcs_from->N_X, L = empcs_from->L, K = empcs_from->K;
 
+	/* For Em. */
 	copy_int_1D(K, empcs_from->n_class, empcs_to->n_class);
 	copy_int_RT(K, L, empcs_from->Mu, empcs_to->Mu);
 	copy_double_RT(N_X, K, empcs_from->Z_modified, empcs_to->Z_modified);
 	copy_double_RT(N_X, K, empcs_from->Z_normalized, empcs_to->Z_normalized);
-	copy_double_1D(K, empcs_from->Z_total, empcs_to->Z_total);
 	copy_double_1D(K, empcs_from->Eta, empcs_to->Eta);
 	copy_double_1D(K, empcs_from->log_Eta, empcs_to->log_Eta);
 	empcs_to->logL_observed = empcs_from->logL_observed;
@@ -279,9 +359,6 @@ void copy_empcs(em_phyclust_struct *empcs_from, em_phyclust_struct *empcs_to){
 				empcs_to->count_Mu_X_missing);
 	}
 } /* End of copy_empcs(). */
-
-
-
 
 void Copy_empcs_to_pcs(em_phyclust_struct *empcs, phyclust_struct *pcs){
 	int n_X_org, n_X, k, L = empcs->L, K = empcs->K;
@@ -304,6 +381,7 @@ void Copy_empcs_to_pcs(em_phyclust_struct *empcs, phyclust_struct *pcs){
 	pcs->logL_observed = empcs->logL_observed;
 } /* End of Copy_empcs_to_pcs(). */
 
+/* For M-step lonely, or semi-supervised. */
 void Copy_pcs_to_empcs(phyclust_struct *pcs, em_phyclust_struct *empcs){
 	int n_X_org, n_X, k, K = empcs->K;
 
@@ -314,6 +392,29 @@ void Copy_pcs_to_empcs(phyclust_struct *pcs, em_phyclust_struct *empcs){
 		}
 	}
 } /* End of Copy_pcs_to_empcs(). */
+
+void Copy_pcs_to_empcs_label(phyclust_struct *pcs, em_phyclust_struct *empcs){
+	int n_X, n_X_org, n_X_labeled = 0, k, K = empcs->K, N_X_labeled = empcs->N_X_labeled;
+
+	for(n_X = 0; n_X < empcs->N_X; n_X++){
+		if(n_X_labeled >= N_X_labeled && empcs->label_index[n_X_labeled] != n_X){
+			n_X_org = empcs->map_X_to_X_org[n_X];
+			for(k = 0; k < K; k++){
+				empcs->Z_normalized[n_X][k] = pcs->Z_normalized[n_X_org][k];
+			}
+		} else{
+/* Copy pre-assigned information (supervised) from pcl to empcl.
+ * This part should be done by initialize_em_phyclust_label() called by
+ * initialize_em_phyclust_struct() when emcps is created.
+ * So, there is no need to do again, and copy unlabeled information is sufficient.
+			for(k = 0; k < K; k++){
+				empcs->Z_normalized_labeled[n_X_labeled][k] = pcs->label->prob_unique[n_X_labeled][k];
+			}
+ * */
+			n_X_labeled++;
+		}
+	}
+} /* End of Copy_pcs_to_empcs_label(). */
 
 
 
@@ -381,6 +482,7 @@ void print_result(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC){
 		       	INIT_PROCEDURE[EMC->init_procedure], INIT_METHOD[EMC->init_method]);
 	printf("model substitution: %s, distance: %s.\n",
 		       	SUBSTITUTION_MODEL[EMC->substitution_model], EDISTANCE_MODEL[EMC->edist_model]);
+        printf("label method: %s.\n", LABEL_METHOD[pcs->label->label_method]);
 	if(EMC->converge_flag < 3){
 		printf("iter: %d %d %d, convergence: %d, check_param: %d, eps: %.4e.\n",
 			EMC->converge_iter, EMC->converge_inner_iter, EMC->converge_cm_iter, EMC->converge_flag,
@@ -391,8 +493,8 @@ void print_result(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC){
 			QA->check_param);
 		printf("eps: %.4e, error: %.4e.\n", EMC->converge_eps, EMC->converge_error);
 	}
-	printf("N_X_org: %d, N_X_unique: %d, N_X: %d, L: %d, K: %d, p: %d, N_seg_site: %d.\n",
-		       	pcs->N_X_org, pcs->N_X_unique, pcs->N_X, pcs->L, pcs->K, pcs->n_param + QA->total_n_param,
+	printf("N_X_org: %d, N_X: %d, L: %d, K: %d, p: %d, N_seg_site: %d.\n",
+		       	pcs->N_X_org, pcs->N_X, pcs->L, pcs->K, pcs->n_param + QA->total_n_param,
 			pcs->N_seg_site);
 	if(is_finite(pcs->logL_observed)){
 		printf("logL_obs: %.8f, BIC: %.8f, AIC: %.8f, ICL: %.8f.\n",

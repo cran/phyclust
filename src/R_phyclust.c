@@ -1,9 +1,8 @@
 /* This file contains a function R_phyclust() called by R wraps phyclust() in
-   "R/f_phyclust.r", and this function calls the relative functions in
-   "src/phyclust/" and "src/".
-
-   Writen: Wei-Chen Chen on 2009/08/20.
-*/
+ * "R/f_phyclust.r", and this function calls the relative functions in
+ * "src/phyclust/" and "src/".
+ *
+ * Writen: Wei-Chen Chen on 2009/08/20. */
 
 #include "R_phyclust.h"
 
@@ -62,15 +61,15 @@ EMPTR allocate_emptr(void){
 
 SEXP initialize_emptr(EMPTR emptr, phyclust_struct *pcs){
 	SEXP emobj, emobj_names, QA_names, converge_names;
-	SEXP N_X_org, N_X_unique, L, K, Eta, Z_normalized, Mu, QA, logL, p, bic, aic, icl, N_seg_site,
-	     class_id, n_class, converge;
+	SEXP N_X_org, N_X, L, K, Eta, Z_normalized, Mu, QA, logL, p, bic, aic, icl, N_seg_site,
+	     class_id, n_class, converge, label_method;
 	SEXP pi, kappa, Tt;
 	SEXP converge_eps, converge_error, converge_flag, converge_iter, converge_inner_iter, converge_cm_iter, check_param;
 	char *names_emobj[] = {"N.X.org", "N.X.unique", "L", "K", "Eta", "Z.normalized", "Mu", "QA", "logL", "p",
-				"bic", "aic", "icl", "N.seg.site", "class.id", "n.class", "conv"};
+				"bic", "aic", "icl", "N.seg.site", "class.id", "n.class", "conv", "label.method"};
 	char *names_QA[] = {"pi", "kappa", "Tt"};
 	char *names_converge[] = {"eps", "error", "flag", "iter", "inner.iter", "cm.iter", "check.param"};
-	int emobj_length = 17, QA_length = 3, converge_length = 7;
+	int emobj_length = 18, QA_length = 3, converge_length = 7;
 	int i, j, *tmp_ptr_int;
 	double *tmp_ptr_double;
 
@@ -81,7 +80,7 @@ SEXP initialize_emptr(EMPTR emptr, phyclust_struct *pcs){
   	PROTECT(converge_names = allocVector(STRSXP, converge_length));
 	
   	PROTECT(N_X_org = allocVector(INTSXP, 1));
-  	PROTECT(N_X_unique = allocVector(INTSXP, 1));
+  	PROTECT(N_X = allocVector(INTSXP, 1));
   	PROTECT(L = allocVector(INTSXP, 1));
   	PROTECT(K = allocVector(INTSXP, 1));
   	PROTECT(Eta = allocVector(REALSXP, pcs->K));
@@ -107,11 +106,12 @@ SEXP initialize_emptr(EMPTR emptr, phyclust_struct *pcs){
 		PROTECT(converge_inner_iter = allocVector(INTSXP, 1));
 		PROTECT(converge_cm_iter = allocVector(INTSXP, 1));
 		PROTECT(check_param = allocVector(INTSXP, 1));
+	PROTECT(label_method = allocVector(INTSXP, 1));
 
 	/* Set the elments and names. */
 	i = 0;
 	SET_VECTOR_ELT(emobj, i++, N_X_org);
-	SET_VECTOR_ELT(emobj, i++, N_X_unique);
+	SET_VECTOR_ELT(emobj, i++, N_X);
 	SET_VECTOR_ELT(emobj, i++, L);
 	SET_VECTOR_ELT(emobj, i++, K);
 	SET_VECTOR_ELT(emobj, i++, Eta);
@@ -127,6 +127,7 @@ SEXP initialize_emptr(EMPTR emptr, phyclust_struct *pcs){
 	SET_VECTOR_ELT(emobj, i++, class_id);
 	SET_VECTOR_ELT(emobj, i++, n_class);
 	SET_VECTOR_ELT(emobj, i++, converge);
+	SET_VECTOR_ELT(emobj, i++, label_method);
 
 	i = 0;
 	SET_VECTOR_ELT(QA, i++, pi);
@@ -181,7 +182,7 @@ SEXP initialize_emptr(EMPTR emptr, phyclust_struct *pcs){
 	pcs->n_class = INTEGER(n_class);
 
 	emptr->C_N_X_org = INTEGER(N_X_org);
-	emptr->C_N_X_unique = INTEGER(N_X_unique);
+	emptr->C_N_X = INTEGER(N_X);
 	emptr->C_L = INTEGER(L);
 	emptr->C_K = INTEGER(K);
 	emptr->C_logL = REAL(logL);
@@ -200,6 +201,7 @@ SEXP initialize_emptr(EMPTR emptr, phyclust_struct *pcs){
 	emptr->C_converge_inner_iter = INTEGER(converge_inner_iter);
 	emptr->C_converge_cm_iter = INTEGER(converge_cm_iter);
 	emptr->C_check_param = INTEGER(check_param);
+	emptr->C_label_method = INTEGER(label_method);
 
 	emptr->C_protect_length = 4 + emobj_length + QA_length + converge_length;
 
@@ -209,7 +211,7 @@ SEXP initialize_emptr(EMPTR emptr, phyclust_struct *pcs){
 void copy_all_to_emptr(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, EMPTR emptr){
 	int i, k, i2;
 	*emptr->C_N_X_org = pcs->N_X_org;
-	*emptr->C_N_X_unique = pcs->N_X_unique;
+	*emptr->C_N_X = pcs->N_X;
 	*emptr->C_L = pcs->L;
 	*emptr->C_K = pcs->K;
 	*emptr->C_logL = pcs->logL_observed;
@@ -235,25 +237,26 @@ void copy_all_to_emptr(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC
 	*emptr->C_converge_inner_iter = EMC->converge_inner_iter;
 	*emptr->C_converge_cm_iter = EMC->converge_cm_iter;
 	*emptr->C_check_param = QA->check_param;
+	*emptr->C_label_method = pcs->label->label_method;
 } /* End of copy_all_to_emptr(). */
 
 
 
 
 /* This function calls init_em_step() in
-   "src/phyclust/phyclust_init_procedure.c" and is
-   called by phyclust() using .Call() in "R/f_phyclust.r".
-   Input:
-     R_N: SEXP[1], number of sequences.
-     R_L: SEXP[1], length of sequences.
-     R_K: SEXP[1], number of clusters.
-     R_X: SEXP[1], sequences.
-     R_EMC: SEXP[1], EM controler.
-     R_manual_id: SEXP[1], manual class id.
-   Output:
-     ret: a list contains everythings returned from phyclust in C.
-*/
-SEXP R_phyclust(SEXP R_N_X_org, SEXP R_L, SEXP R_K, SEXP R_X, SEXP R_EMC, SEXP R_manual_id){
+ * "src/phyclust/phyclust_init_procedure.c" and is
+ * called by phyclust() using .Call() in "R/f_phyclust.r".
+ * Input:
+ *   R_N: SEXP[1], number of sequences.
+ *   R_L: SEXP[1], length of sequences.
+ *   R_K: SEXP[1], number of clusters.
+ *   R_X: SEXP[1], sequences.
+ *   R_EMC: SEXP[1], EM controler.
+ *   R_manual_id: SEXP[1], manual class id.
+ *   R_label: SEXP[1], labels.
+ * Output:
+ *   ret: a list contains everythings returned from phyclust in C. */
+SEXP R_phyclust(SEXP R_N_X_org, SEXP R_L, SEXP R_K, SEXP R_X, SEXP R_EMC, SEXP R_manual_id, SEXP R_label){
 	/* Declare variables for calling phyclust. */
 	int *C_N_X_org, *C_L, *C_K, *C_manual_id;
 	em_control *EMC;
@@ -294,10 +297,16 @@ SEXP R_phyclust(SEXP R_N_X_org, SEXP R_L, SEXP R_K, SEXP R_X, SEXP R_EMC, SEXP R
 		}
 	}
 	update_phyclust_struct(pcs);
+
+	/* Assign labels. */
+	R_update_phyclust_label(pcs, R_label);
+
+	/* Assign function pointers. */
 	EMFP = initialize_em_fp(EMC, pcs);
 
 	/* Assign QA. */
 	QA = initialize_Q_matrix_array(EMC->code_type, *C_K, EMC->substitution_model, EMC->identifier);
+
 	/* Compute. */
 	init_em_step(pcs, QA, EMC, EMFP);
 	assign_class(pcs);

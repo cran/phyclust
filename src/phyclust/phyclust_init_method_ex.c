@@ -11,7 +11,7 @@
 #include "phyclust_ape_nj.h"
 
 
-void Update_init_k_medoids_X_org(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP){
+void Update_init_k_medoids_by_X_org(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP){
 	int init_iter = 0;
 	int n_X_org, n_X, k, l, N_X_org = empcs->N_X_org, N_X = empcs->N_X, K = empcs->K, L = empcs->L;
 	int center_id[K], class_id[N_X_org];
@@ -67,27 +67,27 @@ void Update_init_k_medoids_X_org(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 	}
 
 	free_edist_struct(eds);
-} /* End of Update_init_k_medoids_org(). */
+} /* End of Update_init_k_medoids_by_X_org(). */
 
-void Update_init_k_medoids_X_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP){
+void Update_init_k_medoids_by_X(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP){
 	int init_iter = 0;
-	int n_X_unique, n_X, k, l, N_X_unique = empcs->N_X_unique, N_X = empcs->N_X, K = empcs->K, L = empcs->L;
-	int center_id[K], class_id_unique[N_X_unique];
+	int n_X, k, l, N_X = empcs->N_X, K = empcs->K, L = empcs->L;
+	int center_id[K], class_id[N_X];
 	double init_logL_observed;
 	edist_struct *eds;
 
-	eds = initialize_edist_struct_UT(EMC->edist_model, N_X_unique, L, empcs->X_unique);
+	eds = initialize_edist_struct_UT(EMC->edist_model, N_X, L, empcs->X);
 
 	while(init_iter < EMC->max_init_iter){
 		init_iter++;
 		reset_Q_matrix_array(QA);
 
-		assign_class_by_k_medoids(N_X_unique, K, eds->EDM, center_id, class_id_unique);
+		assign_class_by_k_medoids(N_X, K, eds->EDM, center_id, class_id);
 
 		/* Pick mu from X. */
 		for(k = 0; k < K; k++){
 			for(l = 0; l < L; l++){
-				empcs->Mu[k][l] = empcs->X_unique[center_id[k]][l];
+				empcs->Mu[k][l] = empcs->X[center_id[k]][l];
 			}
 			empcs->n_class[k] = 0;
 		}
@@ -97,11 +97,11 @@ void Update_init_k_medoids_X_unique(em_phyclust_struct *empcs, Q_matrix_array *Q
 			for(k = 0; k < K; k++){
 				empcs->Z_normalized[n_X][k] = 0.0;
 			}
-			empcs->Z_normalized[n_X][class_id_unique[empcs->map_X_org_to_X_unique[empcs->map_X_to_X_org[n_X]]]]
+			empcs->Z_normalized[n_X][class_id[empcs->map_X_org_to_X[empcs->map_X_to_X_org[n_X]]]]
 				= 1.0;
 		}
-		for(n_X_unique = 0; n_X_unique < N_X_unique; n_X_unique++){
-			empcs->n_class[class_id_unique[n_X_unique]] += empcs->replication_X_unique[n_X_unique];
+		for(n_X = 0; n_X < N_X; n_X++){
+			empcs->n_class[class_id[n_X]] += empcs->replication_X[n_X];
 		}
 
 		if(check_all_min_n_class(K, empcs->n_class, EMC->min_n_class)){
@@ -126,26 +126,26 @@ void Update_init_k_medoids_X_unique(em_phyclust_struct *empcs, Q_matrix_array *Q
 	}
 
 	free_edist_struct(eds);
-} /* End of Update_init_k_medoids_X_unique(). */
+} /* End of Update_init_k_medoids_by_X(). */
 
 
 /* Pick clusters by PAM.
  * There is no randomness for this method, so the following settings may be suggested.
  * EMC->init_procedure = exhaustEM;
  * EMC->exhaust_iter = 1; */
-void Update_init_pam_X_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP){
-	int n_X_unique, n_X, k, l, N_X_unique = empcs->N_X_unique, N_X = empcs->N_X, K = empcs->K, L = empcs->L;
-	int center_id[K], class_id_unique[N_X_unique];
+void Update_init_pam_by_X(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP){
+	int n_X, k, l, N_X = empcs->N_X, K = empcs->K, L = empcs->L;
+	int center_id[K], class_id[N_X];
 	double init_logL_observed;
 	edist_struct *eds;
 	
-	eds = initialize_edist_struct_LT_pam(EMC->edist_model, N_X_unique, L, empcs->X_unique);
-	assign_class_by_pam(N_X_unique, K, eds->EDM, center_id, class_id_unique);
+	eds = initialize_edist_struct_LT_pam(EMC->edist_model, N_X, L, empcs->X);
+	assign_class_by_pam(N_X, K, eds->EDM, center_id, class_id);
 
 	/* Pick mu from X. */
 	for(k = 0; k < K; k++){
 		for(l = 0; l < L; l++){
-			empcs->Mu[k][l] = empcs->X_unique[center_id[k]][l];
+			empcs->Mu[k][l] = empcs->X[center_id[k]][l];
 		}
 		empcs->n_class[k] = 0;
 	}
@@ -155,10 +155,10 @@ void Update_init_pam_X_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_
 		for(k = 0; k < K; k++){
 			empcs->Z_normalized[n_X][k] = 0.0;
 		}
-		empcs->Z_normalized[n_X][class_id_unique[empcs->map_X_org_to_X_unique[empcs->map_X_to_X_org[n_X]]]] = 1.0;
+		empcs->Z_normalized[n_X][class_id[empcs->map_X_org_to_X[empcs->map_X_to_X_org[n_X]]]] = 1.0;
 	}
-	for(n_X_unique = 0; n_X_unique < N_X_unique; n_X_unique++){
-		empcs->n_class[class_id_unique[n_X_unique]] += empcs->replication_X_unique[n_X_unique];
+	for(n_X = 0; n_X < N_X; n_X++){
+		empcs->n_class[class_id[n_X]] += empcs->replication_X[n_X];
 	}
 
 	if(check_all_min_n_class(K, empcs->n_class, EMC->min_n_class)){
@@ -175,5 +175,5 @@ void Update_init_pam_X_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_
 	}
 
 	free_edist_struct(eds);
-} /* End of Update_init_pam_unique(). */
+} /* End of Update_init_pam_by_X(). */
 

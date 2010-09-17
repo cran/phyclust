@@ -7,7 +7,8 @@
 \usage{
 phyclust.logL(X, ret.phyclust = NULL, K = NULL, Eta = NULL,
     Mu = NULL, pi = NULL, kappa = NULL, Tt = NULL,
-    substitution.model = NULL, identifier = NULL, code.type = NULL)
+    substitution.model = NULL, identifier = NULL, code.type = NULL,
+    label = NULL)
 }
 \arguments{
   \item{X}{nid/sid matrix with \eqn{N}{N} rows/sequences and \eqn{L}{L} columns/sites.}
@@ -21,6 +22,7 @@ phyclust.logL(X, ret.phyclust = NULL, K = NULL, Eta = NULL,
   \item{substitution.model}{substitution model.}
   \item{identifier}{identifier.}
   \item{code.type}{code type.}
+  \item{label}{label of sequences for semi-supervised clustering.}
 }
 \details{
   \code{X} should be a numerical matrix containing sequence data that
@@ -29,6 +31,10 @@ phyclust.logL(X, ret.phyclust = NULL, K = NULL, Eta = NULL,
   Either input \code{ret.phyclust} or all other arguments for this function.
   \code{ret.phyclust} can be obtain either from an EM iteration of
   \code{phyclust} or from a M step of \code{phyclust.m.step}.
+
+  If \code{label} is inputted, the label information will be used to
+  calculate log likelihood (complete-data), even the \code{ret.phyclust}
+  is the result of unsuprvised clustering.
 }
 \value{
   This function return a log-likelihood value of \code{phyclust}.
@@ -53,6 +59,11 @@ X <- seq.data.toy$org
 
 ret.1 <- phyclust(X, 2, EMC = EMC.1)
 phyclust.logL(X, ret.phyclust = ret.1)
+
+# For semi-supervised clustering.
+semi.label <- rep(0, nrow(X))
+semi.label[1:3] <- 1
+phyclust.logL(X, ret.phyclust = ret.1, label = semi.label)
 }
 }
 \keyword{programming}

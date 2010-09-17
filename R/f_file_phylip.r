@@ -6,8 +6,9 @@
 ###   org: Original sequence in nid. array[nseq, nsite]
 
 read.phylip.nucleotide <- function(filename, byrow = TRUE){
-  phylip <- list()
-  phylip$code.type <- "NUCLEOTIDE"
+  phylip <- list(code.type = "NUCLEOTIDe", info = NULL, nseq = NULL,
+                 seqlen = NULL, seqname = NULL, org.code = NULL, org = NULL,
+                 byrow = byrow)
 
 ### Read header.
   phylip$info <- readLines(filename, n = 1)

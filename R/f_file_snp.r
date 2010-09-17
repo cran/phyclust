@@ -5,8 +5,9 @@
 ###   seqname: Sequence's name.
 ###   org: Original sequence in nid. array[nseq, nsite]
 read.phylip.snp <- function(filename, byrow = TRUE){
-  snp <- list()
-  snp$code.type <- "SNP"
+  snp <- list(code.type = "SNP", info = NULL, nseq = NULL,
+              seqlen = NULL, seqname = NULL, org.code = NULL, org = NULL,
+              byrow = byrow)
 
 ### Read header.
   snp$info <- readLines(filename, n = 1)

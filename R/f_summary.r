@@ -16,6 +16,7 @@ print.phyclust <- function(x, digits = max(4, getOption("digits") - 3), ...){
            ", method: ", ret.phyclust$init.method, ".\n",
            "model substitution: ", ret.phyclust$substitution.model,
            ", distance: ", ret.phyclust$edist.model, ".\n",
+           "label method: ", ret.phyclust$label.method, ".\n",
            "iter: ", ret.phyclust$conv$iter,
            " ", ret.phyclust$conv$inner.iter,
            " ", ret.phyclust$conv$cm.iter,

@@ -1,8 +1,8 @@
 /* This file contains declarations for phyclust. */
 
 
-#ifndef __PHYCLSUT_Q_MATRIX_
-#define __PHYCLSUT_Q_MATRIX_
+#ifndef __PHYCLUST_Q_MATRIX_
+#define __PHYCLUST_Q_MATRIX_
 
 typedef struct _Q_matrix		Q_matrix;
 
@@ -105,5 +105,5 @@ void print_Pt(Q_matrix *Q);
 void print_H(Q_matrix *Q);
 void print_Q(Q_matrix *Q);
 
-#endif	/* End of __PHYCLSUT_Q_MATRIX_. */
+#endif	/* End of __PHYCLUST_Q_MATRIX_. */
 

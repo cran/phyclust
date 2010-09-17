@@ -11,11 +11,11 @@
 \usage{
 .EMControl(exhaust.iter = 1, fixed.iter = 5,
     short.iter = 100, EM.iter = 1000,
-    short.eps = 1e-2, EM.eps = 1e-8,
-    cm.reltol = 1e-10, cm.maxit = 5000,
-    nm.abstol.Mu.given.QA = 1e-10, nm.reltol.Mu.given.QA = 1e-10,
+    short.eps = 1e-2, EM.eps = 1e-6,
+    cm.reltol = 1e-8, cm.maxit = 5000,
+    nm.abstol.Mu.given.QA = 1e-8, nm.reltol.Mu.given.QA = 1e-8,
     nm.maxit.Mu.given.QA = 500,
-    nm.abstol.QA.given.Mu = 1e-10, nm.reltol.QA.given.Mu = 1e-10,
+    nm.abstol.QA.given.Mu = 1e-8, nm.reltol.QA.given.Mu = 1e-8,
     nm.maxit.QA.given.Mu = 5000,
     est.non.seg.site = FALSE, max.init.iter = 50,
     init.procedure = .init.procedure[1],
@@ -31,16 +31,16 @@
   \item{short.iter}{number of short-EM steps, default = 100.}
   \item{EM.iter}{number of long-EM steps, default = 1000.}
   \item{short.eps}{tolerance of short-EM steps, default = 1e-2.}
-  \item{EM.eps}{tolerance of long-EM steps, default = 1e-8.}
+  \item{EM.eps}{tolerance of long-EM steps, default = 1e-6.}
 
-  \item{cm.reltol}{relative tolerance for a CM step, default = 1e-10.}
+  \item{cm.reltol}{relative tolerance for a CM step, default = 1e-8}
   \item{cm.maxit}{maximum number iteration for a CM step, default = 5000.}
 
-  \item{nm.abstol.Mu.given.QA}{see \sQuote{Details}, default = 1e-10.}
-  \item{nm.reltol.Mu.given.QA}{see \sQuote{Details}, default = 1e-10.}
+  \item{nm.abstol.Mu.given.QA}{see \sQuote{Details}, default = 1e-8}
+  \item{nm.reltol.Mu.given.QA}{see \sQuote{Details}, default = 1e-8}
   \item{nm.maxit.Mu.given.QA}{see \sQuote{Details}, default = 500.}
-  \item{nm.abstol.QA.given.Mu}{see \sQuote{Details}, default = 1e-10.}
-  \item{nm.reltol.QA.given.Mu}{see \sQuote{Details}, default = 1e-10.}
+  \item{nm.abstol.QA.given.Mu}{see \sQuote{Details}, default = 1e-8}
+  \item{nm.reltol.QA.given.Mu}{see \sQuote{Details}, default = 1e-8}
   \item{nm.maxit.QA.given.Mu}{ see \sQuote{Details}, default = 5000.}
   \item{est.non.seg.site}{estimate non-segregation sites, default = FALSE.}
   \item{max.init.iter}{maximum number of initialization iteration, default = 50.}

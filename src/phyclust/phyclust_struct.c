@@ -14,8 +14,7 @@
  * Assign X later by calling update_phyclust_struct() to update pcs.
  * Assign MISSING_CODE by code_type. */
 phyclust_struct* initialize_phyclust_struct(int code_type, int N_X_org, int L, int K){
-	int i;
-	phyclust_struct *pcs = NULL;
+	phyclust_struct *pcs;
 
 	pcs = (phyclust_struct*) malloc(sizeof(phyclust_struct));
 	pcs->code_type = code_type;
@@ -24,32 +23,22 @@ phyclust_struct* initialize_phyclust_struct(int code_type, int N_X_org, int L, i
 	pcs->missing_flag = 0;				/* Assigned by update_phyclust_struct(). */
 	pcs->n_param = K - 1 + K * L;
 	pcs->N_X_org = N_X_org;
-	pcs->N_X_unique = 0;				/* Assigned by update_phyclust_struct(). */
 	pcs->N_X = 0;					/* Assigned by update_phyclust_struct(). */
 	pcs->N_seg_site = 0;				/* Assigned by update_phyclust_struct(). */
 	pcs->L = L;
 	pcs->K = K;
 	pcs->X_org = allocate_int_2D_AP(N_X_org);	/* Assigned by ins or R. */
-	pcs->X_unique = NULL;				/* Assigned by update_phyclust_struct(). */
 	pcs->X = NULL;					/* Assigned by update_phyclust_struct(). */
-	pcs->map_X_org_to_X_unique = NULL;		/* Assigned by update_phyclust_struct(). */
-	pcs->map_X_unique_to_X_org = NULL;		/* Assigned by update_phyclust_struct(). */
-	pcs->replication_X_unique = NULL;		/* Assigned by update_phyclust_struct(). */
 	pcs->map_X_org_to_X = NULL;			/* Assigned by update_phyclust_struct(). */
 	pcs->map_X_to_X_org = NULL;			/* Assigned by update_phyclust_struct(). */
 	pcs->replication_X = NULL;			/* Assigned by update_phyclust_struct(). */
 	pcs->seg_site_id = NULL;			/* Assigned by update_phyclust_struct(). */
+	pcs->label = NULL;				/* Point to update_phyclust_label(). */
 
-	pcs->Mu = allocate_int_2D_AP(K); 
-	for(i = 0; i < K; i++){
-		pcs->Mu[i] = allocate_int_1D(L);
-	}
+	pcs->Mu = allocate_int_RT(K, L); 
 	pcs->Eta = allocate_double_1D(K); 
 	/* For report, so use original dimensions. */
-	pcs->Z_normalized = allocate_double_2D_AP(N_X_org);
-	for(i = 0; i < N_X_org; i++){
-		pcs->Z_normalized[i] = allocate_double_1D(K); 
-	}
+	pcs->Z_normalized = allocate_double_RT(N_X_org, K);
 	
 	pcs->logL_observed = 0.0;
 	pcs->logL_entropy = 0.0;
@@ -64,11 +53,12 @@ phyclust_struct* initialize_phyclust_struct(int code_type, int N_X_org, int L, i
 
 void free_phyclust_struct(phyclust_struct *pcs){
 	free(pcs->X_org);
-	free(pcs->X_unique);
-	free(pcs->map_X_org_to_X_unique);
-	free(pcs->map_X_unique_to_X_org);
-	free(pcs->replication_X_unique);
+	free(pcs->X);
+	free(pcs->map_X_org_to_X);
+	free(pcs->map_X_to_X_org);
+	free(pcs->replication_X);
 	free(pcs->seg_site_id);
+	free_phyclust_label(pcs->label);
 	free_int_RT(pcs->K, pcs->Mu);
 	free(pcs->Eta);
 	free_double_RT(pcs->N_X_org, pcs->Z_normalized);
@@ -79,53 +69,46 @@ void free_phyclust_struct(phyclust_struct *pcs){
 
 
 /* After assigning the data X_org, this function will extract the information
- * and update the pcs including: N_X_unique, N_X, X, map_X_to_X_org, replication_X, map_X_unique_to_X_org,
+ * and update the pcs including: N_X, X, map_X_to_X_org, replication_X,
  * seg_site_id, and N_seg_site. */
 void update_phyclust_struct(phyclust_struct *pcs){
-	int i, n_X, l, flag, flag_missing, N_X_org = pcs->N_X_org, N_X_unique, L = pcs->L;
-	int map_X_unique_to_X_org[N_X_org], replication_X_unique[N_X_org], seg_site_id[L], N_seg_site = 0;
+	int i, n_X, l, flag, flag_missing, N_X_org = pcs->N_X_org, N_X, L = pcs->L;
+	int map_X_to_X_org[N_X_org], replication_X[N_X_org], seg_site_id[L], N_seg_site = 0;
 
-	pcs->map_X_org_to_X_unique = allocate_int_1D(N_X_org);
+	pcs->map_X_org_to_X = allocate_int_1D(N_X_org);
 
-	/* Assign N_X_unique and map_X_unique_to_X_org. */
+	/* Assign N_X and map_X_to_X_org. */
 	for(i = 0; i < N_X_org; i++){
-		replication_X_unique[i] = 0;
+		replication_X[i] = 0;
 	}
-	pcs->map_X_org_to_X_unique[0] = 0;
-	map_X_unique_to_X_org[0] = 0;
-	replication_X_unique[0] = 1;
-	N_X_unique = 1;
+	pcs->map_X_org_to_X[0] = 0;
+	map_X_to_X_org[0] = 0;
+	replication_X[0] = 1;
+	N_X = 1;
 	for(n_X = 1; n_X < N_X_org; n_X++){
 		flag = 1;
-		for(i = 0; i < N_X_unique; i++){
-			if(!(edist_D_HAMMING(L, pcs->X_org[n_X], pcs->X_org[map_X_unique_to_X_org[i]]) > 0)){
+		for(i = 0; i < N_X; i++){
+			if(!(edist_D_HAMMING(L, pcs->X_org[n_X], pcs->X_org[map_X_to_X_org[i]]) > 0)){
 				flag = 0;
 				break;
 			}
 		}
-		pcs->map_X_org_to_X_unique[n_X] = i;
+		pcs->map_X_org_to_X[n_X] = i;
 		if(flag){
-			map_X_unique_to_X_org[N_X_unique++] = n_X;
+			map_X_to_X_org[N_X++] = n_X;
 		}
-		replication_X_unique[i]++;
+		replication_X[i]++;
 	}
 	/* Copy to pcs. */
-	pcs->X_unique = allocate_int_2D_AP(N_X_unique);
-	pcs->map_X_unique_to_X_org = allocate_int_1D(N_X_unique);
-	pcs->replication_X_unique = allocate_int_1D(N_X_unique);
-	for(i = 0; i < N_X_unique; i++){
-		pcs->X_unique[i] = pcs->X_org[map_X_unique_to_X_org[i]];
-		pcs->map_X_unique_to_X_org[i] = map_X_unique_to_X_org[i];
-		pcs->replication_X_unique[i] = replication_X_unique[i];
+	pcs->X = allocate_int_2D_AP(N_X);
+	pcs->map_X_to_X_org = allocate_int_1D(N_X);
+	pcs->replication_X = allocate_int_1D(N_X);
+	for(i = 0; i < N_X; i++){
+		pcs->X[i] = pcs->X_org[map_X_to_X_org[i]];
+		pcs->map_X_to_X_org[i] = map_X_to_X_org[i];
+		pcs->replication_X[i] = replication_X[i];
 	}
-	pcs->N_X_unique = N_X_unique;
-
-	/* Copy to pcs. */
-	pcs->N_X = pcs->N_X_unique;
-	pcs->X = pcs->X_unique;
-	pcs->map_X_org_to_X = pcs->map_X_org_to_X_unique;
-	pcs->map_X_to_X_org = pcs->map_X_unique_to_X_org;
-	pcs->replication_X = pcs->replication_X_unique;
+	pcs->N_X = N_X;
 
 
 	/* Assign missing_flag. */
@@ -173,6 +156,9 @@ void update_phyclust_struct(phyclust_struct *pcs){
 		pcs->seg_site_id[i] = seg_site_id[i];
 	}
 	pcs->N_seg_site = N_seg_site;
+
+	/* Initialize pcl. */
+	pcs->label = initialize_phyclust_label();
 } /* End of update_phyclust_struct(). */
 
 

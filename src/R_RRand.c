@@ -1,49 +1,46 @@
 /* This file contains a function R_RRand() called by R wraps rrand() in
-   "R/fcn_rrand.r", and this function calls the relative functions RRand() in
-   "src/RRand.c" using in
-   Dr. Maitra's ten-clusters programs.
-
-   Writen: Wei-Chen Chen on 2008/10/27.
-*/
+ * "R/fcn_rrand.r", and this function calls the relative functions RRand() in
+ * "src/RRand.c" using in
+ * Dr. Maitra's ten-clusters programs.
+ *
+ * Writen: Wei-Chen Chen on 2008/10/27. */
 
 #include<R.h>
 #include<Rinternals.h>
 
 
 /* This function is coded in "src/RRand.c".
-   Input:
-     *N: int[1], number of observations.
-     *TRUK: int[1], number of true clusters.
-     *PREDK: int[1], number of predicted clusters.
-     *trcl: int[N], true cluster ids.
-     *prcl: int[N], predicted cluster ids.
-     *Rand: double[1], Rand index.
-     *adjRand: double[1], adjust Rand index.
-     *Eindex: double[1], Eindex.
-   Output:
-     *Rand, *adjRand, *Eindex.
-*/
+ * Input:
+ *   *N: int[1], number of observations.
+ *   *TRUK: int[1], number of true clusters.
+ *   *PREDK: int[1], number of predicted clusters.
+ *   *trcl: int[N], true cluster ids.
+ *   *prcl: int[N], predicted cluster ids.
+ *   *Rand: double[1], Rand index.
+ *   *adjRand: double[1], adjust Rand index.
+ *   *Eindex: double[1], Eindex.
+ * Output:
+ *   *Rand, *adjRand, *Eindex. */
 void RRand(int *N, int *TRUK, int *PREDK, int *trcl, int *prcl,
 	   double *Rand, double *adjRand, double *Eindex);
 
 
 /* This function calls RRand() in "src/RRand.c" and is called by
-   rrand() using .Call() in "R/fcn_rrand.r".
-   Input:
-     R_N: SEXP[1], number of observations.
-     R_TRUK: SEXP[1], number of true clusters.
-     R_PREDK: SEXP[1], number of predicted clusters.
-     R_trcl: SEXP[N], true cluster ids.
-     R_prcl: SEXP[N], predicted cluster ids.
-     R_Rand: SEXP[1], Rand index.
-     R_adjRand: SEXP[1], adjust Rand index.
-     R_Eindex: SEXP[1], Eindex.
-   Output:
-     ret: a list contains
-       Rand: SEXP[1], Rand index.
-       adjRand: SEXP[1], adjust Rand index.
-       Eindex: SEXP[1], Eindex.
-*/
+ * rrand() using .Call() in "R/fcn_rrand.r".
+ * Input:
+ *   R_N: SEXP[1], number of observations.
+ *   R_TRUK: SEXP[1], number of true clusters.
+ *   R_PREDK: SEXP[1], number of predicted clusters.
+ *   R_trcl: SEXP[N], true cluster ids.
+ *   R_prcl: SEXP[N], predicted cluster ids.
+ *   R_Rand: SEXP[1], Rand index.
+ *   R_adjRand: SEXP[1], adjust Rand index.
+ *   R_Eindex: SEXP[1], Eindex.
+ * Output:
+ *   ret: a list contains
+ *     Rand: SEXP[1], Rand index.
+ *     adjRand: SEXP[1], adjust Rand index.
+ *     Eindex: SEXP[1], Eindex. */
 SEXP R_RRand(SEXP R_N, SEXP R_TRUK, SEXP R_PREDK, SEXP R_trcl, SEXP R_prcl){
   /* Declare variables for calling C. */
   double *C_Rand, *C_adjRand, *C_Eindex;

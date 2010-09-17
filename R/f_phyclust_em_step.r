@@ -4,7 +4,8 @@
 ### EM step.
 phyclust.em.step <- function(X, ret.phyclust = NULL,
     K = NULL, Eta = NULL, Mu = NULL, pi = NULL, kappa = NULL, Tt = NULL,
-    substitution.model = NULL, identifier = NULL, code.type = NULL){
+    substitution.model = NULL, identifier = NULL, code.type = NULL,
+    label = NULL){
   if(is.null(ret.phyclust)){
     if(is.null(K) || is.null(Eta) || is.null(Mu) || is.null(Tt) ||
        is.null(substitution.model) ||
@@ -24,6 +25,7 @@ phyclust.em.step <- function(X, ret.phyclust = NULL,
   }
 
   vect <- convert.QA.to.vect(ret.phyclust)
+  label <- check.label(label, nrow(X), ret.phyclust$K, TRUE)
 
   ret <- .Call("R_phyclust_em_step",
                as.integer(nrow(X)),
@@ -37,6 +39,7 @@ phyclust.em.step <- function(X, ret.phyclust = NULL,
                                 as.character(.substitution$model)) - 1),
                as.integer(which(ret.phyclust$QA$identifier == .identifier) - 1),
                as.integer(which(ret.phyclust$code.type == .code.type) - 1),
+               label,
                PACKAGE = "phyclust")
 
   ret$Z.normalized <- ret$bic <- ret$aic <- ret$icl <-
@@ -57,7 +60,7 @@ phyclust.em.step <- function(X, ret.phyclust = NULL,
 phyclust.e.step <- function(X, ret.phyclust = NULL,
     K = NULL, Eta = NULL, Mu = NULL, pi = NULL, kappa = NULL, Tt = NULL,
     substitution.model = NULL, identifier = NULL, code.type = NULL,
-    Z.state = TRUE){
+    Z.state = TRUE, label = NULL){
   if(is.null(ret.phyclust)){
     if(is.null(K) || is.null(Eta) || is.null(Mu) || is.null(Tt) ||
        is.null(substitution.model) ||
@@ -77,6 +80,7 @@ phyclust.e.step <- function(X, ret.phyclust = NULL,
   }
 
   vect <- convert.QA.to.vect(ret.phyclust)
+  label <- check.label(label, nrow(X), ret.phyclust$K, TRUE)
 
   ret <- .Call("R_phyclust_e_step",
                as.integer(nrow(X)),
@@ -91,6 +95,7 @@ phyclust.e.step <- function(X, ret.phyclust = NULL,
                as.integer(which(ret.phyclust$QA$identifier == .identifier) - 1),
                as.integer(which(ret.phyclust$code.type == .code.type) - 1),
                as.integer(Z.state),
+               label,
                PACKAGE = "phyclust")
   ret <- matrix(ret, nrow = nrow(X), byrow = TRUE)
 
@@ -101,7 +106,8 @@ phyclust.e.step <- function(X, ret.phyclust = NULL,
 ### M-step: return a object with phyclust class.
 phyclust.m.step <- function(X, ret.phyclust = NULL,
     K = NULL, pi = NULL, kappa = NULL, Tt = NULL, Z.normalized = NULL,
-    substitution.model = NULL, identifier = NULL, code.type = NULL){
+    substitution.model = NULL, identifier = NULL, code.type = NULL,
+    label = NULL){
   if(is.null(ret.phyclust)){
     if(is.null(K) || is.null(Tt) ||
        is.null(Z.normalized) || is.null(substitution.model) ||
@@ -122,6 +128,7 @@ phyclust.m.step <- function(X, ret.phyclust = NULL,
   }
 
   vect <- convert.QA.to.vect(ret.phyclust)
+  label <- check.label(label, nrow(X), ret.phyclust$K, TRUE)
 
   ret <- .Call("R_phyclust_m_step",
                as.integer(nrow(X)),
@@ -134,6 +141,7 @@ phyclust.m.step <- function(X, ret.phyclust = NULL,
                                 as.character(.substitution$model)) - 1),
                as.integer(which(ret.phyclust$QA$identifier == .identifier) - 1),
                as.integer(which(ret.phyclust$code.type == .code.type) - 1),
+               label,
                PACKAGE = "phyclust")
 
   ret$Z.normalized <- ret$bic <- ret$aic <- ret$icl <-

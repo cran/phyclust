@@ -1,7 +1,7 @@
 /* This file contains declarations for phyclust. */
 
-#ifndef __PHYCLSUT_EDIST_STRUCT_
-#define __PHYCLSUT_EDIST_STRUCT_
+#ifndef __PHYCLUST_EDIST_STRUCT_
+#define __PHYCLUST_EDIST_STRUCT_
 
 enum {UT, LT_pam};				/* upper/lower triangular form. */
 
@@ -36,4 +36,4 @@ double get_pair_edist_LT_pam(edist_struct *eds, int u, int v);
 /* ----- For debug. ----- */
 void print_edist_matrix(int n, int N_X, double **EDM, int type);
 
-#endif	/* End of __PHYCLSUT_EDIST_STRUCT_. */
+#endif	/* End of __PHYCLUST_EDIST_STRUCT_. */

@@ -4,6 +4,7 @@
 \alias{bootstrap.seq.nucleotide}
 \alias{bootstrap.seq.snp}
 \alias{check.EMC}
+\alias{check.label}
 \alias{convert.QA.to.vect}
 \alias{my.cat}
 \alias{my.format}
@@ -22,6 +23,7 @@
   \code{bootstrap.seq.nucleotide},
   \code{bootstrap.seq.snp}, \cr
   \code{check.EMC},
+  \code{check.label},
   \code{convert.QA.to.vect}, \cr
   \code{my.cat},
   \code{my.format}, \cr

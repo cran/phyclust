@@ -29,6 +29,7 @@
     \code{seqname}   \tab sequence names. \cr
     \code{org.code}  \tab original codes, dim = \eqn{N\times L}{N*L}. \cr
     \code{org}       \tab transfered ids, dim = \eqn{N\times L}{N*L}. \cr
+    \code{byrow}     \tab TRUE for dim = \eqn{N\times L}{N*L}, FALSE for transpose. \cr
   }
 }
 \references{

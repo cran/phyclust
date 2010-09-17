@@ -1,8 +1,8 @@
 /* This file contains declarations for phyclust. */
 
 
-#ifndef __PHYCLSUT_INIT_METHOD_
-#define __PHYCLSUT_INIT_METHOD_
+#ifndef __PHYCLUST_INIT_METHOD_
+#define __PHYCLUST_INIT_METHOD_
 
 #include "phyclust_em.h"
 #include "phyclust_ape_nj.h"
@@ -25,8 +25,12 @@ void find_consensus_Mu(int N_X_org, int L, int ncode, int missing_index, int **X
  * Further updates for em are implemented "phyclust_init_procedure.c".
  * All functions will return 1 for fail, 0 for success. */
 
+/* These functions with "_unique" pick centers from unique sequences
+ * unlike other methods, then maps id back to usual "X_org". */
+
 /* Randomly pick Mu's and assign by edist. */
 int Update_init_random_Mu_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP);
+int Update_init_random_Mu_unique_label(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP);
 
 /* By neighbor-joining. */
 int Update_init_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP);
@@ -49,16 +53,16 @@ void search_largest_branch(nj_struct *njs, int *largest_branch_id);
 void random_branch(nj_struct *njs, int *random_branch_id);
 int assign_class_by_njs_branch(int K, nj_struct *njs, int *branch_id, int *class_id);
 
-/* File: "phyclust_init_method_kmed.c" and "phyclust_init_method_kmed_ex.c". */
+/* File: "phyclust_init_method_kmed.c". */
 void assign_class_by_k_medoids(int N_X, int K, double **EDM, int *center_id, int *class_id);
-void assign_class_unique_by_k_medoids(int N_X_org, int K, double **EDM, int N_X_unique, int *map_X_unique_to_X_org,
+void assign_class_unique_by_k_medoids(int N_X_org, int K, double **EDM, int N_X, int *map_X_to_X_org,
 		int *center_id, int *class_id);
 
 /* File: "phyclust_init_method_pam.c". */
-void assign_class_by_pam(int N_X_unique, int K, double **EDM_LT_pam, int *center_id, int *class_id);
+void assign_class_by_pam(int N_X, int K, double **EDM_LT_pam, int *center_id, int *class_id);
 
 
 /* ----- For debug. ----- */
 void print_consensus_Mu(em_phyclust_struct *empcs, int *consensus_Mu);
 
-#endif	/* End of __PHYCLSUT_INIT_METHOD_. */
+#endif	/* End of __PHYCLUST_INIT_METHOD_. */

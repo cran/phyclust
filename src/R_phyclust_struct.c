@@ -18,21 +18,17 @@ phyclust_struct* R_initialize_phyclust_struct(int code_type, int N_X_org, int L,
 	pcs->missing_flag = 0;
 	pcs->n_param = K - 1 + K * L;
 	pcs->N_X_org = N_X_org;
-	pcs->N_X_unique = 0;
 	pcs->N_X = 0;
 	pcs->N_seg_site = 0;
 	pcs->L = L;
 	pcs->K = K;
 	pcs->X_org = allocate_int_2D_AP(N_X_org);
-	pcs->X_unique = NULL;
 	pcs->X = NULL;
-	pcs->map_X_org_to_X_unique = NULL;
-	pcs->map_X_unique_to_X_org = NULL;
-	pcs->replication_X_unique = NULL;
 	pcs->map_X_org_to_X = NULL;
 	pcs->map_X_to_X_org = NULL;
 	pcs->replication_X = NULL;
 	pcs->seg_site_id = NULL;
+	pcs->label = NULL;					/* Assigned by R_update_phyclust_label(pcs, R_label) */
 
 	pcs->Mu = allocate_int_2D_AP(K);			/* Assigned by R. */
 	pcs->Eta = NULL;					/* Assigned by R. */
@@ -51,11 +47,8 @@ phyclust_struct* R_initialize_phyclust_struct(int code_type, int N_X_org, int L,
 
 void R_free_phyclust_struct(phyclust_struct *pcs){
 	free(pcs->X_org);
-	free(pcs->X_unique);
-	free(pcs->map_X_org_to_X_unique);
-	free(pcs->map_X_unique_to_X_org);
-	free(pcs->replication_X_unique);
 	free(pcs->seg_site_id);
+	free_phyclust_label(pcs->label);
 	free(pcs->Mu);
 	free(pcs->Z_normalized);
 	free(pcs);

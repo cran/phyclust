@@ -9,7 +9,7 @@
 
 nj_struct* initialize_nj_struct(int n){
 	int i;
-	nj_struct *njs = NULL;
+	nj_struct *njs;
 
 	njs = (nj_struct*) malloc(sizeof(nj_struct));
 	njs->D = NULL;		/* D requires to point on an 1D array for ape_nj(). */

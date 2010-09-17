@@ -20,14 +20,8 @@ Q_matrix* initialize_Q_matrix(int code_type, int substitution_model){
 	Q->lower_bound = allocate_double_1D(1);
 	Q->upper_bound = allocate_double_1D(1);
 
-	Q->Pt = allocate_double_2D_AP(NCODE[code_type]);
-	for(i = 0; i < NCODE[code_type]; i++){
-		Q->Pt[i] = allocate_double_1D(NCODE[code_type]);
-	}
-	Q->log_Pt = allocate_double_2D_AP(NCODE[code_type]);
-	for(i = 0; i < NCODE[code_type]; i++){
-		Q->log_Pt[i] = allocate_double_1D(NCODE[code_type]);
-	}
+	Q->Pt = allocate_double_SQ(NCODE[code_type]);
+	Q->log_Pt = allocate_double_SQ(NCODE[code_type]);
 	Q->H = allocate_double_1D(NCODE[code_type]);
 
 	Q->pi = allocate_double_1D(NCODE[code_type]);

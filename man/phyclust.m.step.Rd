@@ -8,7 +8,8 @@
 \usage{
 phyclust.m.step(X, ret.phyclust = NULL, K = NULL,
     pi = NULL, kappa = NULL, Tt = NULL, Z.normalized = NULL,
-    substitution.model = NULL, identifier = NULL, code.type = NULL)
+    substitution.model = NULL, identifier = NULL, code.type = NULL,
+    label = NULL)
 }
 \arguments{
   \item{X}{nid/sid matrix with \eqn{N}{N} rows/sequences and \eqn{L}{L} columns/sites.}
@@ -21,6 +22,7 @@ phyclust.m.step(X, ret.phyclust = NULL, K = NULL,
   \item{substitution.model}{substitution model.}
   \item{identifier}{identifier.}
   \item{code.type}{code type.}
+  \item{label}{label of sequences for semi-supervised clustering.}
 }
 \details{
   \code{X} should be a numerical matrix containing sequence data that
@@ -29,6 +31,10 @@ phyclust.m.step(X, ret.phyclust = NULL, K = NULL,
   Either input \code{ret.phyclust} or all other arguments for this function.
   \code{ret.phyclust} can be obtained either from an EM iteration of
   \code{phyclust} or from a E step of \code{phyclust.e.step}.
+
+  If \code{label} is inputted, the label information will be used
+  the M-step and \code{Z.normalized} will be replaced, even the
+  \code{ret.phyclust} is the result of unsupervised clustering.
 }
 \value{
   This function return an object with class \code{phyclust}.
@@ -74,6 +80,11 @@ phyclust.logL(X, ret.1)
 phyclust.logL(X, ret.em)
 phyclust.logL(X, ret.m)
 phyclust.logL(X, ret.2)
+
+# For semi-supervised.
+semi.label <- rep(0, nrow(X))
+semi.label[1:3] <- 1
+ret.m.1 <- phyclust.m.step(X, ret.phyclust = ret.1, label = semi.label)
 }
 }
 \keyword{programming}

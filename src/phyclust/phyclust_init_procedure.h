@@ -1,8 +1,8 @@
 /* This file contains declarations for phyclust. */
 
 
-#ifndef __PHYCLSUT_INIT_PROCEDURE_
-#define __PHYCLSUT_INIT_PROCEDURE_
+#ifndef __PHYCLUST_INIT_PROCEDURE_
+#define __PHYCLUST_INIT_PROCEDURE_
 
 #include "phyclust_em.h"
 
@@ -26,4 +26,4 @@ void Rndp_EM(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, em_fp *E
 /* Run EM on the best short em initialization. */
 void em_EM(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP);		/* emEM. */
 
-#endif	/* End of __PHYCLSUT_INIT_PROCEDURE_. */
+#endif	/* End of __PHYCLUST_INIT_PROCEDURE_. */

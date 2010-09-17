@@ -217,10 +217,15 @@ int Update_init_manually(em_phyclust_struct *empcs, Q_matrix_array *QA, em_contr
 } /* End of Update_init_manually(). */
 
 
+
+
+/* These functions with "_unique" pick centers from unique sequences
+ * unlike other methods, then maps id back to usual "X_org". */
+
 /* Randomly pick Mu from X. */
 int Update_init_random_Mu_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP){
 	int init_iter = 0, ret_stop = 0;
-	int n_X, k, l, N_X_unique = empcs->N_X_unique, N_X = empcs->N_X, K = empcs->K, L = empcs->L;
+	int n_X, k, l, N_X = empcs->N_X, K = empcs->K, L = empcs->L;
 	int center_id[K], tmp_id;
 	int consensus_Mu[L];
 	double tmp, tmp_min, init_logL_observed = 0.0;
@@ -233,15 +238,147 @@ int Update_init_random_Mu_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 		init_iter++;
 		reset_Q_matrix_array(QA);
 
-		/* Randomly pick mu from X_unique. */
-		srswor(N_X_unique, K, center_id);
+		srswor(N_X, K, center_id);
 		
+		/* Assign Mu by centers. */
 		for(k = 0; k < K; k++){
 			for(l = 0; l < L; l++){
-				empcs->Mu[k][l] = empcs->X_unique[center_id[k]][l];
+				empcs->Mu[k][l] = empcs->X[center_id[k]][l];
 			}
 			empcs->n_class[k] = 0;
-			center_id[k] = empcs->map_X_org_to_X[empcs->map_X_unique_to_X_org[center_id[k]]];
+		}
+
+		/* Assign X to the nearest mu by distance, and recreate Z_normalized. */
+		for(n_X = 0; n_X < N_X; n_X++){
+			tmp_min = eds->get_pair_edist(eds, n_X, center_id[0]);
+			tmp_id = 0;
+			for(k = 1; k < K; k++){
+				tmp = eds->get_pair_edist(eds, n_X, center_id[k]);
+				if(tmp < tmp_min){
+					tmp_min = tmp;
+					tmp_id = k;
+				}
+			}
+	
+			for(k = 0; k < K; k++){
+				empcs->Z_normalized[n_X][k] = 0.0;
+			}
+			empcs->Z_normalized[n_X][tmp_id] = 1.0;
+			empcs->n_class[tmp_id] += empcs->replication_X[n_X];
+		}
+
+		/* Replace missings by the concensus. */
+		for(k = 0; k < K; k++){
+			for(l = 0; l < L; l++){
+				if(empcs->Mu[k][l] == empcs->missing_index){
+					empcs->Mu[k][l] = consensus_Mu[l];
+				}
+			}
+		}
+
+		if(check_all_min_n_class(K, empcs->n_class, EMC->min_n_class)){
+			ret_stop = init_m_step(empcs, QA, EMC, EMFP);
+			if(ret_stop > 0){
+				continue;
+			}
+			init_logL_observed = EMFP->LogL_observed(empcs, QA);
+			if(is_finite(init_logL_observed)){
+				break;
+			}
+		}
+	}
+
+	if(init_iter >= EMC->max_init_iter){
+		ret_stop = init_m_step(empcs, QA, EMC, EMFP);
+		if(ret_stop > 0){
+			#if PRINT_ERROR > 0
+				fprintf(stderr, "PE: Initialization error. (%s)\n", INIT_METHOD[EMC->init_method]);
+			#endif
+			free_edist_struct(eds);
+			return(ret_stop);
+		}
+		init_logL_observed = EMFP->LogL_observed(empcs, QA);
+		if(!is_finite(init_logL_observed)){
+			#if PRINT_ERROR > 0
+				fprintf(stderr, "PE: Initial logL_observed is not finit. (%s)\n",
+						INIT_METHOD[EMC->init_method]);
+			#endif
+			free_edist_struct(eds);
+			return(1);
+		}
+	}
+
+	free_edist_struct(eds);
+	return(ret_stop);
+} /* End of Update_init_random_Mu_unique(). */
+
+int Update_init_random_Mu_unique_label(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP){
+	int init_iter = 0, ret_stop = 0;
+	int n_X, k, l, N_X = empcs->N_X, K = empcs->K, L = empcs->L,
+		N_X_unlabeled = empcs->N_X_unlabeled, K_labeled = empcs->K_labeled, K_unlabeled = K - K_labeled,
+		tmp_n, tmp_k;
+	int center_id[K], tmp_center_id[K], tmp_id;
+	int consensus_Mu[L];
+	double tmp, tmp_min, init_logL_observed = 0.0;
+	edist_struct *eds;
+
+	find_consensus_Mu(empcs->N_X_org, L, empcs->ncode, empcs->missing_index, empcs->X_org, consensus_Mu);
+	eds = initialize_edist_struct_UT(EMC->edist_model, N_X, L, empcs->X);
+
+	while(init_iter < EMC->max_init_iter){
+		init_iter++;
+		reset_Q_matrix_array(QA);
+
+		/* Randomly pick centers from X. */
+		for(k = 0; k < K_labeled; k++){
+			tmp_n = 0;
+			for(n_X = 0; n_X < empcs->N_X_labeled; n_X++){
+				if(empcs->label_semi[n_X] == k){
+					tmp_n++;
+				}
+			}
+			srswor(tmp_n, 1, tmp_center_id);
+
+			tmp_n = -1;
+			for(n_X = 0; n_X < empcs->N_X_labeled; n_X++){
+				if(empcs->label_semi[n_X] == k){
+					tmp_n++;
+					if(tmp_n == tmp_center_id[0]){
+						break;
+					}
+				}
+			}
+			tmp_n = n_X;
+
+			for(n_X = 0; n_X < N_X; n_X++){
+				if(empcs->X[n_X] == empcs->X_labeled[tmp_n]){
+					center_id[k] = n_X;
+					break;
+				}
+			}
+		}
+
+		if(K_unlabeled > 0){
+			srswor(N_X_unlabeled, K_unlabeled, tmp_center_id);
+
+			for(k = 0; k < K_unlabeled; k++){
+				tmp_n = tmp_center_id[k];
+				tmp_k = k + K_labeled;
+				for(n_X = 0; n_X < N_X; n_X++){
+					if(empcs->X[n_X] == empcs->X_unlabeled[tmp_n]){
+						center_id[tmp_k] = n_X;
+						break;
+					}
+				}
+			}
+		}
+
+		/* Assign Mu by centers. */
+		for(k = 0; k < K; k++){
+			for(l = 0; l < L; l++){
+				empcs->Mu[k][l] = empcs->X[center_id[k]][l];
+			}
+			empcs->n_class[k] = 0;
 		}
 
 		/* Assign X to the nearest mu by distance, and recreate Z_normalized. */
@@ -309,20 +446,22 @@ int Update_init_random_Mu_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 } /* End of Update_init_random_Mu_unique(). */
 
 
+
+
 /* Pick clusters by cutting the longest K internal branches of neighbor-joining tree.
  * There is no randomness for this method, so the following settings may be suggested.
  * EMC->init_procedure = exhaustEM;
  * EMC->exhaust_iter = 1; */
 int Update_init_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP){
-	int n_X_org, n_X_unique, n_X, k, ret_stop = 0;
-	int N_X_org = empcs->N_X_org, N_X_unique = empcs->N_X_unique, N_X = empcs->N_X, K = empcs->K, L = empcs->L;
-	int largest_branch_id[N_X_unique - 3], class_id_unique[N_X_unique];
+	int n_X_org, n_X, k, ret_stop = 0;
+	int N_X_org = empcs->N_X_org, N_X = empcs->N_X, K = empcs->K, L = empcs->L;
+	int largest_branch_id[N_X - 3], class_id[N_X];
 	double init_logL_observed;
 	edist_struct *eds;
 	nj_struct *njs;
 	
-	eds = initialize_edist_struct_UT(EMC->edist_model, N_X_unique, L, empcs->X_unique);
-	njs = initialize_nj_struct(N_X_unique);
+	eds = initialize_edist_struct_UT(EMC->edist_model, N_X, L, empcs->X);
+	njs = initialize_nj_struct(N_X);
 	njs->D = eds->EDM[0];
 	phyclust_ape_nj(njs);
 	if(! check_njs(njs)){
@@ -339,7 +478,7 @@ int Update_init_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 	#endif
 
 	search_largest_branch(njs, largest_branch_id);
-	ret_stop = assign_class_by_njs_branch(K, njs, largest_branch_id, class_id_unique);
+	ret_stop = assign_class_by_njs_branch(K, njs, largest_branch_id, class_id);
 	if(ret_stop != 0){
 		#if PRINT_ERROR > 0
 			fprintf(stderr, "PE: Class assignment fails.\n");
@@ -351,7 +490,7 @@ int Update_init_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 
 	/* Assign Mu and recreate Z_normalized. */
 	for(n_X_org = 0; n_X_org < N_X_org; n_X_org++){
-		empcs->class_id[n_X_org] = class_id_unique[empcs->map_X_org_to_X_unique[n_X_org]];
+		empcs->class_id[n_X_org] = class_id[empcs->map_X_org_to_X[n_X_org]];
 	}
 	assign_Mu_by_class(empcs->N_X_org, empcs->K, empcs->L, empcs->ncode, empcs->missing_index,
 				empcs->class_id, empcs->X_org, empcs->Mu);
@@ -362,10 +501,10 @@ int Update_init_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 		for(k = 0; k < K; k++){
 			empcs->Z_normalized[n_X][k] = 0.0;
 		}
-		empcs->Z_normalized[n_X][class_id_unique[empcs->map_X_org_to_X_unique[empcs->map_X_to_X_org[n_X]]]] = 1.0;
+		empcs->Z_normalized[n_X][class_id[empcs->map_X_org_to_X[empcs->map_X_to_X_org[n_X]]]] = 1.0;
 	}
-	for(n_X_unique = 0; n_X_unique < N_X_unique; n_X_unique++){
-		empcs->n_class[class_id_unique[n_X_unique]] += empcs->replication_X_unique[n_X_unique];
+	for(n_X = 0; n_X < N_X; n_X++){
+		empcs->n_class[class_id[n_X]] += empcs->replication_X[n_X];
 	}
 
 	if(check_all_min_n_class(K, empcs->n_class, EMC->min_n_class)){
@@ -407,15 +546,15 @@ int Update_init_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 /* Pick clusters by randomly cutting the longest K internal branches of neighbor-joining tree. */
 int Update_init_random_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP){
 	int init_iter = 0, ret_stop = 0;
-	int n_X_org, n_X_unique, n_X, k;
-	int N_X_org = empcs->N_X_org, N_X_unique = empcs->N_X_unique, N_X = empcs->N_X, K = empcs->K, L = empcs->L;
-	int random_branch_id[N_X_unique - 3], class_id_unique[N_X_unique];
+	int n_X_org, n_X, k;
+	int N_X_org = empcs->N_X_org, N_X = empcs->N_X, K = empcs->K, L = empcs->L;
+	int random_branch_id[N_X - 3], class_id[N_X];
 	double init_logL_observed;
 	edist_struct *eds;
 	nj_struct *njs;
 	
-	eds = initialize_edist_struct_UT(EMC->edist_model, N_X_unique, L, empcs->X_unique);
-	njs = initialize_nj_struct(N_X_unique);
+	eds = initialize_edist_struct_UT(EMC->edist_model, N_X, L, empcs->X);
+	njs = initialize_nj_struct(N_X);
 	njs->D = eds->EDM[0];
 	phyclust_ape_nj(njs);
 	if(! check_njs(njs)){
@@ -437,7 +576,7 @@ int Update_init_random_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 
 		/* Randomly pick mu from X. */
 		random_branch(njs, random_branch_id);
-		ret_stop = assign_class_by_njs_branch(K, njs, random_branch_id, class_id_unique);
+		ret_stop = assign_class_by_njs_branch(K, njs, random_branch_id, class_id);
 		if(ret_stop != 0){
 			free_edist_struct(eds);
 			free_nj_struct(njs);
@@ -446,7 +585,7 @@ int Update_init_random_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 
 		/* Assign Mu and recreate Z_normalized. */
 		for(n_X_org = 0; n_X_org < N_X_org; n_X_org++){
-			empcs->class_id[n_X_org] = class_id_unique[empcs->map_X_org_to_X_unique[n_X_org]];
+			empcs->class_id[n_X_org] = class_id[empcs->map_X_org_to_X[n_X_org]];
 		}
 		assign_Mu_by_class(empcs->N_X_org, empcs->K, empcs->L, empcs->ncode, empcs->missing_index,
 					empcs->class_id, empcs->X_org, empcs->Mu);
@@ -457,11 +596,11 @@ int Update_init_random_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 			for(k = 0; k < K; k++){
 				empcs->Z_normalized[n_X][k] = 0.0;
 			}
-			empcs->Z_normalized[n_X][class_id_unique[empcs->map_X_org_to_X_unique[empcs->map_X_to_X_org[n_X]]]]
+			empcs->Z_normalized[n_X][class_id[empcs->map_X_org_to_X[empcs->map_X_to_X_org[n_X]]]]
 				= 1.0;
 		}
-		for(n_X_unique = 0; n_X_unique < N_X_unique; n_X_unique++){
-			empcs->n_class[class_id_unique[n_X_unique]] += empcs->replication_X_unique[n_X_unique];
+		for(n_X = 0; n_X < N_X; n_X++){
+			empcs->n_class[class_id[n_X]] += empcs->replication_X[n_X];
 		}
 
 		if(check_all_min_n_class(K, empcs->n_class, EMC->min_n_class)){
@@ -504,10 +643,11 @@ int Update_init_random_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 } /* End of Update_init_random_nj_unique(). */
 
 
+
+
 int Update_init_k_medoids(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP){
 	int init_iter = 0, ret_stop = 0;
-	int n_X_org, n_X, k, l, N_X_org = empcs->N_X_org, N_X_unique = empcs->N_X_unique;
-	int N_X = empcs->N_X, K = empcs->K, L = empcs->L;
+	int n_X_org, n_X, k, l, N_X_org = empcs->N_X_org, N_X = empcs->N_X, K = empcs->K, L = empcs->L;
 	int center_id[K], class_id[N_X_org];
 	int consensus_Mu[L];
 	double init_logL_observed;
@@ -520,7 +660,7 @@ int Update_init_k_medoids(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 		init_iter++;
 		reset_Q_matrix_array(QA);
 
-		assign_class_unique_by_k_medoids(N_X_org, K, eds->EDM, N_X_unique, empcs->map_X_unique_to_X_org,
+		assign_class_unique_by_k_medoids(N_X_org, K, eds->EDM, N_X, empcs->map_X_to_X_org,
 							center_id, class_id);
 
 		/* Pick mu from X. */
@@ -586,6 +726,8 @@ int Update_init_k_medoids(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 	free_edist_struct(eds);
 	return(ret_stop);
 } /* End of Update_init_k_medoids(). */
+
+
 
 
 /* Pick clusters by PAM.

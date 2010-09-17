@@ -1,8 +1,9 @@
 # This file contains functions to call phyclust in C.
 
-phyclust <- function(X, K, EMC = .EMC, manual.id = NULL, byrow = TRUE){
+phyclust <- function(X, K, EMC = .EMC, manual.id = NULL,
+    label = NULL, byrow = TRUE){
   if(K <= 0){
-    stop(K > 0)
+    stop("K > 0")
   }
   if(byrow){
     X <- t(X)
@@ -12,11 +13,13 @@ phyclust <- function(X, K, EMC = .EMC, manual.id = NULL, byrow = TRUE){
   L <- nrow(X)
 
   if(! is.null(manual.id)){
-    if(max(manual.id) != K){
-      stop("manual.id is not correct.")
-    } else{
-      manual.id <- manual.id - 1
+    if(! is.null(label)){
+      stop("manual.id is only for unsupervised clustering.")
     }
+    if(any(manual.id <= 0 | manual.id > K)){
+      stop("manual.id is not correct.")
+    }
+    manual.id <- manual.id - 1
   } else{
     if(EMC$init.method == "manualMu"){
       stop("manual.id is missing.")
@@ -25,6 +28,7 @@ phyclust <- function(X, K, EMC = .EMC, manual.id = NULL, byrow = TRUE){
 
   EMC <- check.EMC(EMC)
   EMC <- translate.EMC(EMC)
+  label <- check.label(label, N.X.org, K, byrow)
 
   ret <- .Call("R_phyclust",
                as.integer(N.X.org),
@@ -33,6 +37,7 @@ phyclust <- function(X, K, EMC = .EMC, manual.id = NULL, byrow = TRUE){
                as.integer(X),
                EMC,
                as.integer(manual.id),
+               label,
                PACKAGE = "phyclust")
 
   if(!is.finite(ret$logL)){
@@ -120,6 +125,8 @@ translate.ret <- function(ret, EMC = NULL){
     ret$QA$kappa <- NULL
   }
 
+  ret$label.method <- .label.method[ret$label.method + 1]
+
   ret
 } # End of translate.ret().
 
@@ -200,4 +207,66 @@ translate.EMC <- function(EMC){
 
   EMC
 } # End of translate.EMC().
+
+
+### For internal used in semi-supervised clustering.
+check.label <- function(label, N.X.org, K, byrow){
+  ### label$label.method = 0 for NONE, 1 for SIMPLE, and 2 for COMPLEX.
+  if(is.null(label)){
+    ### Do nothing for unsupervised.
+    label <- list(label.method = as.integer(which(.label.method == "NONE") - 1),
+               semi = NULL, index = NULL, prob = NULL)
+  } else{
+    ### Check for semi-supervised.
+    if(is.vector(label, mode = "numeric")){
+      ### A vector of label is for semi-supervised clustering.
+      label <- list(label.method = as.integer(which(.label.method == "SEMI") - 1),
+                 semi = label, index = NULL, prob = NULL)
+
+      if((length(label$semi) != N.X.org) ||
+         (length(unique(label$semi)) != (max(label$semi) + 1)) ||
+         any(label$semi < 0 | label$semi > K)){
+        stop("label$semi is not correct.")
+      }
+
+      label$index <- which(label$semi != 0)
+      label$prob <- matrix(0, nrow = K, ncol = length(label$index))
+      for(i in 1:length(label$index)){
+        label$prob[label$semi[label$index[i]], i] <- 1
+      }
+    } else{
+      ### A data.frame of label is for semi-supervised clustering.
+      if(! is.vector(label, mode = "list")){
+        stop("label should be a list.")
+      }
+
+      label$label.method <- as.integer(which(.label.method == "GENERAL") - 1)
+
+      if(is.null(label$index) || is.null(label$prob)){
+        stop("label$index and label$prob are required.")
+      }
+      if(length(label$index) > N.X.org ||
+         any(label$index < 1 | label$index > N.X.org)){
+        stop("label$index is not correct.")
+      }
+
+      if(byrow){
+        label$prob <- t(label$prob)
+      }
+      label$semi <- apply(label$prob, 2, which.max)
+
+      if((nrow(label$prob) != K) ||
+         (ncol(label$prob) != length(label$index)) ||
+         any(label$prob < 0 | label$prob > 1) ||
+         any(colSums(label$prob) != 1)){
+        stop("label$prob is not correct.")
+      }
+    }
+
+    label$semi <- as.integer(label$semi[label$semi > 0] - 1)
+    label$index <- as.integer(label$index - 1)
+  }
+
+  label
+} # End of check.label().
 

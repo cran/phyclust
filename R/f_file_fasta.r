@@ -42,7 +42,7 @@ read.fasta.nucleotide <- function(filename, byrow = TRUE){
   
   fasta <- list(code.type = "NUCLEOTIDE",
               nseq = nseq, seqlen = nrow(org), seqname = seqname,
-              org.code = org, org = NULL)
+              org.code = org, org = NULL, byrow = byrow)
   fasta$org <- matrix(code2nid(org), nrow = fasta$seqlen, ncol = fasta$nseq)
 
   if(byrow){

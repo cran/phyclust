@@ -15,27 +15,27 @@
  * NUCLEOTIDE	JC69,K80,F81,HKY85	D_JC69,D_K80,D_HAMMING
  * SNP		SNP_JC69,SNP_F81	D_HAMMING
  *
- * INIT_METHOD	INIT_PROCEDURE		IDENTIFIER
- * -----------	--------------		----------
- * randomMu	all			all
- * NJ		exhaustEM(iter=1)	all
- * randomNJ	all			all
- * PAM		exhaustEM(iter=1)	all
- * kMedoids	all			all
- * manualMu	exhaustEM(iter=1)	all
+ * INIT_METHOD	INIT_PROCEDURE		IDENTIFIER	LABEL_METHOD
+ * -----------	--------------		----------	------------
+ * randomMu	all			all		all
+ * NJ		exhaustEM(iter=1)	all		NONE
+ * randomNJ	all			all		NONE
+ * PAM		exhaustEM(iter=1)	all		NONE
+ * kMedoids	all			all		NONE
+ * manualMu	exhaustEM(iter=1)	all		NONE
  */
 
 /* Collection of all initialization procedures. */
 void init_em_step(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP){
-	double lower_bound_org, lower_bound_unique;
+	double lower_bound_org, lower_bound;
 
-	if(pcs->K * EMC->min_n_class >= pcs->N_X_unique){
+	if(pcs->K * EMC->min_n_class >= pcs->N_X){
 		fprintf(stderr, "PE: K is too huge.");
 		exit(1);
 	}
 	lower_bound_org = (double) EMC->min_n_class / (double) pcs->N_X_org;
-	lower_bound_unique = 1.0 / (double) pcs->N_X_unique;
-	EMC->Eta_lower_bound = (lower_bound_org > lower_bound_unique) ? lower_bound_org : lower_bound_unique;
+	lower_bound = 1.0 / (double) pcs->N_X;
+	EMC->Eta_lower_bound = (lower_bound_org > lower_bound) ? lower_bound_org : lower_bound;
 	if(pcs->K > 1){
 		EMC->Eta_upper_bound = 1.0 - EMC->Eta_lower_bound;
 	} else{
@@ -43,6 +43,9 @@ void init_em_step(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, em_
 	}
 
 	/* Check exceptions. */
+	if(pcs->label->label_method != NONE){
+		EMC->init_method = randomMu;
+	}
 	if(EMC->init_method == randomNJ && pcs->K == 1){
 		EMC->exhaust_iter = 1;
 		EMC->init_procedure = exhaustEM;

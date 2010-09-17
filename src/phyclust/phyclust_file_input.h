@@ -1,7 +1,7 @@
-/* This file contains declarations for phylip. */
+/* This file contains declarations for phylip and fasta. */
 
-#ifndef __PHYCLSUT_FILE_INPUT_
-#define __PHYCLSUT_FILE_INPUT_
+#ifndef __PHYCLUST_FILE_INPUT_
+#define __PHYCLUST_FILE_INPUT_
 
 static const int NAME_LENGTH = 10;		/* length of sequence name. */
 
@@ -30,4 +30,4 @@ input_struct* read_input_phylip(char *file_name);
 input_struct* read_input_fasta(char *file_name);
 input_struct* read_input_snp(char *file_name);
 
-#endif	/* End of __PHYCLSUT_FILE_INPUT_. */
+#endif	/* End of __PHYCLUST_FILE_INPUT_. */

@@ -198,12 +198,38 @@ int** allocate_int_RT(int nrow, int ncol){
 			exit(1);
 		}
 		for(j = 0; j < ncol; j++){
-			pointerarray[i][j] = 0.0;
+			pointerarray[i][j] = 0;
 		}
 	}
 
 	return(pointerarray);
 } /* End of allocate_int_RT(). */
+
+/* Allocate a rectriangular array with int. */
+char** allocate_char_RT(int nrow, int ncol){
+	int i, j;
+	char **pointerarray = allocate_char_2D_AP(nrow);
+
+	if(pointerarray == NULL){
+		fprintf(stderr, "PE: Memory allocation fails!\n");
+		exit(1);
+	}
+
+	for(i = 0; i < nrow; i++){
+		pointerarray[i] = allocate_char_1D(ncol + 1);
+		if(pointerarray[i] == NULL){
+			fprintf(stderr, "PE: Memory allocation fails!\n");
+			exit(1);
+		}
+		for(j = 0; j < ncol; j++){
+			pointerarray[i][j] = '0';
+		}
+		pointerarray[i][ncol] = '\0';
+	}
+
+	return(pointerarray);
+} /* End of allocate_int_RT(). */
+
 
 void free_double_RT(int nrow, double **RT){
 	int i;

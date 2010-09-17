@@ -1,9 +1,8 @@
 /* This file contains a function R_edist() called by R wraps edist_matrix() in
-   "R/f_edist.r", and this function calls the relative functions
-   edist() in "src/phyclust_qmatrix.c".
-
-   Writen: Wei-Chen Chen on 2009/08/20.
-*/
+ * "R/f_edist.r", and this function calls the relative functions
+ * edist() in "src/phyclust_qmatrix.c".
+ *
+ * Writen: Wei-Chen Chen on 2009/08/20. */
 
 #include <R.h>
 #include <Rinternals.h>
@@ -24,15 +23,14 @@ void R_edist_matrix(int edist_model, int N_X, int L, int **X, double *ret){
 
 
 /* This function calls edist_matrix() in "src/phyclust_qmatrix.c" and is
-   called by edist() using .Call() in "R/f_edist.r".
-   Input:
-     R_edist_model: SEXP[1], index of edist model.
-     R_N_X: SEXP[1], number of sequences.
-     R_L: SEXP[1], length of sequences.
-     R_X: SEXP[1], sequences.
-   Output:
-     ret: SEXP[N_X * (N_X - 1) / 2], an array contains distance.
-*/
+ * called by edist() using .Call() in "R/f_edist.r".
+ * Input:
+ *   R_edist_model: SEXP[1], index of edist model.
+ *   R_N_X: SEXP[1], number of sequences.
+ *   R_L: SEXP[1], length of sequences.
+ *   R_X: SEXP[1], sequences.
+ * Output:
+ *   ret: SEXP[N_X * (N_X - 1) / 2], an array contains distance. */
 SEXP R_phyclust_edist(SEXP R_edist_model, SEXP R_N_X, SEXP R_L, SEXP R_X){
 	/* Declare variables for calling C. */
 	int *C_edist_model, *C_N_X, *C_L, **C_X;

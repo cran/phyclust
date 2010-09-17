@@ -2,7 +2,8 @@
 
 phyclust.logL <- function(X, ret.phyclust = NULL,
     K = NULL, Eta = NULL, Mu = NULL, pi = NULL, kappa = NULL, Tt = NULL,
-    substitution.model = NULL, identifier = NULL, code.type = NULL){
+    substitution.model = NULL, identifier = NULL, code.type = NULL,
+    label = NULL){
   if(is.null(ret.phyclust)){
     if(is.null(K) || is.null(Eta) || is.null(Mu) || is.null(Tt) ||
        is.null(substitution.model) ||
@@ -30,6 +31,7 @@ phyclust.logL <- function(X, ret.phyclust = NULL,
   }
 
   vect <- convert.QA.to.vect(ret.phyclust)
+  label <- check.label(label, nrow(X), ret.phyclust$K, TRUE)
 
   ret <- .Call("R_phyclust_logL",
                as.integer(nrow(X)),
@@ -43,6 +45,7 @@ phyclust.logL <- function(X, ret.phyclust = NULL,
                                 as.character(.substitution$model)) - 1),
                as.integer(which(ret.phyclust$QA$identifier == .identifier) - 1),
                as.integer(which(ret.phyclust$code.type == .code.type) - 1),
+               label,
                PACKAGE = "phyclust")
 
   ret

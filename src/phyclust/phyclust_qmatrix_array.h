@@ -1,8 +1,8 @@
 /* This file contains declarations for phyclust. */
 
 
-#ifndef __PHYCLSUT_Q_MATRIX_ARRAY_
-#define __PHYCLSUT_Q_MATRIX_ARRAY_
+#ifndef __PHYCLUST_Q_MATRIX_ARRAY_
+#define __PHYCLUST_Q_MATRIX_ARRAY_
 
 #include "phyclust_qmatrix.h"
 
@@ -72,4 +72,4 @@ void reset_Q_matrix_array(Q_matrix_array *QA);
 /* ----- For debug. ----- */
 void print_QA(Q_matrix_array *QA);
 
-#endif	/* End of __PHYCLSUT_Q_MATRIX_ARRAY_. */
+#endif	/* End of __PHYCLUST_Q_MATRIX_ARRAY_. */

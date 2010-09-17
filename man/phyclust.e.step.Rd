@@ -9,7 +9,7 @@
 phyclust.e.step(X, ret.phyclust = NULL, K = NULL, Eta = NULL,
     Mu = NULL, pi = NULL, kappa = NULL, Tt = NULL,
     substitution.model = NULL, identifier = NULL, code.type = NULL,
-    Z.state = TRUE)
+    Z.state = TRUE, label = NULL)
 }
 \arguments{
   \item{X}{nid/sid matrix with \eqn{N}{N} rows/sequences and \eqn{L}{L} columns/sites.}
@@ -24,6 +24,7 @@ phyclust.e.step(X, ret.phyclust = NULL, K = NULL, Eta = NULL,
   \item{identifier}{identifier.}
   \item{code.type}{code type.}
   \item{Z.state}{see \sQuote{Details}.}
+  \item{label}{label of sequences for semi-supervised clustering.}
 }
 \details{
   \code{X} should be a numerical matrix containing sequence data that
@@ -37,6 +38,10 @@ phyclust.e.step(X, ret.phyclust = NULL, K = NULL, Eta = NULL,
   TRUE, the \code{Z.normalized} returned by this function will be
   posterior probabilities. Otherwise, it will be \code{logPt}, log of
   transition probabilities, \eqn{\log(\phi(\cdots))}{log(phi(...))}.
+
+  If \code{label} is inputted, the label information will be used
+  the E-step, even the \code{ret.phyclust} is the result of unsupervised
+  clustering.
 }
 \value{
   This function return a \eqn{Z_{nk}}{Z_nk} matrix with dimension =
@@ -67,6 +72,11 @@ X <- seq.data.toy$org
 ret.1 <- phyclust(X, 2, EMC = EMC.1)
 ret.2 <- phyclust.e.step(X, ret.phyclust = ret.1)
 str(ret.2)
+
+# For semi-supervised clustering.
+semi.label <- rep(0, nrow(X))
+semi.label[1:3] <- 1
+ret.3 <- phyclust.e.step(X, ret.phyclust = ret.1, label = semi.label)
 }
 }
 \keyword{programming}

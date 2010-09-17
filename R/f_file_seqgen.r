@@ -5,8 +5,9 @@
 ###   seqname: Sequence's name.
 ###   org: Original sequence in nid. array[nseq, nsite]
 read.seqgen <- function(text, byrow = TRUE, code.type = .code.type[1]){
-  phylip <- list()
-  phylip$code.type <- code.type[1]
+  phylip <- list(code.type = code.type[1], info = NULL, nseq = NULL,
+                 seqlen = NULL, seqname = NULL, org.code = NULL, org = NULL,
+                 byrow = byrow)
 
 ### Read header.
   phylip$info <- text[1]

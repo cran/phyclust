@@ -10,7 +10,9 @@
 
 /* Initial a em_fp. */
 em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
-	em_fp *EMFP = (em_fp*) malloc(sizeof(em_fp));
+	em_fp *EMFP;
+	
+	EMFP = (em_fp*) malloc(sizeof(em_fp));
 	
 	/* Assign init_method FP. */
 	switch(EMC->init_method){
@@ -63,8 +65,29 @@ em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
 	}
 
 	/* Update functions. */
-	/* In "phyclust_em.c". */
-	EMFP->E_step_and_logL_observed = &E_step_and_logL_observed;
+	switch(pcs->label->label_method){
+		case NONE:
+			EMFP->E_step_logL_observed = &E_step_logL_observed;
+			EMFP->LogL_observed = &LogL_observed;
+			EMFP->Copy_pcs_to_empcs = &Copy_pcs_to_empcs;
+			break;
+		case SEMI:
+			EMFP->Update_init = &Update_init_random_Mu_unique_label;
+			EMFP->E_step_logL_observed = &E_step_logL_observed_label_semi;
+			EMFP->LogL_observed = &LogL_observed_label_semi;
+			EMFP->Copy_pcs_to_empcs = &Copy_pcs_to_empcs_label;
+			break;
+		case GENERAL:
+			EMFP->Update_init = &Update_init_random_Mu_unique_label;
+			EMFP->E_step_logL_observed = &E_step_logL_observed_label_general;
+			EMFP->LogL_observed = &LogL_observed_label_general;
+			EMFP->Copy_pcs_to_empcs = &Copy_pcs_to_empcs_label;
+			break;
+		default:
+			fprintf(stderr, "PE: The label method is not found.\n");
+			exit(1);
+	}
+
 	switch(EMC->boundary_method){
 		case IGNORE:
 			EMFP->Update_Eta_given_Z = &Update_Eta_given_Z_IGNORE;
@@ -76,20 +99,10 @@ em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
 			fprintf(stderr, "PE: The boundary method is not found.\n");
 			exit(1);
 	}
-	/* In "phyclust_em_tool.h". */
-	EMFP->LogL_observed = &LogL_observed;
+
 	if(pcs->missing_flag){
 		EMFP->LogL_complete = &LogL_complete_missing;
 		EMFP->LogL_profile = &LogL_profile_missing;
-	} else{
-		EMFP->LogL_complete = &LogL_complete;
-		EMFP->LogL_profile = &LogL_profile;
-	}
-	EMFP->Copy_empcs_to_pcs = &Copy_empcs_to_pcs;
-	EMFP->Copy_pcs_to_empcs = &Copy_pcs_to_empcs;
-
-	/* In "phyclust_logpL.c". */
-	if(pcs->missing_flag){
 		EMFP->Compute_R = &Compute_R_missing;
 		if(EMC->est_non_seg_site != 0){
 			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_full_missing;
@@ -97,6 +110,8 @@ em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
 			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_skip_non_seg_missing;
 		}
 	} else{
+		EMFP->LogL_complete = &LogL_complete;
+		EMFP->LogL_profile = &LogL_profile;
 		EMFP->Compute_R = &Compute_R;
 		if(EMC->est_non_seg_site != 0){
 			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_full;
@@ -104,6 +119,7 @@ em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
 			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_skip_non_seg;
 		}
 	}
+	EMFP->Copy_empcs_to_pcs = &Copy_empcs_to_pcs;
 	
 	return(EMFP);
 } /* End of initialize_em_control(). */

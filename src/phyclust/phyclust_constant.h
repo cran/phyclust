@@ -92,12 +92,19 @@ static char VARIABLE_IS_NOT_USED *BOUNDARY_METHOD[N_BOUNDARY_METHOD] =
 	{"ADJUST", "IGNORE"};
 
 
+/* Label methods. */
+#define N_LABEL_METHOD 3
+enum {NONE, SEMI, GENERAL};
+static char VARIABLE_IS_NOT_USED *LABEL_METHOD[N_LABEL_METHOD] =
+	{"NONE", "SEMI", "GENERAL"};
+
+
 /* Rprintf: print message to R console. */
 #ifdef R_EXT_PRINT_H_
-#undef printf
-#define printf Rprintf
-#undef exit
-#define exit(a) error("%d\n", a)
+	#undef printf
+	#define printf Rprintf
+	#undef exit
+	#define exit(a) error("%d\n", a)
 #endif
 
 
@@ -112,7 +119,6 @@ static char VARIABLE_IS_NOT_USED *BOUNDARY_METHOD[N_BOUNDARY_METHOD] =
 #define verbosity_em_step 0	/* 3 */		/* 0 for no output, >0 for print information. */
 #define verbosity_exhaust_EM 0	/* 1 */		/* 0 for no output, >0 for print information. */
 #define PRINT_ERROR 0		/* 1 */		/* 0 for no output, >0 for error messages. */
-
 
 #endif	/* End of __PHYCLUST_CONSTANT_. */
 

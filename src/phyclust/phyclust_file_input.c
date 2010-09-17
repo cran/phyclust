@@ -9,21 +9,14 @@
 
 input_struct* initialize_input_struct(int code_type, int N_X_org, int L){
 	input_struct *ins;
-	int i;
 
 	ins = (input_struct*) malloc(sizeof(input_struct));
 	ins->code_type = code_type;
 	ins->ncode = NCODE[code_type];
 	ins->N_X_org = N_X_org;
 	ins->L = L;
-	ins->X_org = allocate_int_2D_AP(N_X_org);
-	for(i = 0; i < N_X_org; i++){
-		ins->X_org[i] = allocate_int_1D(L);
-	}
-	ins->X_name = allocate_char_2D_AP(N_X_org);
-	for(i = 0; i < N_X_org; i++){
-		ins->X_name[i] = allocate_char_1D(NAME_LENGTH);
-	}
+	ins->X_org = allocate_int_RT(N_X_org, L);
+	ins->X_name = allocate_char_RT(N_X_org, NAME_LENGTH);
 
 	return(ins);
 } /* End of initialize_input_struct(). */
@@ -51,7 +44,7 @@ int nucleotide_to_id(char x){
 		case 'C': case 'c':
 			ret = C;
 			break;
-		case 'T': case 't':
+		case 'T': case 't': case 'U': case 'u':
 			ret = T;
 			break;
 		default:
@@ -64,8 +57,8 @@ int nucleotide_to_id(char x){
 
 
 int is_nucleotide(char X_org){
-	if(X_org == 'A' || X_org == 'G' || X_org == 'C' || X_org == 'T' ||
-		X_org == 'a' || X_org == 'g' || X_org == 'c' || X_org == 't' ||
+	if(X_org == 'A' || X_org == 'G' || X_org == 'C' || X_org == 'T' || X_org == 'U' ||
+		X_org == 'a' || X_org == 'g' || X_org == 'c' || X_org == 't' || X_org == 'u' ||
 		X_org == '-' ||
 		X_org == 'K' || X_org == 'M' || X_org == 'N' || X_org == 'R' || X_org == 'W' || X_org == 'Y' ||
 		X_org == 'k' || X_org == 'm' || X_org == 'n' || X_org == 'r' || X_org == 'w' || X_org == 'y'
@@ -145,7 +138,7 @@ input_struct* read_input_fasta(char *file_name){
 	input_struct *ins = NULL;
 	FILE *fp;
 	char X_org;
-	int i, j, N_X_org, L, flag, flag_start;
+	int i, j, N_X_org, L;
 
 	fp = fopen(file_name, "r");
 
@@ -156,27 +149,25 @@ input_struct* read_input_fasta(char *file_name){
 		/* Count total sequences. */
 		N_X_org = 0;
 		L = 0;
-		flag = 0;
-		flag_start = 0;
 		while(! feof(fp)){
 			X_org = (char) fgetc(fp);
 			if(X_org == '\r'){
 				continue;
 			}
-			if(X_org == '>' && flag == 0){
+			if(X_org == '>'){
 				N_X_org++;
-				flag = 1;
-				flag_start = 1;
-			} else if(X_org == '\n'){
-				flag = 0;
-				if(flag_start == 1){
-					flag_start = 2;
+				while(! feof(fp)){
+					X_org = (char) fgetc(fp);
+					if(X_org == '\r'){
+						continue;
+					}
+					if(X_org == '\n'){
+						break;
+					}
 				}
-			} else{
-				flag = 1;
+				continue;
 			}
-
-			if(flag_start == 2 && N_X_org == 1 && X_org != '\n'){
+			if(N_X_org == 1 && X_org != '\n'){
 				L++;
 			}
 		}
@@ -186,40 +177,36 @@ input_struct* read_input_fasta(char *file_name){
 
 		ins = initialize_input_struct(NUCLEOTIDE, N_X_org, L);
 
+		/* Read sequences. */
 		i = -1;
 		j = 0;
-		flag = 0;
-		flag_start = 0;
 		while(! feof(fp)){
 			X_org = (char) fgetc(fp);
 			if(X_org == '\r'){
 				continue;
 			}
-			if(X_org == '>' && flag == 0){
-				for(j = 0; j < NAME_LENGTH; j++){
+			if(X_org == '>'){
+				j = 0;
+				while(! feof(fp)){
 					X_org = (char) fgetc(fp);
-					if(X_org == ' '){
+					if(X_org == '\r'){
+						continue;
+					}
+					if(X_org == '\n'){
 						break;
 					}
-					ins->X_name[i + 1][j] = X_org;
+					if(j < NAME_LENGTH){
+						ins->X_name[i + 1][j++] = X_org;
+					}
 				}
-				flag = 1;
-				flag_start = 1;
-			} else if(X_org == '\n'){
-				flag = 0;
-				if(flag_start == 1){
-					flag_start = 2;
-					i++;
-					j = 0;
-				}
-			} else{
-				flag = 1;
+				ins->X_name[i + 1][j] = '\0';
+				i++;
+				j = 0;
+				continue;
 			}
-
-			if(flag_start == 2 && X_org != '\n'){
-				if(is_nucleotide(X_org)){
-					ins->X_org[i][j++] = nucleotide_to_id(X_org);
-				}
+		       
+			if(is_nucleotide(X_org)){
+				ins->X_org[i][j++] = nucleotide_to_id(X_org);
 			}
 		}
 	}

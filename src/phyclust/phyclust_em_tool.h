@@ -1,7 +1,7 @@
 /* This file contains declarations for em steps. */
 
-#ifndef __PHYCLSUT_EM_TOOL_
-#define __PHYCLSUT_EM_TOOL_
+#ifndef __PHYCLUST_EM_TOOL_
+#define __PHYCLUST_EM_TOOL_
 
 #include "phyclust_struct.h"
 #include "phyclust_em.h"
@@ -10,9 +10,13 @@
 
 /* ----- Independent summary tool. ----- */
 double LogL_observed(em_phyclust_struct *empcs, Q_matrix_array *QA);
+double LogL_observed_label_semi(em_phyclust_struct *empcs, Q_matrix_array *QA);
+double LogL_observed_label_general(em_phyclust_struct *empcs, Q_matrix_array *QA);
+/* For debug only. */
 double LogL_complete(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);		/* QA_H unused */
-double LogL_profile(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);		/* QA_H unused */
 double LogL_complete_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);	/* QA_H != QA */
+/* For M-step. */
+double LogL_profile(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);		/* QA_H unused */
 double LogL_profile_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);	/* QA_H != QA */
 
 /* ----- Initialization tool. ----- */
@@ -24,10 +28,12 @@ int is_finite(double x);
 
 /* ----- For copy. ----- */
 void copy_EMC(em_control *EMC_from, em_control *EMC_to);
+void reassign_label_pointer(em_phyclust_struct *empcs);
 void copy_empcs(em_phyclust_struct *empcs_from, em_phyclust_struct *empcs_to);
-
 void Copy_empcs_to_pcs(em_phyclust_struct *empcs, phyclust_struct *pcs);
+/* For M-step lonely, or semi-supervised. */
 void Copy_pcs_to_empcs(phyclust_struct *pcs, em_phyclust_struct *empcs);
+void Copy_pcs_to_empcs_label(phyclust_struct *pcs, em_phyclust_struct *empcs);
 
 
 /* ----- For debug. ----- */
@@ -43,4 +49,4 @@ void print_empcs_Mu_seg_site(em_phyclust_struct *empcs);
 void print_count_Mu_X(em_phyclust_struct *empcs, int n_X, int k);
 void print_count_Mu_X_missing(em_phyclust_struct *empcs, int n_X, int k);
 
-#endif	/* End of __PHYCLSUT_EM_TOOL_. */
+#endif	/* End of __PHYCLUST_EM_TOOL_. */

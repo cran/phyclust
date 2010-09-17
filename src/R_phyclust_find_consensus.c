@@ -1,25 +1,23 @@
 /* This file contains a function R_phyclust_find_consensus() called by R wraps
-   find_consensus() in "R/f_find_consensus.r", and this function calls the
-   relative functions
-   find_consensus_Mu() in "src/phyclust_init_method.c".
-
-   Writen: Wei-Chen Chen on 2010/02/26.
-*/
+ * find_consensus() in "R/f_find_consensus.r", and this function calls the
+ * relative functions
+ * find_consensus_Mu() in "src/phyclust_init_method.c".
+ *
+ * Writen: Wei-Chen Chen on 2010/02/26. */
 
 #include <R.h>
 #include <Rinternals.h>
 #include "phyclust/phyclust.h"
 
 /* This function calls find_consensus_Mu() in "src/phyclust_init_method.c" and
-   is called by find.consensus() using .Call() in "R/f_find_consensus.r".
-   Input:
-     R_N_X_org: SEXP[1], number of sequences.
-     R_L: SEXP[1], length of sequences.
-     R_code_type: SEXP[1], code type.
-     R_X_org: SEXP[1], sequences.
-   Output:
-     ret: SEXP[R_L], an array contains Mu.
-*/
+ * is called by find.consensus() using .Call() in "R/f_find_consensus.r".
+ * Input:
+ *   R_N_X_org: SEXP[1], number of sequences.
+ *   R_L: SEXP[1], length of sequences.
+ *   R_code_type: SEXP[1], code type.
+ *   R_X_org: SEXP[1], sequences.
+ * Output:
+ *   ret: SEXP[R_L], an array contains Mu. */
 SEXP R_phyclust_find_consensus(SEXP R_N_X_org, SEXP R_L, SEXP R_code_type,
 		SEXP R_X_org){
 	/* Declare variables for calling C. */

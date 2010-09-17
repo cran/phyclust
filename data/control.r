@@ -1,6 +1,6 @@
 ### This file contains all control functions for EM.
 
-### These orders are metter for C.
+### These orders are matter for C.
 .init.procedure <- c("exhaustEM", "emEM", "RndEM", "RndpEM")
 .init.method <- c("randomMu", "NJ", "randomNJ", "PAM", "K-Medoids", "manualMu")
 .substitution <- data.frame(
@@ -14,3 +14,4 @@
 .code.type <- c("NUCLEOTIDE", "SNP")
 .em.method <- c("EM", "ECM", "AECM")
 .boundary.method <- c("ADJUST", "IGNORE")
+.label.method <- c("NONE", "SEMI", "GENERAL")
