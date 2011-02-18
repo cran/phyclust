@@ -1,10 +1,13 @@
-ms version May 29, 2007.
+"ms" version May 29, 2007.
 
-This directory contains "ms" source codes partially.
-See the other "readme" in this directory for more details.
-The pdf file in "ms.tar" (download from author's webpage) is also
-useful to understand the command line options.
+The pdf file (download from the author's website) in the installed directory
+    "phyclust/doc/Documents/msdoc.pdf"
+or in the source code directory
+    "phyclust/inst/doc/Documents/msdoc.pdf"
+is an original document and useful to understand the command line options.
+See "ms-Readme.txt" in this directory for more information about "ms".
 
+-------------------------------------------------------------------------------
 I turn "ms" in a library format by adding and modifing some functions, "R_*.c",
 for directorly using "msdir" in R, and the standardlone version will not
 be guaranteed here. Try the original "ms" for standardlone.

@@ -45,7 +45,7 @@ gen.equal.star.anc.dec(K, N.K, rate.f = 0.5)
 set.seed(1234)
 tree.K <- gen.equal.star.anc.dec(6, rep(3:5, 2),
                                  rate.f = 0.7)
-X.class <- as.numeric(gsub("d(.).(.)", "\\1",
+X.class <- as.numeric(gsub("d(.).(.)", "\\\\1",
                            tree.K$equal.star$tip.label))
 
 # Plot results

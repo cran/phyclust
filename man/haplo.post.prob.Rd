@@ -65,7 +65,7 @@
 }
 \examples{
 \dontrun{
-data.path <- paste("./data/crohn.phy", sep = "")
+data.path <- paste(.libPaths()[1], "/phyclust/data/crohn.phy", sep = "")
 my.snp <- read.phylip.snp(data.path)
 ret <- haplo.post.prob(my.snp$org, ploidy = 1)
 str(ret)

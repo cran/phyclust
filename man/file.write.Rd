@@ -68,7 +68,7 @@ write.phylip(my.snp$org, "new.crohn.phy", code.type = "SNP")
 # FASTA
 data.path <- paste(.libPaths()[1], "/phyclust/data/pony625.fas", sep = "")
 (my.pony <- read.fasta(data.path))
-write.phylip(my.pony$org, "new.pony.phy")
+write.fasta(my.pony$org, "new.pony.fas")
 }
 }
 \keyword{programming}

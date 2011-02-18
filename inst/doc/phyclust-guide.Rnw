@@ -1,0 +1,105 @@
+%\VignetteIndexEntry{phyclust-guide}
+
+\documentclass[article,shortnames,nojss]{phyclust-include/jss}
+
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\newcommand{\vect}[1]{\boldsymbol{#1}}
+\newcommand{\A}{\mbox{A}}
+\newcommand{\C}{\mbox{C}}
+\newcommand{\G}{\mbox{G}}
+\newcommand{\T}{\mbox{T}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% declarations for jss.cls %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% almost as usual
+\author{Wei-Chen Chen\\Iowa State University} %\\ \today}
+\title{A Quick Guide for the \pkg{phyclust} Package\\
+\vspace{0.2cm} \large (Based on Version 0.1-2)}
+
+%% for pretty printing and a nice hypersummary also set:
+\Plainauthor{Wei-Chen Chen} %% comma-separated
+\Plaintitle{Quick Guide for phyclust} %% without formatting
+\Shorttitle{Quick Guide for phyclust} %% a short title (if necessary)
+
+%% an abstract and keywords
+%\Abstract{
+%  The \pkg{phyclust} package in \proglang{R} is for Phylogenetic Clustering
+%  a novel statistics method incorporating model-based clusterings with
+%  evolution theories to identify population
+%  structures and cluster DNA sequences. It's kernel is implemented
+%  in \proglang{C} with objective structures as a library for further
+%  standalone applications. It also integrates three famous tools
+%  \pkg{ms} \citep{Hudson2002} and \pkg{seq-gen} \citep{Rambaut1997}
+%  for generating coalescent trees and sequences,
+%  and \pkg{Hap-Clustering} \citep{Tzeng2005} for SNP haplotype grouping.
+%  It also provides functions for visualizing classifications of sequence data.
+%}
+%\Keywords{phyloclustering, model-based clustering, EM algorithm}
+%\Plainkeywords{phyloclustering, model-based clustering, EM algorithm} %% without formatting
+%% at least one keyword must be supplied
+
+%% publication information
+%% NOTE: Typically, this can be left commented and will be filled out by the technical editor
+%% \Volume{13}
+%% \Issue{9}
+%% \Month{September}
+%% \Year{2004}
+%% \Submitdate{2004-09-29}
+%% \Acceptdate{2004-09-29}
+
+%% The address of (at least) one author should be given
+%% in the following format:
+\Address{
+  Wei-Chen Chen\\
+  Department Statisitcs \& Statistical Laboratory\\
+  1121 Snedecor Hall\\
+  Ames, Iowa 50011, USA\\
+  E-mail: \email{phyclust@gmail.com}\\
+  URL: \url{http://thirteen-01.stat.iastate.edu/snoweye/phyclust/}
+}
+%% It is also possible to add a telephone and fax number
+%% before the e-mail in the following format:
+%% Telephone: +43/1/31336-5053
+%% Fax: +43/1/31336-734
+
+%% for those who use Sweave please include the following line (with % symbols):
+%% need no \usepackage{Sweave.sty}
+
+%% end of declarations %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\pagenumbering{roman}
+\tableofcontents
+
+%% include your article here, just as usual
+%% Note that you should use the \pkg{}, \proglang{} and \code{} commands.
+
+\section*{Acknowledgement}
+\addcontentsline{toc}{section}{Acknowledgement \vspace{-0.3cm}}
+The author thanks Dr. Karin S. Dorman and Dr. Ranjan Maitra in Iowa State
+University for their generous support, and is funded by Dr. Maitra's grand,
+NSF CAREER DMS-0437555.
+
+\newpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\input{./phyclust-include/01-introduction}
+\input{./phyclust-include/02-dataio}
+\input{./phyclust-include/03-msseqgen}
+\input{./phyclust-include/04-phyclust}
+\input{./phyclust-include/05-haplo}
+\input{./phyclust-include/06-more}
+
+\bibliography{./phyclust-include/phyclust}
+\addcontentsline{toc}{section}{References}
+
+\end{document}

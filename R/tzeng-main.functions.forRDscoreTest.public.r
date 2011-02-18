@@ -13,7 +13,7 @@ getcut.fun<-function(pp.org,nn=2*nhap, plot=0){
       netinfo<-info-dimen
       cutpos <-netinfo==max(netinfo)
       if(plot==1){
-        plot( netinfo, pp,type="b",cex=0.5)
+#        plot( netinfo, pp,type="b",cex=0.5)
         barplot(pp.org)
         abline(h=pp[cutpos])
       }

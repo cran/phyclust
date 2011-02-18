@@ -62,7 +62,7 @@ gen.unit.K(K, N.K, rate.anc = 10, rate.dec = 10)
 set.seed(1234)
 tree.K <- gen.unit.K(6, rep(3:5, 2),
                      rate.anc = 0.7, rate.dec = 1.1)
-X.class <- as.numeric(gsub("d(.).(.)", "\\1",
+X.class <- as.numeric(gsub("d(.)(.*)", "\\\\1",
                            tree.K$org$tip.label))
 
 # Plot results

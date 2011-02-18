@@ -1,10 +1,13 @@
-seq-gen versin 1.3.2 - 7 Jan, 2005
+"seq-gen" versin 1.3.2 - 7 Jan, 2005
 
-This directory contains "seq-gen" source codes partially.
-See the other "README" in this directory for more details.
-The html file in "Seq-Gen.v.1.3.2" (download from author's webpage) is also
-useful to understand the command line options.
+The html file (download from the author's website) in the installed directory
+    "phyclust/doc/Documents/Seq-Gen.v.1.3.2/Seq-Gen.Manual.html"
+or in the source code directory
+    "phyclust/inst/doc/Documents/Seq-Gen.v.1.3.2/Seq-Gen.Manual.html"
+is an original document and useful to understand the command line options.
+See "seq-gen-Readme.txt" in this directory for more information about "seq-gen".
 
+-------------------------------------------------------------------------------
 I turn "seq-gen" in a library format by adding and modifing some functions,
 "R_*.c", for directorly using "seq-gen" in R, and the standardlone version
 will not be guaranteed here. Try the original "seq-gen" for standardlone.

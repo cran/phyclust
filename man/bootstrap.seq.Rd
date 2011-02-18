@@ -44,7 +44,7 @@ EMC.1$EM.iter <- 1
 
 ret.1 <- phyclust(seq.data.toy$org, 2, EMC = EMC.1)
 ret.tree <- bootstrap.star.trees(ret.1)
-ret.seq <- bootstrap.seq(ret.1, ret.1)
+ret.seq <- bootstrap.seq(ret.1, ret.tree)
 }
 }
 \keyword{programming}

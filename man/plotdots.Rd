@@ -59,8 +59,7 @@ plotdots(X, diff.only = FALSE, label = FALSE)
 plotdots(X, fill = TRUE, diff.only = FALSE, label = FALSE)
 
 # With class ids
-X.class <- as.numeric(gsub(".*-(.)", "\\1",
-                           seq.data.toy$seqname))
+X.class <- as.numeric(gsub(".*-(.*)", "\\\\1", seq.data.toy$seqname))
 plotdots(X, X.class)
 
 # For SNP

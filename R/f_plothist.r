@@ -23,7 +23,7 @@ plothist <- function(X, X.class = NULL, Mu = NULL, fill.color = .Color,
     plothist.my(X.ht, main = main, xlab = xlab, ylab = ylab, fill.color = color)
   } else{
     K <- length(unique(X.class))
-    color <- .Color[1:K %% length(.Color) + 1]
+    color <- .Color[0:(K - 1) %% length(.Color) + 1]
 
     X.ht <- NULL
     xlim <- NULL

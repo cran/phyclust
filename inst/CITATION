@@ -1,11 +1,11 @@
 citHeader("To cite phyclust in a publication use:")
 
-citEntry(entry="Article",
-	title = "",
-        author = personList(),
-	journal = "",
-  	year = "",
-	volume = "",
-	pages = "",
-        textVersion = ""
+citEntry(
+  entry = "Manual",
+  title = "Phylogenetic Clustering with the phyclust Package",
+  author = personList(as.person("W.-C. Chen")),
+  year = "2010",
+  note = "R package version 0.1-2",
+  url = "http://thirteen-01.stat.iastate.edu/snoweye/phyclust/",
+  textVersion = "W.-C. Chen (2010). Phylogenetic Clustering with the phyclust Package"
 )

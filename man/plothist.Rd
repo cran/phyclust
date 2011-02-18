@@ -53,8 +53,7 @@ X <- seq.data.toy$org
 plothist(X)
 
 # With class ids
-X.class <- as.numeric(gsub(".*-(.)", "\\1",
-                           seq.data.toy$seqname))
+X.class <- as.numeric(gsub(".*-(.*)", "\\\\1", seq.data.toy$seqname))
 plothist(X, X.class)
 }
 }

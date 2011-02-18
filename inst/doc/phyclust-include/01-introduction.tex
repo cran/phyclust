@@ -1,0 +1,76 @@
+
+\section[Introduction]{Introduction}
+\label{sec:introduction}
+\addcontentsline{toc}{section}{\thesection. Introduction}
+
+Without further notifications, this document is written for major
+functions and it should work consistently for the later version. 
+
+This is a quick guide for the \pkg{phyclust}, and I demonstrate
+major functions in this document. They
+includes reading and writing sequence data,
+two famous programs \code{ms} and \code{seq-gen}
+\citep{Hudson2002, Rambaut1997} for generating
+a coalescent tree and sequences based on the tree
+that both programs have been
+incorporated into the \pkg{phyclust},
+the main function \code{phyclust()} for finding sequence structures,
+and Haplo-Clustering \citep{tzeng2005}.
+More information about theory, examples for other tool functions
+and new added functions can be found on our website:
+Phylogenetic Clustering at
+\url{http://thirteen-01.stat.iastate.edu/snoweye/phyclust/}.
+
+In the Section~\ref{sec:dataio}, I introduce the basic data structures
+of the \pkg{phyclust} and I/O functions for reading and writing basic
+PHYLIP and FASTA files. In the Section~\ref{sec:msseqgen},
+I redo the "ms+seqgen" approach in \proglang{R}.
+In the Section~\ref{sec:phyloclustering}, I briefly describe the
+Phylogenetic Clustering, visualization functions,
+ the main function \code{phyclust()}, the auxiliary function
+\code{.EMControl()} for models, initializations, optimizations,
+and EM algorithms, and propose a "ms+seqgen+phyclust" approach.
+In the Section~\ref{sec:haplo}, I display the function
+\code{haplo.post.prob()} for Hap-Clustering.
+In the Section~\ref{sec:more}, I discuss some important issues
+which are in development or will be implemented in the next version.
+
+
+
+
+\subsection[Installation]{Installation}
+\label{sec:installation}
+\addcontentsline{toc}{subsection}{\thesubsection. Installation}
+
+You can install directly from CRAN at \url{http://cran.r-project.org} or
+download the \pkg{phyclust} from our website.
+In most systems, you can install the \pkg{phyclust} by typing the command
+into the \proglang{R}'s terminal as
+\begin{Code}
+> install.packages("phyclust")
+\end{Code}
+When it finishes, you can use \code{library()} to load the package as
+\begin{Code}
+> library("phyclust")
+\end{Code}
+Note that the \pkg{phyclust} requires the
+\pkg{ape} package \citep{Paradis2004}, and
+the \pkg{ape} also requires other packages depending on its version.
+All the required packages will be checked and automatically loaded when
+the \pkg{phyclust} is loading.
+
+
+
+
+\subsection[Need help]{Need help}
+\label{sec:needhelp}
+\addcontentsline{toc}{subsection}{\thesubsection. Need help \vspace{-0.3cm}}
+
+You can look and check more examples from the help pages or our
+website:
+\url{http://thirteen-01.stat.iastate.edu/snoweye/phyclust/}.
+Also, you can mail to \email{phyclust@gmail.com}.
+All commands are welcome, and bugs for the
+\pkg{phyclust} package or suggestions for Phylogenetic Clustering
+will be fixed and implemented in the new version.
+
