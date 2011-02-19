@@ -19,8 +19,9 @@
 
 %% almost as usual
 \author{Wei-Chen Chen\\Iowa State University} %\\ \today}
-\title{A Quick Guide for the \pkg{phyclust} Package\\
-\vspace{0.2cm} \large (Based on Version 0.1-2)}
+\title{A Quick Guide for the \pkg{phyclust} Package}
+%\\
+%\vspace{0.2cm} \large (Based on Version 0.1-2)}
 
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Wei-Chen Chen} %% comma-separated

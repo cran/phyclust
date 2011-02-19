@@ -4,7 +4,8 @@
 \addcontentsline{toc}{section}{\thesection. Introduction}
 
 Without further notifications, this document is written for major
-functions and it should work consistently for the later version. 
+functions based on version 0.1-2,
+and it should work well and consistently for the later version. 
 
 This is a quick guide for the \pkg{phyclust}, and I demonstrate
 major functions in this document. They
@@ -38,9 +39,9 @@ which are in development or will be implemented in the next version.
 
 
 
-\subsection[Installation]{Installation}
+\subsection[Installation and quick start]{Installation and quick start}
 \label{sec:installation}
-\addcontentsline{toc}{subsection}{\thesubsection. Installation}
+\addcontentsline{toc}{subsection}{\thesubsection. Installation and quick start}
 
 You can install directly from CRAN at \url{http://cran.r-project.org} or
 download the \pkg{phyclust} from our website.
@@ -58,6 +59,15 @@ Note that the \pkg{phyclust} requires the
 the \pkg{ape} also requires other packages depending on its version.
 All the required packages will be checked and automatically loaded when
 the \pkg{phyclust} is loading.
+
+You can have a quick start by using the \code{demo()} command
+in \proglang{R}.
+\begin{Code}
+> demo("toy", package = "phyclust")
+\end{Code}
+This will give you three plots as the Figure~\ref{fig:toydots},
+\ref{fig:toyhist} and \ref{fig:toynj}, and a partial result in
+the Section~\ref{sec:emcontrol}.
 
 
 

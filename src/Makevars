@@ -3,15 +3,11 @@
 
 PKG_CFLAGS = -D__HAVE_R_
 
-ORG_SRCS = $(wildcard *.c)
+SRCS = $(wildcard *.c)
 PC_SRCS = $(wildcard phyclust/*.c)
 MS_SRCS = $(wildcard msdir/*.c)
 SG_SRCS = $(wildcard seq-gen/*.c)
-ORG_OBJS = $(SRCS:.c=.o)
-PC_OBJS = $(PC_SRCS:.c=.o)
-MS_OBJS = $(MS_SRCS:.c=.o)
-SG_OBJS = $(SG_SRCS:.c=.o)
-OBJECTS = $(ORG_OBJS) $(PC_OBJS) $(MS_OBJS) $(SG_OBJS)
+OBJECTS = $(SRCS:.c=.o) $(PC_SRCS:.c=.o) $(MS_SRCS:.c=.o) $(SG_SRCS:.c=.o)
 
 .PHONY: all
 
@@ -20,24 +16,13 @@ all: before $(SHLIB) after
 $(SHLIB): $(OBJECTS)
 
 before:
-	@-rm -f $(PC_OBJS)
-	@-rm -f $(MS_OBJS)
-	@-rm -f $(SG_OBJS)
-	@-rm -f $(ORG_OBJS)
-	@-rm -f $(SHLIB)
+	@-rm -f $(OBJECTS) $(SHLIB)
 	@-rm -f *.o *.d *.rc Makedeps
 
 after:
-	@-rm -f $(PC_OBJS)
-	@-rm -f $(MS_OBJS)
-	@-rm -f $(SG_OBJS)
-	@-rm -f $(ORG_OBJS)
+	@-rm -f $(OBJECTS)
 	@-rm -f *.o *.d *.rc Makedeps
 
 clean:
-	@-rm -f $(PC_OBJS)
-	@-rm -f $(MS_OBJS)
-	@-rm -f $(SG_OBJS)
-	@-rm -f $(ORG_OBJS)
-	@-rm -f $(SHLIB)
+	@-rm -f $(OBJECTS) $(SHLIB)
 	@-rm -f *.o *.d *.rc Makedeps
