@@ -2,28 +2,35 @@
 \label{sec:dataio}
 \addcontentsline{toc}{section}{\thesection. Sequence Data Input and Output}
 
-Two type of sequences are supported in the \pkg{phyclust},
-nucleotide and SNP, and the types are stored in \code{.code.type} as
+Two types of sequences are supported in \pkg{phyclust},
+nucleotide and SNP. The supported types are stored in \code{.code.type}:
 \begin{Code}
 > .code.type
 [1] "NUCLEOTIDE" "SNP" 
 \end{Code}
-There are three input sources of sequence data in the \pkg{phyclust}:
+\pkg{Phyclust} accepts three types of input:
 \begin{enumerate}
 \item
-Read the data from a text file in the PHYLIP format (Section~\ref{sec:phylip}).
+Data read from a text file in PHYLIP format (Section~\ref{sec:phylip}).
 \item
-Read the data from a test file in the FASTA format (Section~\ref{sec:fasta}).
+Data read from a text file in FASTA format (Section~\ref{sec:fasta}).
 \item
-Simulated by \code{ms()} and \code{seqgen()} (Section~\ref{sec:msseqgen}).
+Data simulated by the \code{ms+seqgen} approach (Section~\ref{sec:msseqgen}).
 \end{enumerate}
-The reading functions \code{read.*()} will return a list object with
+The data reading functions \code{read.*()} will return a list object of 
 class {\color{red} \code{seq.data}} (Section~\ref{sec:phylip}),
-and transfered data based on the standard coding and
-stored in a major element {\color{red} \code{org}}
-exactly used in most functions of the \pkg{phyclust}.
-There are two ways to output sequence data in the \pkg{phyclust},
-either the PHYLIP format or the FASTA format.
+named \code{ret} for the returned list object.
+The \code{ret$org.code} and \code{ret$org} are two main elements in matrix
+format to store data.
+The \code{ret$org.code} contains the original data, e.g. A,G,C,T for
+nucleotide, and
+\code{ret$org} contains the id data, e.g. 0,1,2,3 for nucleotide,
+which is transfered from \code{ret$org.code}
+according to the code type and it's standard coding.
+The \code{ret$org} is a major data for calculation in most functions
+of the \pkg{phyclust} package.
+\pkg{Phyclust} outputs sequence data in two formats:
+PHYLIP or FASTA.
 
 
 
@@ -33,11 +40,9 @@ either the PHYLIP format or the FASTA format.
 \label{sec:coding}
 \addcontentsline{toc}{subsection}{\thesubsection. Standard coding}
 
-I use several internal objects to store default ids, and two of them
-are related to sequence structure, \code{.nucleotide} and \code{.snp},
-which store the mapping information in \code{data.frame}.
-They are used to transfer data when reading and writing sequences.
-By typing the names, we can see the details as
+Genetic data are represented internally using an integer code, and only the integer values get passed to the \proglang{C} core.
+The two data frames, \code{.nucleotide} and \code{.snp},
+are used to map between internal integer code (\code{nid}, \code{sid}) and the human interpretable code (\code{code}, \code{code.l}).
 \begin{Code}
 > .nucleotide
   nid code code.l
@@ -52,30 +57,26 @@ By typing the names, we can see the details as
 2   1    2
 3   2    -
 \end{Code}
-The headings \code{nid} and \code{sid} are standard ids used in
-\pkg{phyclust}, and \code{code} and \code{code.l} are general syntax 
-for nucleotide $\{\A, \G, \C, \T\}$ and SNP $\{1, 2\}$ sequences.
-The standard ids will be directly passed to the kernel of \pkg{phyclust}
-in \proglang{C} for efficient optimizations, so sequences are coded by
-integers stated from 0.
-Note that I use "\code{-}" to indicate gaps and other non general syntax.
-The computations and functions to deal with "\code{-}" are developing.
+Note that we use ``\code{-}'' to indicate gaps and other non general syntax.
+The methods and functions to deal with gaps are still under development.
 
 
-\subsection[PHYLIP format]{PHYLIP format}
+\subsection[PHYLIP format]{Input PHYLIP format}
 \label{sec:phylip}
 \addcontentsline{toc}{subsection}{\thesubsection. PHYLIP format}
 
-An example is "Great pony 524 EIAV rev dataset" \citep{Baccam2003},
-and you can view the file as
+Some virus data collected from an EIAV-infected pony, \#524~\citep{Baccam2003},
+named ``Great pony 524 EIAV rev dataset'',
+is provided as an example of PHYLIP-formatted sequence data.
+You can view the file with commands
 \begin{Code}
 > data.path <- paste(.libPaths()[1], "/phyclust/data/pony524.phy", sep = "")
 > edit(file = data.path)
 \end{Code}
-Here is the first 5 sequences and the first 50 sites. The first line
-says that there are 146 sequences and 405 sites in this files. The sequences
-are started from the second line, and the first 10 characters are reserved for
-the sequence's name or id.
+Below, we show the first 5 sequences and first 50 sites. The first line
+indicates there are 146 sequences and 405 sites in this file. The sequences
+are visible starting from the second line, where the first 10 characters are reserved for
+the sequence name or id.
 \begin{verbatim}
  146 405
 AF314258     gatcctcagg gccctctgga aagtgaccag tggtgcaggg tcctccggca
@@ -85,14 +86,13 @@ AF314261     gatcctcagg gccctctgga aagtgaccag tggtgcaggg tcctccggca
 AF314262     gatcctcagg gccctctgga aagtgaccag tggtgcaggg tcctccggca
 \end{verbatim}
 
-By default, the \code{read.phylip()} will read in a PHYLIP file and
+By default, function \code{read.phylip()} will read in a PHYLIP file and
 assume the file contains nucleotide sequences. It will read in sequences
-and store in a list object with class \code{seq.data}, and the element
-\code{org.code} store the original data in a character matrix, and
-the element \code{org} store the transfered original data in a numerical
-matrix. The transfered data are based on the standard coding in
-the Section~\ref{sec:coding}.
-The following is an example to read the pony524 dataset.
+and store them in a list object of class \code{seq.data}.  The element
+\code{org.code} stores the original data in a character matrix, and
+the element \code{org} stores the translate data in a numerical
+matrix (see Section~\ref{sec:coding} for the encoding).
+The following example reads the Pony 524 dataset.
 \begin{Code}
 > data.path <- paste(.libPaths()[1], "/phyclust/data/pony524.phy", sep = "")
 > (my.pony.524 <- read.phylip(data.path))
@@ -110,26 +110,27 @@ List of 7
  - attr(*, "class")= chr "seq.data"
 \end{Code}
 
-Another example is "Crohn's disease SNP dataset" \citep{Hugot2001},
-and the following is an example to read in SNP sequences by
-changing \code{code.type} to SNP.
+The sample PHYLIP-formatted SNP dataset from a study of Crohn's disease~\citep{Hugot2001} can be loaded with the commands
 \begin{Code}
 > data.path <- paste(.libPaths()[1], "/phyclust/data/crohn.phy", sep = "")
 > (my.snp <- read.phylip(data.path, code.type = .code.type[2]))
 code.type: SNP, n.seq: 1102, seq.len: 8.
 \end{Code}
+Notice, the \code{code.type} argument must specify the data is of type SNP.
 
 
 
 
-\subsection[FASTA format]{FASTA format}
+\subsection[Input FASTA format]{FASTA format}
 \label{sec:fasta}
 \addcontentsline{toc}{subsection}{\thesubsection. FASTA format}
 
-An example is "Great pony 625 EIAV rev dataset" \citep{Baccam2003}
-Here is the first one sequences and all 406 sites. It start with ">"
-and followed by sequence's id and descriptions, then is followed by
-couple lines containing sequence itself.
+The sequence data from another pony, \#625~\citep{Baccam2003},
+named ``Great pony 625 EIAV rev dataset'',
+is provided in FASTA format.
+Here is full-length first sequence in that file. It starts with ``>''
+followed by a sequence id and description on the same line.
+Subsequent lines contain the actualy sequence until the next line starting with ``>''.
 \begin{verbatim}
 >AF512608 Equine infectious anemia virus isolate R93.3/E98.1 gp45 and rev
 GATCCTCAGGGCCCTCTGGAAAGTGACCAGTGGTGCAGGGTCCTTCGGCAGTCACTACCT
@@ -139,12 +140,13 @@ CTCCAGGAACGACTGGAATGGAGAATCAGAGGAGTACAACAGGCGGCCAAAGAGCTGGAT
 GAAGTCAATCGAGGCATTTGGAGAGAGCTACATTTCCGAGAAGACCAAAAGGGAGATTTC
 TCAGCCTGGGGCGGTTATCAACGAGCACAAGAACGGCACTGGGGGGAACAATCCTCACCA
 AGGGTCCTTAGACCTGGAGATTCGAAGCGAAGGAGGAAACATTTAT
+>AF512609 Equine infectious anemia virus isolate R93.2/E105 ...
 \end{verbatim}
 
-By default, the \code{read.fasta()} will read in a FASTA file and
-assume the file contains nucleotide sequences. As \code{read.phylip()},
-it also return a list object with class \code{seq.data}.
-The following is an example to read the pony524 dataset.
+By default, function \code{read.fasta()} will read in a FASTA file and
+assume the file contains nucleotide sequences. 
+It also returns a list object of class \code{seq.data}.
+The following code example reads the pony \#625 dataset.
 \begin{Code}
 > data.path <- paste(.libPaths()[1], "/phyclust/data/pony625.fas", sep = "")
 > (my.pony.625 <- read.fasta.nucleotide(data.path))
@@ -163,14 +165,14 @@ List of 6
 
 
 
-\subsection[Save sequences]{Save sequences}
+\subsection[Saving sequences]{Saving sequences}
 \label{sec:save}
 \addcontentsline{toc}{subsection}{\thesubsection. Save sequences \vspace{-0.3cm}}
 
-To save sequences in files, you can use functions \code{write.*()} which are
-analogical to functions \code{read.*()} but input a data matrix \code{X} and
+To save sequences in a file, you can use the functions \code{write.*()}, which are
+analogous to the functions \code{read.*()} but take a data matrix \code{X} and
 a file name \code{filename}.
-The following I save two pony datasets in PHYLIP and FASTA formats to
+With the following code, we save the two pony datasets in PHYLIP and FASTA formats to
 the working directory.
 \begin{Code}
 > # PHYLIp

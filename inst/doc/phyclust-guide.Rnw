@@ -11,6 +11,7 @@
 \newcommand{\C}{\mbox{C}}
 \newcommand{\G}{\mbox{G}}
 \newcommand{\T}{\mbox{T}}
+\definecolor{mygreen}{RGB}{0,150,0}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -98,7 +99,6 @@ NSF CAREER DMS-0437555.
 \input{./phyclust-include/03-msseqgen}
 \input{./phyclust-include/04-phyclust}
 \input{./phyclust-include/05-haplo}
-\input{./phyclust-include/06-more}
 
 \bibliography{./phyclust-include/phyclust}
 \addcontentsline{toc}{section}{References}

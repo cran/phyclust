@@ -2,54 +2,62 @@
 \label{sec:phyloclustering}
 \addcontentsline{toc}{section}{\thesection. Phylogenetic Clustering (Phyloclustering)}
 
+Phylogenetic clustering (phyloclustering) is an evolutionary
+Continuous Time Markov Chain (CTMC) model-based approach to identify population
+structure from molecular data without assuming linkage equilibrium.
+The \pkg{phyclust} package provides a convenient implementation of
+phyloclustering for DNA and SNP data, capable of clustering individuals into
+subpopulations and identifying molecular sequences representative
+of those subpopulations.
+It is designed in \proglang{C} for performance,
+interfaced with \proglang{R} for visualization,
+and incorporates other popular open source software for
+simulating data and additional analyses.
+All aspects are intended to make the software useful to a broad
+spectrum of biological users.
 
-Phylogenetic clustering (Phyloclustering) is a model-based
-approach based on evolution theories to determine population
-structures in molecular level.
 Let $\vect{X} = (x_{nl})_{N\times L}$ be the data matrix containing
-$N$ sequences observed of $L$ sites where $n = 1, \ldots, N$ and
-$l = 1, \ldots, L$. Denote the sequence
+$N$ sequences observed at $L$ sites. Denote the molecular sequence
+of individual $n$ as
 $\vect{x}_n = (x_{n1}, \ldots, x_{nL}) \in \mathfrak{X}$ and
 $x_{nl} \in \mathcal{S}$ where
-$\mathfrak{X}$ contains all possible sequences and
-$\mathcal{S}$ contains bases, e.g. $\mathcal{S} = \{\A, \G, \C, \T\}$
+$\mathfrak{X}$ contains all possible sequences of length $L$ from alphabet
+$\mathcal{S}$, e.g.\ $\mathcal{S} = \{\A, \G, \C, \T\}$
 for nucleotide sequences.
-
-A finite mixture distribution for model-based clusterings is
-\begin{equation*}
+A finite mixture model provides a statistical framework for clustering.
+In this setting, each individual sequence $\vect{x}_n$ is independent
+and identically drawn from
+$
 f(\vect{x}_n | \vect{\eta}, \vect{\Theta}) =
 \sum_{k = 1}^K \eta_k f_k(\vect{x}_n | \Theta_k)
-\end{equation*}
-where $f_k()$ is the density for $k$th component,
-$\vect{\eta} = \{\eta_1, \ldots, \eta_K\}$ is the mixture proportion
+$
+where $f_k()$ is the density for the $k$th component,
+$\vect{\eta} = \{\eta_1, \ldots, \eta_K\}$ are the mixing proportions
 summing to one, and
-$\vect{\Theta} = \{\Theta_1,\ldots,\Theta_K\}$ contains parameters for
-components.  By the Continuous Time Markov Chain theory,
-$f_k()$ is modeled as transition probability
-$p_{\vect{\mu}_k,\vect{x}_n}(t)$ of mutation process \citep{Felsenstein2004}.
-A sequence $\vect{x}_n$ evolves from
-a representative
+$\vect{\Theta} = \{\Theta_1,\ldots,\Theta_K\}$ contains parameters for the
+components \citep{Fraley2002}.
+Component $f_k()$ is modeled as a transition probability
+$p_{\vect{\mu}_k,\vect{x}_n}(t_k)$ from a CTMC mutation
+process \citep{Felsenstein2004}, where
+a sequence $\vect{x}_n$ evolves from
+an ancestor
 $\vect{\mu}_k = (\mu_{k1}, \ldots, \mu_{kL}) \in \mathfrak{X}$
-dominating the $k$th cluster where $\mu_{kl} \in \mathcal{S}$,
-and process evolves with parameters $\vect{Q}_k$ in time $t_k$
-which are allowed to differ, so that
-$\Theta_k = \{\vect{\mu}_k, \vect{Q}_k, t_k\}$,
-and the transition probability matrix can be computed by
-$\mathbb{P}(t_k) = e^{\vect{Q}_k t_k}$ fot constructing likelihood functions.
-This model can be solved by EM algorithms \citep{Dempster1977}, sequences can
-be classified by the maximum posterior probabilities, and the number of
-clusters can be assessed by bootstrapping \citep{Maitra2010}.
+representing the $k$th cluster.
+The evolutionary process is modeled with instantaneous rate matrix
+$\vect{Q}_k$ and time $t_k$
+which are allowed to differ by cluster, so that
+$\Theta_k = \{\vect{\mu}_k, \vect{Q}_k, t_k\}$.
+The likelihood is maximized by an EM algorithm \citep{Dempster1977},
+sequences are classified
+by the maximum posterior probabilities, and the number of clusters is
+assessed by bootstrap \citep{Maitra2010}.
 
-Usually, the $\vect{\mu}_k$'s are different with each other and
-represent the central sequences of subpopulations.
-The major evolution models used in $Q_k$ for nucleotide sequences supported in
-the \pkg{phyclust} include \code{JC69} \citep{Jukes1969},
-\code{K80} \citep{Kimura1980},
-and \code{HKY85} \citep{Hasegawa1985}
-which are indicated in \code{.substitution}.
-I use an identifier (\code{.identifer}) to indicate possible combinations
-of models for $\vect{Q}_k$ and $t_k$ and list in the
-Table~\ref{tab:identifier}.
+Available choices for the $Q_k$ parameterization in \pkg{phyclust} include
+\code{JC69} \citep{Jukes1969}, \code{K80} \citep{Kimura1980},
+and \code{HKY85} \citep{Hasegawa1985}.
+These choices are listed in \code{.substitution}.
+In addition, $Q_k$ and $t_k$ can be constrained across clusters as shown
+in Table~\ref{tab:identifier} (also see \code{.identifier}).
 \begin{table}[h]
 \begin{center}
 \caption{Combinations of Models}
@@ -69,15 +77,26 @@ Identifier & $\vect{Q}$ & $t$ \\ \hline
 \end{center}
 \end{table}
 
-Note that there is an evolution distance model \code{.edist.model} that
-I use to indicate the model for computing distance of paired sequences,
-and they may differ to \code{.substitution}.
-There are more options in the \pkg{ape} package \citep{Paradis2004}.
+The initialization method (\code{.init.method})
+for the EM algorithm use pairwise distances, and
+the available models for computing the 
+evolutionary distance are listed in \code{.edist.model}.
+The model used for computing distances need not match the model
+used to model evolution in phylogenetic clustering (in \code{.substitution}).
+There are additional pairwise distance models available
+in the \pkg{ape} package \citep{Paradis2004}.
 
 The \code{.show.option()} function will list all options
-available in the \pkg{phyclust} package as the following.
+available in the \pkg{phyclust} package.
 These options can be used in the \code{.EMControl()} function
-to generate a template for the \code{phyclust()} function.
+to generate a template (such as \code{.EMC}) which describes
+the fitted identifier and model, initializations, EM algorithms and
+data type, and this template is used to control the function
+\code{phyclust()}. 
+All options are explained in the help pages.
+The best choices for options may vary with application.
+In particular, initialization can be tricky, and you should try
+several initialization algorithms (see Section~\ref{sec:emcontrol}).
 \begin{Code}
 > .show.option()
 boundary method: ADJUST, IGNORE
@@ -111,39 +130,41 @@ substitution model:
  [9,] E_SNP_F81        SNP
 \end{Code}
 
-All options will be explained in the help page and the short explanation
-will be given on our website.
-Some options may perform better than others in different situations.
-For EM algorithms, several initializations are necessary to obtain
-a better result, see the Section~\ref{sec:emcontrol}.
 
 
 
-
-\subsection[Illustrate data]{Illustrate data}
+\subsection[Exploring data]{Exploring data}
 \label{sec:illustrate}
-\addcontentsline{toc}{subsection}{\thesubsection. Illustrate data}
+\addcontentsline{toc}{subsection}{\thesubsection. Exploring data}
 
-The toy dataset has 100 nucleotide sequences and 200 sites in 4 clusters
-where the ancestral tree height 0.15 and the descendant tree height 0.09,
-and sequences are evolved by a HKY85 model \citep{Hasegawa1985}.
-The 4 clusters are isolated
-in groups, but they also carry common information about their ancestral
-sequences and differ with each other at some mutated sites.
+\pkg{Phyclust} has functions to help visualize large datasets.
+We have prepared a simulated dataset (\code{seq.data.toy}) with 100 nucleotide sequences of length 200 sites from 4 clusters.
+The ancestral sequences were simulated using the HKY85 model \citep{Hasegawa1985} along a tree of height $0.15$ (expected number of mutations per site).
+The observed sequences were simulated from trees descending from the ancestors along independent trees with height $0.09$.
 
-The following code shows a plot in the Figure~\ref{fig:toydots}
-to illustrate the sequences.
-Each row represents a sequence in the order of the dataset,
-the matrix \code{X}, and each column represents a site.
-Assume the first sequence in the first cluster of the toy dataset
-is the common/consensus sequence.
-The dashed lines split the clusters.
-The row fully drawn with colors is the common sequence,
-and colors represent 4 different nucleotides.
-Other rows are drawn the mutations indicated by colors
-comparing to the common sequence.
-The bottom row indicates the segregating sites which are sites containing
-at least one mutations with the origin dots.
+We use \code{X} to indicate the data,
+and use \code{X.class} to indicate the classification which can be
+{\color{red}
+a result (\code{class.id}) of the \code{phyclust()} function
+or specified by simulations (\code{ms+seqgen}).}
+In simulations, \pkg{phyclust} uses
+the format ``\code{class.id-sequence.id}'' to store the sequence name.
+We can apply the \proglang{R} function \code{gsub()}
+(for details, type \code{?gsub}) to obtain
+the classification of sequences (\code{class id}).
+In this section, we demonstrate a simulated dataset,
+and it can be applied to real dataset analyzed by the \code{phyclust()}
+function.
+
+For example, the following code produces the plot of Figure~\ref{fig:toydots}.
+Each row represents a sequence in the same order as they appear in the dataset
+and each column represents a site.
+By default, it will show all changes with respect to the reference sequence,
+the first sequence of the first cluster,
+which may not be the first sequence/row of \code{X} if the data were not
+sorted by the classification id.
+If the \code{X.class} is omitted (i.e. \code{plotdots(X)}), then the first
+sequence/row of the dataset will be the reference sequence.
 \begin{Code}
 > seq.data.toy
 code.type: NUCLEOTIDE, n.seq: 100, seq.len: 200.
@@ -151,40 +172,48 @@ code.type: NUCLEOTIDE, n.seq: 100, seq.len: 200.
 > X.class <- as.numeric(gsub(".*-(.)", "\\1", seq.data.toy$seqname))
 > plotdots(X, X.class)
 \end{Code}
+
+The chosen sequence is fully colored, with green, blue, purple and red representing 
+nucleotides A, G, C, and T.
+All other sequences show only mutant sites compared to the chosen reference sequence.
+The dashed lines split the clusters; in general we will not know the cluster membership before running \code{phyclust()}.
+The bottom row indicates the segregating sites, i.e.\ those sites containing
+at least one mutation.
+The default will draw the segregating sites only,
+type \code{?plotdots} for more information.
 \begin{figure}[h]
 \begin{center}
-\includegraphics[width=5.0in]{./phyclust-graph/toydots}
+\includegraphics[width=5.0in]{./phyclust-include/f-toydots}
 \caption{A dot plot for the toy dataset.}
 \label{fig:toydots}
 \end{center}
 \end{figure}
 
-The following code provides a plot in the Figure~\ref{fig:toyhist}
-to show the number of mutations by comparing all sequences to
-the common sequence. The top plot is for the whole dataset,
-the second to the bottom plots are for the sequences in
-the first to the fourth clusters indicating by colors.
+Next, we may wish to see how many mutations each sequence has relative to a reference sequence.
+The following code prepares the plot of Figure~\ref{fig:toyhist}, showing the number of mutations of all sequences within each cluster relative to the chosen reference sequence.
+The top plot is for the whole dataset.
+The other plots are for the four clusters.
 \begin{Code}
 > plothist(X, X.class)
 \end{Code}
 \begin{figure}[h]
 \begin{center}
-\includegraphics[width=5.0in]{./phyclust-graph/toyhist}
+\includegraphics[width=5.0in]{./phyclust-include/f-toyhist}
 \caption{A histogram plot for the toy dataset.}
 \label{fig:toyhist}
 \end{center}
 \end{figure}
 
-The following code shows a plot in the Figure~\ref{fig:toynj}
-to illustrate the distance method which gives a rough structure
-of dataset.
+Next, we may like to visualize clusters on a more traditional diagram of evolutionary relationships, the phylogenetic tree.
+The following code produces Figure~\ref{fig:toynj}.
 The \code{phyclust.edist()} function takes in a data
-matrix \code{X}, compute and return pairwise distances for all sequences
-where \code{.edist.model[3]} is \code{D_HAMMING} and the HAMMING distance
-is used as a distance measure.
-I apply a neighbor-joining method to build a tree based
-on the distance matrix. The colors drawn on the leaf branches indicate
-the clusters.
+matrix \code{X}, computes and returns pairwise distances for all sequences
+using the Hamming distance
+as a distance measure (\code{.edist.model[3]} is \code{D_HAMMING}).
+The neighbor-joining method \citep{Saitou1987} is used to build a tree from
+the distance matrix. The function \code{plotnj()} is a function in \pkg{phyclust} for plotting
+the resulting tree with branches colored according to the clusters defined in argument \code{X.class}.
+These clusters may be provided by the user (as is the case here) or as a result of inferring the clusters using \code{phyclust()}.
 \begin{Code}
 > (ret <- phyclust.edist(X, edist.model = .edist.model[3]))
 Class 'dist'  atomic [1:4950] 4 3 4 7 2 4 5 5 8 2 ...
@@ -204,25 +233,24 @@ Unrooted; includes branch lengths.
 \end{Code}
 \begin{figure}[h]
 \begin{center}
-\includegraphics[width=5.0in]{./phyclust-graph/toynj}
+\includegraphics[width=5.0in]{./phyclust-include/f-toynj}
 \caption{A NJ tree for the toy dataset.}
 \label{fig:toynj}
 \end{center}
 \end{figure}
 
 
-\subsection[Use the phyclust() function]{Use the \code{phyclust()} function}
-\label{sec:phyclust}
-\addcontentsline{toc}{subsection}{\thesubsection. Use the \code{phyclust()} function}
 
-I use the toy dataset to demonstrate the \code{phyclust()} function.
-Basically, the \code{phyclust()} function takes in two required objects,
-a data matrix \code{X} and the number of clusters \code{K}, then it
-will fit a default model for \code{X} based on \code{EMC = .EMC}
-which specifies models and optimizations. I will introduce this default
-control \code{.EMC} and the function \code{.EMControl()} to generate it
-in the Section~\ref{sec:emcontrol}.
-In the following example, I fit a default model with 4 clusters to the
+
+\subsection[Using the phyclust() function]{Using the \code{phyclust()} function}
+\label{sec:phyclust}
+\addcontentsline{toc}{subsection}{\thesubsection. Using the \code{phyclust()}\ function}
+
+We will use the toy dataset to demonstrate the \code{phyclust()} function, which requires two arguments: the data matrix \code{X} and the number of clusters \code{K}.
+The optional \code{EMC} argument of \code{phyclust()} is used to pass in model and optimization choices.
+By default, the object \code{.EMC} is passed to \code{phyclust()}.
+See Section~\ref{sec:emcontrol} for more information about changing the defaults.
+In the following example, we use the defaults to fit 4 clusters to the
 toy data.
 \begin{Code}
 > set.seed(1234)
@@ -246,47 +274,67 @@ identifier: EE
 [1] "phyclust"
 \end{Code}
 
-From the above reports, the default settings are used and
-the result does not fit well (with a degenerated cluster, see \code{n.class})
-due to the initialization problem. The initialization procedure
-is \code{exhaustEM} and the initialization method is \code{randomMu},
-so it randomly picks 4 sequences as the center of clusters and
-run the EM algorithm to convergence. While the EM algorithms do not guarantee
-to converge to global optimizations, more initializations should be
-explored to seek a better solution efficiently.
-The adjusted Rand index \citep{Hubert1985}, \code{adjRand}, is about 0.7653.
-The \code{phyclust} function returns a list object with class
-{\color{red} \code{phyclust}}
-and it can be as an input of other functions such as the function
-\code{bootstrap.star.trees.seq()} for bootstrapping.
-in the Section~\ref{sec:msseqgenphyclust}.
+A quick glance at the results shows that the default settings did not produce good results.
+There is a degenerate cluster (only one member), as indicated by the count of members in each of the four classes: \code{n.class}.
+The default initialization procedure
+is \code{exhaustEM} and the default initialization method is \code{randomMu},
+which means it randomly picks 4 sequences to be the cluster centers and
+runs the EM algorithm to convergence. While the EM algorithm is guaranteed to converge, it may only find a local optimum.
+It is important to try multiple random initializations to improve your chances of finding the global maximum.
+The adjusted Rand index \citep{Hubert1985}, \code{adjRand}, which can be used to compare two clusterings, is about 0.7653 when comparing the \code{phyclust()} solution to the true clusters.
+It should be $1.000$ for perfect agreement.
+
+The reports for the data are
+\code{N.X.org} for the number of sequences,
+\code{N.X.unique} for the number of unique/distinct sequences,
+\code{L} for the number of sites, and
+\code{N.seq.site} for the number of segregating sites.
+The reports for the model are
+\code{K} for the number of clusters,
+\code{p} for the number of parameters,
+\code{logL} for the likelihood value,
+\code{bic}, \code{aic} and \code{icl} for BIC, AIC and ICL,
+\code{identifier} for $\vect{Q}_k$ and $t_k$,
+\code{Eta} for $\vect{\eta}$, and
+\code{Tt} for $t_k$.
+The default is that \code{EE} for \code{identifier} and
+\code{JC69} \citep{Jukes1969} for $\vect{Q}_k$.
+
+The \code{phyclust()} function returns a list object of class
+{\color{red} \code{phyclust}}.
+You can type \code{str(ret.1)} to have the details of the \code{phyclust}
+class, or type \code{?phyclust} to see the descriptions of all
+elements.
+The Section~\ref{sec:emcontrol} will give more information for controling
+the \code{phyclust()} function.
+This object can also be used as input to other functions such as 
+bootstraps and simulation studies
+(see Section~\ref{sec:msseqgenphyclust}).
 
 
 
 
-\subsection[Use the .EMControl() function]{Use the \code{.EMControl()} function}
+\subsection[Using the .EMControl() function]{Using the \code{.EMControl()} function}
 \label{sec:emcontrol}
-\addcontentsline{toc}{subsection}{\thesubsection. Use the \code{.EMControl()} function}
+\addcontentsline{toc}{subsection}{\thesubsection. Using the \code{.EMControl()}\ function}
 
-The \code{.EMControl()} function provides a list object as the default
-value for the \code{phyclust()} function. The internal object \code{.EMC}
-is a template. Each element indicates a configuration for evolution models,
-identifier, initialization, optimizations, and EM algorithms. See the help
-page for details, and visit our website for examples.
+The \code{.EMControl()} function provides a list object that can be used as argument \code{EMC} to \code{phyclust()}.
+With no arguments, it retusn the default values. The internal object \code{.EMC}
+is a template object holding the defaults. Each element specifies some configuration for the evolutionary models,
+phyloclust model, initialization, optimization, and EM algorithm. See the help
+page for details and visit our website for examples.
 \begin{Code}
 > ?.EMControl
 > ?.EMC
 \end{Code}
 
 
-You can either modify from the template \code{.EMC} or use the function
-\code{.EMControl()} to generate a new control.
-First, the following example modifies an object coping from the template.
-It uses "emEM" as an initialization procedure, and
-the result of \code{ret.2} has a higher likelihood value than that
-of \code{ret.1}.
-The adjusted Rand index is also 1 that the prediction has a perfect match
-to the dataset.
+You can either modify the template \code{.EMC} directly, or use the function
+\code{.EMControl()} to generate a new control object.
+The following example modifies an object copied from the template.
+It changes the initialization method to ``emEM,'' which
+yields a better solution than our previous attempt (\code{ret.1}).
+The adjusted Rand index is now 1.000, indicating a perfect match between the truth and inferred structures.
 \begin{Code}
 > EMC.2 <- .EMC
 > EMC.2$init.procedure <- .init.procedure[2]
@@ -311,16 +359,15 @@ identifier: EE
  1.0000  1.0000  0.1209
 \end{Code}
 
-Second, the following use the function \code{.EMControl()} to generate a
-new control that uses "RndEM" as an initialization procedure, and
-fit a model with an "EV" identifier. An over fitted model can also cause
-a degenerated cluster and usually needs more initializations to have a
-better result.
-From the output,
-the \code{Eta} of the second cluster is smaller than others,
-and the \code{Tt} gives an evolving time for sequences away from the ancestor
-of the cluster, and the second cluster has a longer time than others.
-This makes the second cluster is degenerated.
+Now, we use the function \code{.EMControl()} to generate a
+new control that uses ``RndEM'' for initialization.
+It also changes the phyloclustering model to use the ``EV'' variant (see Table~\ref{tab:identifier}).
+The data was simulated under ``EE'' conditions, so this is an over-parameterized model.
+Such models may also tend to infer degenerate clusters,  and again, more initializations may be required for good results.
+From the output, we observe
+the mixing proprtion \code{Eta} of the second cluster is smaller than others.
+In addition, the evolutionary time \code{Tt}  of this cluster is unusually larger compared to the others.
+These are both indications of a degenerate cluster, and indeed, no sequences were assigned to this cluster.
 \begin{Code}
 > EMC.3 <- .EMControl(init.procedure = "RndEM", identifier = "EV")
 > ### The same as
@@ -346,85 +393,61 @@ identifier: EV
  0.9002  0.7640  0.1698
 \end{Code}
 
-Note that an convenient function \code{find.best()} is useful to
-search the best result based on the highest likelihood value by
-repeatedly running on possible combinations
-of the \code{.EMControl()} function. This function may also take
-time to obtain a result.
+There is a convenient function \code{find.best()} that is useful for finding
+the highest likelihood value fit among multiple calls to \code{phyclust()} with varying arguments.
+This function attempts to run \code{phyclust()} repeatedly on
+combinations of assigned initialization options by updating
+an internal \code{EMC} control object in each iteration.
+Please be patient, as this function may take some time to complete.
 
 
 
 
 \subsection[The ms+seqgen+phyclust approach]{The ms+seqgen+phyclust approach}
 \label{sec:msseqgenphyclust}
-\addcontentsline{toc}{subsection}{\thesubsection. The ms+seqgen+phyclust approach \vspace{-0.3cm}}
+\addcontentsline{toc}{subsection}{\thesubsection. The \code{ms+seqgen+phyclust}\ approach \vspace{-0.3cm}}
 
-Usually, the assessment for a fitted model includes the number of clusters,
-the evolution models, and the identifiers for clusters. All of these may
-rely on information criteria, but it may not accurate and sometimes
-it may give a wrong answer. A more elegant procedure is based on
-the parameter bootstrap technique \citep{Maitra2010}.
-The basic idea is
-to bootstrap sequences by the functions \code{ms()} and \code{seqgen()}
-and re-sample from a fitted model, a result of the \code{phyclust}
-function.
+Model selection includes identifying the number of clusters, type of evolutionary model, and phyloclustering assumptions (Table~\ref{tab:identifier}).
+We could use information criteria to choose among models, but the parameter space is mixed continuous and discrete so the theory justifying these critiera does not apply.
+A more elaborate procedure to assess the number of clusters
+for a dataset is based on the parametric bootstrap
+technique and sequential hypothesis testings \citep{Maitra2010}.
 
-The \code{bootstrap.star.trees.seq()} function implements this procedure
-that it takes in a fitted model, \code{pcobj}, a list object with class
-\code{phyclust} and utilizes the functions \code{ms()} and \code{seqgen()}
-to re-sample new datasets. We can perform the same fitting method on
-all new datasets to obtain an expected distribution of parameters,
-and compared to the observed distribution obtained from the fitted model.
-
-The following gives an example how to obtain a new datasets from a
-model with 2 clusters based on the toy dataset.
-The function \code{bootstrap.star.trees.seq()} returns a list object
-contains two elements \code{trees} and \code{seq} for all clusters.
-Combining \code{seq} and using the function \code{read.seqgen} can
-read in the new dataset and save as a list object with class
-\code{seq.data}.
+The basic idea is to resample dataset from the fitted model using the
+functions \code{ms()} and \code{seqgen()},
+and refit the resampled dataset by \code{phyclust()}.
+The \code{bootstrap.seq.data()} function is a tool for this procedure
+by taking in a fitted model, the output of a previous call to \code{phyclust()}.
+It utilizes the functions \code{ms()} and \code{seqgen()}
+to re-sample bootstrap datasets. The same fitting method is applied to each
+dataset, producing a distribution of parameter estimates.
+The following example bootstraps the toy dataset assuming $K=2$ clusters
+for only one time.
 \begin{Code}
 > set.seed(1234)
 > ret.4 <- phyclust(X, 2)
-> ret.all <- bootstrap.star.trees.seq(ret.4)
-> str(ret.all)
-List of 2
- $ trees:List of 2
-  ..$ :List of 5
-  .. ..$ edge       : int [1:102, 1:2] 53 54 54 55 56 57 57 58 58 56 ...
-  .. ..$ Nnode      : int 51
-  .. ..$ tip.label  : chr [1:52] "42" "52" "27" "47" ...
-  .. ..$ edge.length: num [1:102] 0.00000 0.00385 0.00000 0.00000 0.00000 ...
-  .. ..$ n.tip      : int 52
-  .. ..- attr(*, "class")= chr "phylo"
-  ..$ :List of 5
-  .. ..$ edge       : int [1:94, 1:2] 49 50 50 49 51 52 53 54 54 55 ...
-  .. ..$ Nnode      : int 47
-  .. ..$ tip.label  : chr [1:48] "16" "43" "10" "38" ...
-  .. ..$ edge.length: num [1:94] 0.00000 0.00385 0.00385 0.00000 0.00000 ...
-  .. ..$ n.tip      : int 48
-  .. ..- attr(*, "class")= chr "phylo"
- $ seq  :List of 2
-  ..$ :Class 'seqgen'  chr [1:53] " 52 200" "42        GAGATCTTGACCGCTTT ...
-  ..$ :Class 'seqgen'  chr [1:49] " 48 200" "16        GAGATCTTGACCGCTTT ...
-> toy.new <- c(paste(ret.4$N.X.org, ret.4$L, sep = " "),
-+              ret.all$seq[[1]][-1], ret.all$seq[[2]][-1])
-> ### Not necessary, but keep consistence.
-> ### class(toy.new) <- "seqgen"
-> (X.new <- read.seqgen(toy.new))
+> (seq.data.toy.new <- bootstrap.seq.data(ret.4))
 code.type: NUCLEOTIDE, n.seq: 100, seq.len: 200.
-> (ret.5 <- phyclust(X, 2))
+> (ret.4.new <- phyclust(seq.data.toy.new$org, 2))
 Phyclust Results:
 code type: NUCLEOTIDE, em method: EM, boundary method: ADJUST.
 init procedure: exhaustEM, method: randomMu.
 model substitution: JC69, distance: D_JC69.
-iter: 39 3035 0, convergence: 0, check.param: 1.
-eps: 1.616e-12, error: 0.
-N.X.org: 100, N.X.unique: 87, L: 200, K: 2, p: 402, N.seg.site: 127.
-logL: -1571, bic: 4993, aic: 3946, icl: 4994
+iter: 30 2947 0, convergence: 0, check.param: 1.
+eps: 1.41e-14, error: 0.
+N.X.org: 100, N.X.unique: 56, L: 200, K: 2, p: 402, N.seg.site: 69.
+logL: -685.3, bic: 3222, aic: 2175, icl: 3222
 identifier: EE
-  Eta: 0.4444 0.5556 
-  Tt: 0.003846 
-  n.class: 44 56
+  Eta: 0.48 0.52 
+  Tt: 0.001354 
+  n.class: 48 52
 \end{Code}
+
+The \code{ret.4} is the result from \code{phyclust()},
+\code{seq.data.toy.new} is a new dataset bootstrapped from
+the model in \code{ret.4}, and we refit the same model to
+this new data set and store in \code{ret.4.new} as one
+bootstrap result.
+Generally, we need to repeat these steps for several times to obtain
+an expected distribution for parameters.
 

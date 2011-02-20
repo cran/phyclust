@@ -73,3 +73,14 @@ bootstrap.star.trees.seq <- function(pcobj, min.n.class = 1){
   list(trees = star.trees, seq = seq.boot)
 } # End of bootstrap.star.trees.seq().
 
+bootstrap.seq.data <- function(pcobj, min.n.class = 1){
+  ret.all <- bootstrap.star.trees.seq(pcobj, min.n.class)
+  ret.new <- paste(pcobj$N.X.org, pcobj$L, sep = " ")
+  for(i in 1:pcobj$K){
+    ret.new <- c(ret.new, ret.all$seq[[i]][-1])
+  }
+  class(ret.new) <- "seqgen"
+  ret <- read.seqgen(ret.new)
+  ret
+} # End of bootstrap.seq.data().
+

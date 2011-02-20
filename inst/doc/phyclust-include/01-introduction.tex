@@ -3,38 +3,30 @@
 \label{sec:introduction}
 \addcontentsline{toc}{section}{\thesection. Introduction}
 
-Without further notifications, this document is written for major
-functions based on version 0.1-2,
-and it should work well and consistently for the later version. 
+{\bf Warning.} This document is written to explain the major functions of \pkg{phyclust}, version 0.1-4.
+Every effort will be made to insure future versions are consistent with these instructions, but new features in later versions may not be explained in this document.
 
-This is a quick guide for the \pkg{phyclust}, and I demonstrate
-major functions in this document. They
-includes reading and writing sequence data,
-two famous programs \code{ms} and \code{seq-gen}
-\citep{Hudson2002, Rambaut1997} for generating
-a coalescent tree and sequences based on the tree
-that both programs have been
-incorporated into the \pkg{phyclust},
-the main function \code{phyclust()} for finding sequence structures,
+This is a quick guide to the package \pkg{phyclust}.
+We will cover how to read and write sequence data,
+how to use the popular programs \code{ms}~\citep{Hudson2002} and \code{seq-gen}~\citep{Rambaut1997} for generating
+coalescent trees and molecular sequences from within \pkg{phyclust},
+the main function \code{phyclust()} for finding population structure,
 and Haplo-Clustering \citep{tzeng2005}.
-More information about theory, examples for other tool functions
-and new added functions can be found on our website:
+More information about the theory, other package functions,
+and any changes in future versions can be found on our website
 Phylogenetic Clustering at
 \url{http://thirteen-01.stat.iastate.edu/snoweye/phyclust/}.
 
-In the Section~\ref{sec:dataio}, I introduce the basic data structures
-of the \pkg{phyclust} and I/O functions for reading and writing basic
-PHYLIP and FASTA files. In the Section~\ref{sec:msseqgen},
-I redo the "ms+seqgen" approach in \proglang{R}.
-In the Section~\ref{sec:phyloclustering}, I briefly describe the
-Phylogenetic Clustering, visualization functions,
- the main function \code{phyclust()}, the auxiliary function
-\code{.EMControl()} for models, initializations, optimizations,
-and EM algorithms, and propose a "ms+seqgen+phyclust" approach.
-In the Section~\ref{sec:haplo}, I display the function
+Specifically, in Section~\ref{sec:dataio}, we introduce the basic data structures
+of \pkg{phyclust} and the I/O functions for reading and writing 
+PHYLIP and FASTA files. In Section~\ref{sec:msseqgen},
+we demonstrate how to simulate molecular data using the ``ms+seqgen'' approach from within \proglang{R}.
+In Section~\ref{sec:phyloclustering}, we briefly describe
+the phylogenetic clustering method, its implementation in \code{phyclust()}, the visualization functions,
+the auxiliary function \code{.EMControl()} for choosing the model, initialization method, optimization method,
+and the EM algorithm variant, and propose a ``ms+seqgen+phyclust'' approach.
+In Section~\ref{sec:haplo}, we demonstrate the function
 \code{haplo.post.prob()} for Hap-Clustering.
-In the Section~\ref{sec:more}, I discuss some important issues
-which are in development or will be implemented in the next version.
 
 
 
@@ -45,8 +37,8 @@ which are in development or will be implemented in the next version.
 
 You can install directly from CRAN at \url{http://cran.r-project.org} or
 download the \pkg{phyclust} from our website.
-In most systems, you can install the \pkg{phyclust} by typing the command
-into the \proglang{R}'s terminal as
+On most systems, you can install \pkg{phyclust} by typing the following command
+into \proglang{R}'s terminal:
 \begin{Code}
 > install.packages("phyclust")
 \end{Code}
@@ -54,33 +46,53 @@ When it finishes, you can use \code{library()} to load the package as
 \begin{Code}
 > library("phyclust")
 \end{Code}
-Note that the \pkg{phyclust} requires the
-\pkg{ape} package \citep{Paradis2004}, and
+Note that \pkg{phyclust} requires \pkg{ape} package \citep{Paradis2004}, and
 the \pkg{ape} also requires other packages depending on its version.
 All the required packages will be checked and automatically loaded when
 the \pkg{phyclust} is loading.
 
-You can have a quick start by using the \code{demo()} command
+You can get started quickly with \pkg{phyclust} by using the \code{demo()} command
 in \proglang{R}.
 \begin{Code}
 > demo("toy", package = "phyclust")
 \end{Code}
-This will give you three plots as the Figure~\ref{fig:toydots},
-\ref{fig:toyhist} and \ref{fig:toynj}, and a partial result in
+This demo will produce the three plots shown in Figures~\ref{fig:toydots},
+\ref{fig:toyhist} and \ref{fig:toynj}, and some of the results reported in
 the Section~\ref{sec:emcontrol}.
+This demonstration does the same as the followings, see the next
+few section for more details.
+\begin{Code}
+### Rename the data and obtain classification.
+  X <- seq.data.toy$org
+  X.class <- as.numeric(gsub(".*-(.)", "\\1", seq.data.toy$seqname))
+### A dot plot, Figure 2.
+  windows()
+  plotdots(X, X.class)
+### A histogram plot, Figure 3.
+  windows()
+  plothist(X, X.class)
+### A Neighbor-Joining plot, Figure 4.
+  ret <- phyclust.edist(X, edist.model = .edist.model[3])
+  ret.tree <- nj(ret)
+  windows()
+  plotnj(ret.tree, X.class = X.class)
+### Fit a EE, JC69 model using emEM, Section ``Use the .EMControl() function''.
+  EMC.2 <- .EMControl(init.procedure = "emEM")
+  set.seed(1234)
+  (ret.2 <- phyclust(X, 4, EMC = EMC.2))
+  RRand(ret.2$class.id, X.class)
+\end{Code}
 
 
 
-
-\subsection[Need help]{Need help}
+\subsection[Getting help]{Getting help}
 \label{sec:needhelp}
-\addcontentsline{toc}{subsection}{\thesubsection. Need help \vspace{-0.3cm}}
+\addcontentsline{toc}{subsection}{\thesubsection. Getting help \vspace{-0.3cm}}
 
-You can look and check more examples from the help pages or our
+You can look for more examples on the help pages or our
 website:
 \url{http://thirteen-01.stat.iastate.edu/snoweye/phyclust/}.
-Also, you can mail to \email{phyclust@gmail.com}.
-All commands are welcome, and bugs for the
-\pkg{phyclust} package or suggestions for Phylogenetic Clustering
-will be fixed and implemented in the new version.
+Also, you can email the author at \email{phyclust@gmail.com}.
+All comments are welcome.  Bugs will be fixed and
+suggestions may be implemented in future versions of \pkg{phyclust}.
 
