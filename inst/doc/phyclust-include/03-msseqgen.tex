@@ -18,8 +18,8 @@ or in the source code directory
 
 The \pkg{ms} documentation demonstrates how to use \pkg{ms}
 to generate coalescent trees, followed by sequence generation using \pkg{seq-gen},
-the popular \code{ms+seqgen} approach for simulation molecular data.
-\pkg{Phyclust} edits the source code slightly and makes these commands available through new \proglang{R} functions \code{ms()} and \code{seqgen()}.
+the popular \code{ms+seqgen} approach for simulating molecular data.
+I have edited the source code slightly to make these commands available through new \proglang{R} functions \code{ms()} and \code{seqgen()}.
 This solution eases the burden on the user, bypassing the need to compile both programs.
 Moreover, combining these functions with the \code{phyclust()} function produces a
 \code{ms+seqgen+phyclust} approach 
@@ -33,14 +33,14 @@ Moreover, combining these functions with the \code{phyclust()} function produces
 \addcontentsline{toc}{subsection}{\thesubsection. Using the \code{ms()}\ function to generate trees}
 
 Almost all command line options of program \pkg{ms} are available
-through object \code{opts} in \code{ms()}.
+through option \code{opts} in \code{ms()}.
 Call the function without arguments to see all the options.
 \begin{Code}
 > ms()
 > ?ms
 \end{Code}
 
-The following example generates a coalescent tree (\code{-T})
+The following example generates a coalescent tree (\pkg{ms} option \code{-T})
 with 3 leaves (\code{nsam = 3})
 and population growth rate 0.1
 (\code{-G 0.1}). Function \code{ms()} returns \pkg{ms} text output
@@ -94,9 +94,9 @@ Call the function without arguments to see the options.
 
 The \code{seqgen()} function requires a rooted tree in NEWICK format or an object of class \code{phylo}.
 In the following, we demonstrate the \code{ms+seqgen} approach
-to generate sequences according a coalescent tree. The result is a character
+to generate sequences. The result is a character
 vector of class {\color{red} \code{seqgen}}, which contains 5 sequences, 
-each of 40 bases (\code{-l40}). The option \code{-mHKY} specifies the HKY85
+each of 40 bases (\pkg{seq-gen} option \code{-l40}). The option \code{-mHKY} specifies the HKY85
 model of evolution \citep{Hasegawa1985}.
 Without further options, HKY85 is equivalent to the JC69 model \citep{Jukes1969}.
 \begin{Code}
@@ -126,8 +126,7 @@ Class 'seqgen'  chr [1:6] " 5 40" "1         CTCTCATTGGACGCACACTTTAGGGGGG ...
 The \code{seqgen()} function need not take in a tree from \code{ms()},
 but \code{ms()} provides options to construct trees of
 different shapes using coalescent theory.
-Also, you can provide \code{seqgen()} with an ancestral sequence via the option \code{input}.
-The sequence is then evolved along the given tree (see Section~\ref{sec:ancestral}).
+Also, you can provide \code{seqgen()} with an ancestral sequence that is then evolved along the given tree (see Section~\ref{sec:ancestral}).
 
 
 
@@ -141,15 +140,14 @@ The sequence is then evolved along the given tree (see Section~\ref{sec:ancestra
 approach under wide-ranging parameter choices. A rooted tree is required and an
 ancestral sequence is an option.
 
-The following example generates a tree, and provides an ancestral
-sequence \code{anc.HKY}. Function \code{seqgen()} will use
+The following example generates a tree and provides an ancestral
+sequence. Function \code{seqgen()} will use
 parameters $\kappa$ (\code{kappa}) and
 $\pi_{A}, \pi_{G}, \pi_{C}, \pi_{T}$ (\code{pi.HKY})
 to evolve the ancestral sequence (\code{anc.HKY}) down the tree.
-The function \code{read.seqgen()} can read the object of
-\code{seqgen()} and return a new dataset with class \code{seq.data}
-which can be used for the function \code{phyclust()} in the
-Section~\ref{sec:phyclust}.
+The function \code{read.seqgen()} reads the \code{seqgen()}
+object and returns a new dataset of class \code{seq.data}
+for use by the function \code{phyclust()} (see Section~\ref{sec:phyclust}).
 \begin{Code}
 > # Generate a tree
 > set.seed(1234)
@@ -177,15 +175,16 @@ code.type: NUCLEOTIDE, n.seq: 5, seq.len: 12.
 \end{Code}
 
 Function \code{gen.seq.HKY()} may be a good example
-for advanced users wanting to develop more complex evolutionary processes, such as recombination,
+for advanced users wanting to simulate more complex evolutionary processes, such as recombination,
 migration and island models. It passes an option \code{input} to
-\code{seqgen()}, which in this case is the ancestral sequence, but could be other
+\code{seqgen()}, which in this case is used to pass the ancestral sequence, but could be used to pass other
 options available in the \pkg{seq-gen} program.
 The option \code{input} takes in a character vector (including the tree)
-where each element contains one line, which \code{seqgen()} stores/writes to
-a temporary file for further processing.
+where each element contains one \pkg{seq-gen} option.
+Function \code{seqgen()} writes these options to
+a temporary file, which is later communicated to \pkg{seq-gen}.
 \begin{Code}
-### Source code from gen.seq.HKY().
+### Partial source code of gen.seq.HKY().
         L <- length(anc.seq)
         mu <- paste(nid2code(anc.seq, lower.case = FALSE), collapse = "")
         seqname <- paste("Ancestor  ", collapse = "")
@@ -196,7 +195,7 @@ a temporary file for further processing.
             " -u", ttips + 1, " -k1", " -q", sep = "")
         ret <- seqgen(opts, input = input)
 
-### Source code from seqgen().
+### Partial source code of seqgen().
         if (!is.null(newick.tree)) {
             write(newick.tree, file = temp.file.ms, sep = "")
         }

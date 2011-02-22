@@ -3,11 +3,11 @@
 \addcontentsline{toc}{section}{\thesection. Using the \code{haplo.post.prob()}\ function for Hap-Clustering \vspace{-0.3cm}}
 
 Haplotype grouping \citep{tzeng2005} for SNP datasets
-can be viewed as an alternative method to the phyloclustering.
+can be viewed as an alternative method to phyloclustering.
 The author's \proglang{R} code has been integrate into \pkg{phyclust},
 and the original function has been renamed \code{haplo.post.prob()}.
 The example used by the author is the Crohn's disease dataset
-\citep{Hugot2001} which is also built into the \pkg{phyclust} package.
+\citep{Hugot2001}, which is also included in the \pkg{phyclust} package.
 The original description of the author's \proglang{R} code is in the
 install directory 
 \url{phyclust/doc/Documents/tzeng-Readme.txt} or in the source code directory
@@ -22,7 +22,7 @@ indices,
 \code{ret$FD.post} and \code{ret$RD.post} store the full and reduced dimensional
 posterior probabilities, and \code{g.truncate} shows
 the number of clusters,
-the truncated results as mentioned in \cite{tzeng2005}.
+the truncated results as described in \cite{tzeng2005}.
 \begin{Code}
 > data.path <- paste(.libPaths()[1], "/phyclust/data/crohn.phy", sep = "")
 > my.snp <- read.phylip.snp(data.path)
@@ -46,8 +46,8 @@ List of 6
 \end{Code}
 
 The \code{getcut.fun()} produces a plot based on the information
-criterion, which can be used to visualize the truncated dimension (see
-Figure~\ref{fig:getcut}) where the horizontal line indicates the cut point
+criterion, which can be used to visualize the truncated dimension.
+In Figure~\ref{fig:getcut}, the horizontal line indicates the cut point
 of $13$ haplotypes.
 \begin{figure}[h]
 \begin{center}

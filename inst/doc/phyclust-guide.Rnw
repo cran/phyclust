@@ -3,6 +3,7 @@
 \documentclass[article,shortnames,nojss]{phyclust-include/jss}
 
 
+\usepackage{verbatim}
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{amssymb}
@@ -86,8 +87,8 @@
 
 \section*{Acknowledgement}
 \addcontentsline{toc}{section}{Acknowledgement \vspace{-0.3cm}}
-The author thanks Dr. Karin S. Dorman and Dr. Ranjan Maitra in Iowa State
-University for their generous support, and is funded by Dr. Maitra's grand,
+The author thanks Drs. Karin S. Dorman and Ranjan Maitra in Iowa State
+University for helpful discussion and is a research assistant on grant
 NSF CAREER DMS-0437555.
 
 \newpage

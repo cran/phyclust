@@ -18,19 +18,18 @@ Data read from a text file in FASTA format (Section~\ref{sec:fasta}).
 Data simulated by the \code{ms+seqgen} approach (Section~\ref{sec:msseqgen}).
 \end{enumerate}
 The data reading functions \code{read.*()} will return a list object of 
-class {\color{red} \code{seq.data}} (Section~\ref{sec:phylip}),
-named \code{ret} for the returned list object.
-The \code{ret$org.code} and \code{ret$org} are two main elements in matrix
-format to store data.
-The \code{ret$org.code} contains the original data, e.g. A,G,C,T for
+class {\color{red} \code{seq.data}} (Section~\ref{sec:phylip}).
+Suppose we call the returned list object \code{ret}.
+Then, \code{ret$org.code} and \code{ret$org} are two matrices that
+store the data.
+Matrix \code{ret$org.code} contains the original data, e.g. A,G,C,T for
 nucleotide, and
-\code{ret$org} contains the id data, e.g. 0,1,2,3 for nucleotide,
-which is transfered from \code{ret$org.code}
-according to the code type and it's standard coding.
-The \code{ret$org} is a major data for calculation in most functions
-of the \pkg{phyclust} package.
+\code{ret$org} contains the data formatted for the computer, e.g. 0,1,2,3 for nucleotide.
+Matrix \code{ret$org} is translated from \code{ret$org.code}
+according to the standard encoding (\S\ref{sec:coding}) of the chosen data type and most calculations are done with \code{ret$org}.
+
 \pkg{Phyclust} outputs sequence data in two formats:
-PHYLIP or FASTA.
+PHYLIP or FASTA (\S\ref{sec:save}).
 
 
 
@@ -42,7 +41,7 @@ PHYLIP or FASTA.
 
 Genetic data are represented internally using an integer code, and only the integer values get passed to the \proglang{C} core.
 The two data frames, \code{.nucleotide} and \code{.snp},
-are used to map between internal integer code (\code{nid}, \code{sid}) and the human interpretable code (\code{code}, \code{code.l}).
+are used to map between internal integer code (\code{nid} or \code{sid}) and the human interpretable code (\code{code} or \code{code.l}).
 \begin{Code}
 > .nucleotide
   nid code code.l
@@ -67,7 +66,7 @@ The methods and functions to deal with gaps are still under development.
 
 Some virus data collected from an EIAV-infected pony, \#524~\citep{Baccam2003},
 named ``Great pony 524 EIAV rev dataset'',
-is provided as an example of PHYLIP-formatted sequence data.
+are provided as an example of PHYLIP-formatted sequence data.
 You can view the file with commands
 \begin{Code}
 > data.path <- paste(.libPaths()[1], "/phyclust/data/pony524.phy", sep = "")
@@ -87,11 +86,9 @@ AF314262     gatcctcagg gccctctgga aagtgaccag tggtgcaggg tcctccggca
 \end{verbatim}
 
 By default, function \code{read.phylip()} will read in a PHYLIP file and
-assume the file contains nucleotide sequences. It will read in sequences
-and store them in a list object of class \code{seq.data}.  The element
-\code{org.code} stores the original data in a character matrix, and
-the element \code{org} stores the translate data in a numerical
-matrix (see Section~\ref{sec:coding} for the encoding).
+assume the file contains nucleotide sequences. It will read in sequences,
+translate them using the encoding (\S\ref{sec:coding}), and
+store them in a list object of class \code{seq.data}.
 The following example reads the Pony 524 dataset.
 \begin{Code}
 > data.path <- paste(.libPaths()[1], "/phyclust/data/pony524.phy", sep = "")
@@ -167,7 +164,7 @@ List of 6
 
 \subsection[Saving sequences]{Saving sequences}
 \label{sec:save}
-\addcontentsline{toc}{subsection}{\thesubsection. Save sequences \vspace{-0.3cm}}
+\addcontentsline{toc}{subsection}{\thesubsection. Saving sequences \vspace{-0.3cm}}
 
 To save sequences in a file, you can use the functions \code{write.*()}, which are
 analogous to the functions \code{read.*()} but take a data matrix \code{X} and

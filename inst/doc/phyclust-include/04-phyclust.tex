@@ -5,6 +5,7 @@
 Phylogenetic clustering (phyloclustering) is an evolutionary
 Continuous Time Markov Chain (CTMC) model-based approach to identify population
 structure from molecular data without assuming linkage equilibrium.
+\begin{comment}
 The \pkg{phyclust} package provides a convenient implementation of
 phyloclustering for DNA and SNP data, capable of clustering individuals into
 subpopulations and identifying molecular sequences representative
@@ -15,7 +16,7 @@ and incorporates other popular open source software for
 simulating data and additional analyses.
 All aspects are intended to make the software useful to a broad
 spectrum of biological users.
-
+\end{comment}
 Let $\vect{X} = (x_{nl})_{N\times L}$ be the data matrix containing
 $N$ sequences observed at $L$ sites. Denote the molecular sequence
 of individual $n$ as
@@ -77,7 +78,7 @@ Identifier & $\vect{Q}$ & $t$ \\ \hline
 \end{center}
 \end{table}
 
-The initialization method (\code{.init.method})
+The available initialization methods (\code{.init.method})
 for the EM algorithm use pairwise distances, and
 the available models for computing the 
 evolutionary distance are listed in \code{.edist.model}.
@@ -86,13 +87,12 @@ used to model evolution in phylogenetic clustering (in \code{.substitution}).
 There are additional pairwise distance models available
 in the \pkg{ape} package \citep{Paradis2004}.
 
-The \code{.show.option()} function will list all options
+The \code{.show.option()} function lists all options
 available in the \pkg{phyclust} package.
 These options can be used in the \code{.EMControl()} function
-to generate a template (such as \code{.EMC}) which describes
-the fitted identifier and model, initializations, EM algorithms and
-data type, and this template is used to control the function
-\code{phyclust()}. 
+to generate an options object (such as \code{.EMC}), which defines
+the selected phyloclust model, the initialization method, the EM algorithm and
+the data type.  This argument is passed to function \code{phyclust()} using argument \code{EMC}.
 All options are explained in the help pages.
 The best choices for options may vary with application.
 In particular, initialization can be tricky, and you should try
@@ -140,31 +140,28 @@ substitution model:
 \pkg{Phyclust} has functions to help visualize large datasets.
 We have prepared a simulated dataset (\code{seq.data.toy}) with 100 nucleotide sequences of length 200 sites from 4 clusters.
 The ancestral sequences were simulated using the HKY85 model \citep{Hasegawa1985} along a tree of height $0.15$ (expected number of mutations per site).
-The observed sequences were simulated from trees descending from the ancestors along independent trees with height $0.09$.
+The observed sequences were simulated along independent trees with height $0.09$ descending from the ancestors.
 
-We use \code{X} to indicate the data,
-and use \code{X.class} to indicate the classification which can be
-{\color{red}
+We use \code{X} to indicate the data
+and \code{X.class} to indicate the classification which can be
 a result (\code{class.id}) of the \code{phyclust()} function
-or specified by simulations (\code{ms+seqgen}).}
-In simulations, \pkg{phyclust} uses
-the format ``\code{class.id-sequence.id}'' to store the sequence name.
-We can apply the \proglang{R} function \code{gsub()}
-(for details, type \code{?gsub}) to obtain
-the classification of sequences (\code{class id}).
-In this section, we demonstrate a simulated dataset,
-and it can be applied to real dataset analyzed by the \code{phyclust()}
-function.
+or known, in the case of simulation (\code{ms+seqgen}).
+The \pkg{ms}+\pkg{seq-gen} simulation procedure within \pkg{phyclust} produces 
+sequences with names \\
+``\code{class.id-sequence.id},'' so the \proglang{R}
+function \code{gsub()} (for details, type \code{?gsub}) can be used
+to extract the sequence classification (\code{class id}).
+In this section, we demonstrate visualization of a simulated dataset, where
+the clusters are know. 
+Similar figures can be produced for real datasets with clusters estimated by \code{phyclust()}.
 
-For example, the following code produces the plot of Figure~\ref{fig:toydots}.
-Each row represents a sequence in the same order as they appear in the dataset
+The following code produces the plot of Figure~\ref{fig:toydots}.
+Each row represents a sequence in the same order as they appear in the dataset,
 and each column represents a site.
-By default, it will show all changes with respect to the reference sequence,
-the first sequence of the first cluster,
-which may not be the first sequence/row of \code{X} if the data were not
-sorted by the classification id.
-If the \code{X.class} is omitted (i.e. \code{plotdots(X)}), then the first
-sequence/row of the dataset will be the reference sequence.
+By default, it will show all changes with respect to the first sequence of the first cluster,
+which is only the first sequence of \code{X} if the data were sorted by the classification id.
+If the \code{X.class} is omitted (i.e. \code{plotdots(X)}), then it shows changes with respect to the first
+sequence of the dataset.
 \begin{Code}
 > seq.data.toy
 code.type: NUCLEOTIDE, n.seq: 100, seq.len: 200.
@@ -175,12 +172,12 @@ code.type: NUCLEOTIDE, n.seq: 100, seq.len: 200.
 
 The chosen sequence is fully colored, with green, blue, purple and red representing 
 nucleotides A, G, C, and T.
-All other sequences show only mutant sites compared to the chosen reference sequence.
-The dashed lines split the clusters; in general we will not know the cluster membership before running \code{phyclust()}.
+All other sequences show only mutant sites compared to the reference sequence.
+The dashed lines separate the clusters.
 The bottom row indicates the segregating sites, i.e.\ those sites containing
 at least one mutation.
-The default will draw the segregating sites only,
-type \code{?plotdots} for more information.
+By default {\it only} segregating sites are shown.
+Type \code{?plotdots} for more information.
 \begin{figure}[h]
 \begin{center}
 \includegraphics[width=5.0in]{./phyclust-include/f-toydots}
@@ -204,7 +201,7 @@ The other plots are for the four clusters.
 \end{center}
 \end{figure}
 
-Next, we may like to visualize clusters on a more traditional diagram of evolutionary relationships, the phylogenetic tree.
+Last, we may like to visualize clusters on a more traditional diagram of evolutionary relationships, the phylogenetic tree.
 The following code produces Figure~\ref{fig:toynj}.
 The \code{phyclust.edist()} function takes in a data
 matrix \code{X}, computes and returns pairwise distances for all sequences
@@ -274,6 +271,23 @@ identifier: EE
 [1] "phyclust"
 \end{Code}
 
+The output of the call to \code{phyclust()} includes
+\begin{center}
+\begin{tabular}{rl}
+	\code{N.X.org}& the number of sequences \\
+	\code{N.X.unique}& the number of unique/distinct sequences \\
+	\code{L}& for the number of sites \\
+	\code{N.seq.site}& for the number of segregating sites \\
+	\code{K}& the number of clusters \\
+	\code{p}& the number of parameters \\
+	\code{logL}& the maximum likelihood value \\
+	\code{bic}, \code{aic} and \code{icl}& for BIC, AIC and ICL \\
+	\code{identifier}& the model choice for $\vect{Q}_k$ and $t_k$ (see Table~\ref{tab:identifier}) \\
+	\code{Eta}& mixing proportions $\vect{\eta}$ \\
+	\code{Tt}& $t_k$
+\end{tabular}
+\end{center}
+
 A quick glance at the results shows that the default settings did not produce good results.
 There is a degenerate cluster (only one member), as indicated by the count of members in each of the four classes: \code{n.class}.
 The default initialization procedure
@@ -284,32 +298,14 @@ It is important to try multiple random initializations to improve your chances o
 The adjusted Rand index \citep{Hubert1985}, \code{adjRand}, which can be used to compare two clusterings, is about 0.7653 when comparing the \code{phyclust()} solution to the true clusters.
 It should be $1.000$ for perfect agreement.
 
-The reports for the data are
-\code{N.X.org} for the number of sequences,
-\code{N.X.unique} for the number of unique/distinct sequences,
-\code{L} for the number of sites, and
-\code{N.seq.site} for the number of segregating sites.
-The reports for the model are
-\code{K} for the number of clusters,
-\code{p} for the number of parameters,
-\code{logL} for the likelihood value,
-\code{bic}, \code{aic} and \code{icl} for BIC, AIC and ICL,
-\code{identifier} for $\vect{Q}_k$ and $t_k$,
-\code{Eta} for $\vect{\eta}$, and
-\code{Tt} for $t_k$.
-The default is that \code{EE} for \code{identifier} and
-\code{JC69} \citep{Jukes1969} for $\vect{Q}_k$.
-
 The \code{phyclust()} function returns a list object of class
 {\color{red} \code{phyclust}}.
-You can type \code{str(ret.1)} to have the details of the \code{phyclust}
-class, or type \code{?phyclust} to see the descriptions of all
-elements.
-The Section~\ref{sec:emcontrol} will give more information for controling
+You can type \code{str(ret.1)} to get the details of the \code{phyclust}
+class, or type \code{?phyclust} to see descriptions of all elements.
+Section~\ref{sec:emcontrol} will give more information for controlling
 the \code{phyclust()} function.
-This object can also be used as input to other functions such as 
-bootstraps and simulation studies
-(see Section~\ref{sec:msseqgenphyclust}).
+This object can also be used as input to other functions, for example bootstrapping
+and simulations (see Section~\ref{sec:msseqgenphyclust}).
 
 
 
@@ -319,8 +315,8 @@ bootstraps and simulation studies
 \addcontentsline{toc}{subsection}{\thesubsection. Using the \code{.EMControl()}\ function}
 
 The \code{.EMControl()} function provides a list object that can be used as argument \code{EMC} to \code{phyclust()}.
-With no arguments, it retusn the default values. The internal object \code{.EMC}
-is a template object holding the defaults. Each element specifies some configuration for the evolutionary models,
+With no arguments, it returns the default values. The internal object \code{.EMC}
+is a template object holding the defaults. Each element configures some aspect of the evolutionary model,
 phyloclust model, initialization, optimization, and EM algorithm. See the help
 page for details and visit our website for examples.
 \begin{Code}
@@ -393,10 +389,12 @@ identifier: EV
  0.9002  0.7640  0.1698
 \end{Code}
 
-There is a convenient function \code{find.best()} that is useful for finding
-the highest likelihood value fit among multiple calls to \code{phyclust()} with varying arguments.
-This function attempts to run \code{phyclust()} repeatedly on
-combinations of assigned initialization options by updating
+There is a convenient function \code{find.best()}
+(Section~\ref{sec:msseqgenphyclust}) that is useful for finding
+the highest likelihood fit among multiple calls to \code{phyclust()} with
+varying arguments.
+This function runs \code{phyclust()} repeatedly on
+combinations of selected initialization options by updating
 an internal \code{EMC} control object in each iteration.
 Please be patient, as this function may take some time to complete.
 
@@ -411,18 +409,16 @@ Model selection includes identifying the number of clusters, type of evolutionar
 We could use information criteria to choose among models, but the parameter space is mixed continuous and discrete so the theory justifying these critiera does not apply.
 A more elaborate procedure to assess the number of clusters
 for a dataset is based on the parametric bootstrap
-technique and sequential hypothesis testings \citep{Maitra2010}.
+technique and sequential hypothesis testing \citep{Maitra2010}.
 
-The basic idea is to resample dataset from the fitted model using the
+The basic idea is to resample datasets from the fitted model using the
 functions \code{ms()} and \code{seqgen()},
 and refit the resampled dataset by \code{phyclust()}.
-The \code{bootstrap.seq.data()} function is a tool for this procedure
-by taking in a fitted model, the output of a previous call to \code{phyclust()}.
-It utilizes the functions \code{ms()} and \code{seqgen()}
-to re-sample bootstrap datasets. The same fitting method is applied to each
+The same fitting method is applied to each
 dataset, producing a distribution of parameter estimates.
-The following example bootstraps the toy dataset assuming $K=2$ clusters
-for only one time.
+The \code{bootstrap.seq.data()} function is a tool for this procedure;
+it takes a fitted model, the output of a previous call to \code{phyclust()}.
+The following example bootstraps the toy dataset once assuming $K=2$ clusters.
 \begin{Code}
 > set.seed(1234)
 > ret.4 <- phyclust(X, 2)
@@ -442,12 +438,41 @@ identifier: EE
   Tt: 0.001354 
   n.class: 48 52
 \end{Code}
-
-The \code{ret.4} is the result from \code{phyclust()},
+Output \code{ret.4} is the result from \code{phyclust()},
 \code{seq.data.toy.new} is a new dataset bootstrapped from
-the model in \code{ret.4}, and we refit the same model to
-this new data set and store in \code{ret.4.new} as one
-bootstrap result.
-Generally, we need to repeat these steps for several times to obtain
-an expected distribution for parameters.
+the model in \code{ret.4}, and \code{ret.4.new} is the fit
+of the bootstrapped dataset.
+Generally, we need to repeat these steps several times to obtain
+a distribution of parameter estimates.
+For example, the following code uses $B = 10$ bootstraps to obtain
+the distributions of log-likelihood for $K = 1$ and $K = 2$, and
+we can perform a likelihood ratio test to assess the number of clusters.
+\begin{Code}
+> ### This code may take a long time to run.
+> set.seed(1234)
+> ret.K1 <- find.best(X, 1)
+> ret.K2 <- find.best(X, 2)
+> (logL.diff <- ret.K2$logL - ret.K1$logL)
+[1] 663.2635
+> set.seed(1234)
+> B <- 10
+> boot.logL.diff <- NULL
+> for(b in 1:B){
+>   seq.data.toy.new <- bootstrap.seq.data(ret.K1)
+>   ret.H0 <- find.best(seq.data.toy.new$org, 1)
+>   ret.H1.H0 <- find.best(seq.data.toy.new$org, 2)
+>   boot.logL.diff <- c(boot.logL.diff, ret.H1.H0$logL - ret.H0$logL)
+> }
+> boot.logL.diff
+ [1] 20.17399 24.94449 25.50644 24.30299 25.94984 19.03801 19.20099 19.40565
+ [9] 18.88133 37.16275
+> sum(logL.diff < boot.logL.diff)
+[1] 0
+\end{Code}
+Here, the difference of likelihood values \code{logL.idff} is $663.2635$
+between models $K = 1$ and $K = 2$.
+We bootstrap from a fitted model of $K = 1$,
+and it is 0 out of 10 results indicating the $K = 2$ performs
+better than $K = 1$. As the $B$ increases, we may more confident to
+reject $K = 1$.
 

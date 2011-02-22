@@ -1,6 +1,6 @@
 Package: phyclust
-Version: 0.1-4
-Date: 2011-02-20
+Version: 0.1-5
+Date: 2011-02-22
 Title: Phylogenetic Clustering (Phyloclustering)
 Author: Wei-Chen Chen
 Maintainer: Wei-Chen Chen <phyclust@gmail.com>
@@ -21,6 +21,6 @@ Description: Phylogenetic clustering (phyloclustering) is an
         information, documentations and examples.
 License: GPL (>= 2)
 URL: http://thirteen-01.stat.iastate.edu/snoweye/phyclust/
-Packaged: Sun Feb 21 00:08:44 2010; snoweye
+Packaged: Sun Feb 21 23:28:48 2010; snoweye
 Repository: CRAN
-Date/Publication: 2010-02-21 18:43:21
+Date/Publication: 2010-02-22 08:04:56
