@@ -9,19 +9,9 @@ MS_SRCS = $(wildcard msdir/*.c)
 SG_SRCS = $(wildcard seq-gen/*.c)
 OBJECTS = $(SRCS:.c=.o) $(PC_SRCS:.c=.o) $(MS_SRCS:.c=.o) $(SG_SRCS:.c=.o)
 
-.PHONY: all
-
-all: before $(SHLIB) after
+all: $(SHLIB)
 
 $(SHLIB): $(OBJECTS)
-
-before:
-	@-rm -f $(OBJECTS) $(SHLIB)
-	@-rm -f *.o *.d *.rc Makedeps
-
-after:
-	@-rm -f $(OBJECTS)
-	@-rm -f *.o *.d *.rc Makedeps
 
 clean:
 	@-rm -f $(OBJECTS) $(SHLIB)
