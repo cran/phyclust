@@ -16,7 +16,10 @@ Q_matrix* R_initialize_Q_matrix(int code_type, int substitution_model){
 	Q->lower_bound = NULL;
 	Q->upper_bound = NULL;
 
+	Q->Pt = allocate_double_2D_AP(NCODE[code_type]);
 	Q->log_Pt = allocate_double_2D_AP(NCODE[code_type]);
+	Q->H = NULL;
+	
 	Q->pi = NULL;
 	Q->kappa = NULL;
 	Q->Tt = NULL;
@@ -34,6 +37,7 @@ void R_free_Q_matrix(Q_matrix *Q){
 	free(Q->code_type);
 	free(Q->substitution_model);
 	free(Q->n_param);
+	free(Q->Pt);
 	free(Q->log_Pt);
 	free(Q->ncode);
 	free(Q);

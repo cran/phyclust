@@ -12,7 +12,7 @@ plothist(X, X.class = NULL, Mu = NULL, fill.color = .Color,
 \arguments{
   \item{X}{nid/sid matrix with \eqn{N}{N} rows/sequences and \eqn{L}{L} columns/sites.}
   \item{X.class}{class ids indicated for all sequences.}
-  \item{Mu}{a central sequences with length \eqn{L}{L}.}
+  \item{Mu}{a central sequence with length \eqn{L}{L}.}
   \item{fill.color}{color to fill the histogram.}
   \item{draw.all}{draw a histogram use all sequences.}
   \item{main}{main label, default = "Mutation counts".}

@@ -15,7 +15,8 @@
  * class_id: array(N_X_org).
  * new_class_id: array(N_X_org). */
 
-void assign_class_id_compute_total_cost(int N_X, int K, double **EDM, int *center_id, int *new_class_id, double *new_total_cost){
+void assign_class_id_compute_total_cost(int N_X, int K, double **EDM, int *center_id, int *new_class_id,
+		double *new_total_cost){
 	int n_X, k;
 	double tmp_dist, dist;
 
@@ -190,7 +191,8 @@ void classify_unique_by_EDM(int N_X_org, int K, double **EDM, int N_X_unique, in
 	}
 } /* End of classify_unique_by_EDM(). */
 
-void assign_class_unique_by_k_medoids(int N_X_org, int K, double **EDM, int N_X_unique, int *map_X_unique_to_X_org, int *center_id, int *class_id){
+void assign_class_unique_by_k_medoids(int N_X_org, int K, double **EDM, int N_X_unique, int *map_X_unique_to_X_org,
+		int *center_id, int *class_id){
 	int max_kmed_iter = 1000;
 	int i, n_X_org, k;
 	int new_center_id[K], new_class_id[N_X_org];
@@ -203,7 +205,8 @@ void assign_class_unique_by_k_medoids(int N_X_org, int K, double **EDM, int N_X_
 	assign_class_id_compute_total_cost(N_X_org, K, EDM, center_id, class_id, &total_cost);
 
 	for(i = 0; i < max_kmed_iter; i++){
-		classify_unique_by_EDM(N_X_org, K, EDM, N_X_unique, map_X_unique_to_X_org, center_id, class_id, new_center_id);
+		classify_unique_by_EDM(N_X_org, K, EDM, N_X_unique, map_X_unique_to_X_org, center_id, class_id,
+				new_center_id);
 		#if INITDEBUG > 0
 			printf("iter = %d\n", i);
 			print_kmed(N_X_org, K, center_id, class_id, total_cost, new_center_id);

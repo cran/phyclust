@@ -15,7 +15,7 @@ phyclust_struct* R_initialize_phyclust_struct(int code_type, int N_X_org, int L,
 void R_free_phyclust_struct(phyclust_struct *pcs);
 
 
-/* This function calls LogL_observed_NU() in "src/phyclust/phyclust_em_tool.c"
+/* This function calls LogL_observed() in "src/phyclust/phyclust_em_tool.c"
    and is called by phyclust.logL() using .Call() in "R/f_phyclust_logL.r".
    Input:
      R_N_X_org: SEXP[1], number of sequences.
@@ -76,7 +76,7 @@ SEXP R_phyclust_logL(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
 		tmp_ptr += *C_L;
 	}
 	pcs->Eta = REAL(R_Eta);
-	update_phyclust_struct(pcs, 1);		/* 1 for using unique sequences. */
+	update_phyclust_struct(pcs);
 	empcs = initialize_em_phyclust_struct(pcs);
 
 	/* Assign QA. */
@@ -89,7 +89,7 @@ SEXP R_phyclust_logL(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
 	tmp_logL = REAL(ret_logL);
 
 	/* Compute. */
-	*tmp_logL = LogL_observed_NU(empcs, QA);
+	*tmp_logL = LogL_observed(empcs, QA);
 
 	/* Free memory and release protectation. */
 	free_Q_matrix_array(QA);

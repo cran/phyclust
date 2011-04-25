@@ -9,14 +9,14 @@
   The fitted model can be varied in \code{.identifier}.
 }
 \usage{
-bootstrap.star.trees(pcobj, min.n.class = 1)
+bootstrap.star.trees(ret.phyclust, min.n.class = 1)
 }
 \arguments{
-  \item{pcobj}{a phyclust object in \code{Class phyclust}.}
+  \item{ret.phyclust}{a phyclust object in \code{Class phyclust}.}
   \item{min.n.class}{minimum number of sequences for a cluster.}
 }
 \details{
-  \code{pcobj} is a phyclust object in \code{Class phyclust} which is usually
+  \code{ret.phyclust} is a phyclust object in \code{Class phyclust} which is usually
   fitted by \code{phyclust}, or returned by \code{phyclust.m.step}.
 
   \code{min.n.class} is a boundary condition to avoid degenerate clusters
@@ -24,7 +24,7 @@ bootstrap.star.trees(pcobj, min.n.class = 1)
   fitted model.
 }
 \value{
-  Return a list containing \eqn{K}{K} star trees according to \code{pcobj}.
+  Return a list containing \eqn{K}{K} star trees according to \code{ret.phyclust}.
 }
 \references{
   Phylogenetic Clustering Website:

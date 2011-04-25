@@ -17,6 +17,8 @@ em_phyclust_struct* initialize_em_phyclust_struct(phyclust_struct *pcs){
 	empcs = (em_phyclust_struct*) malloc(sizeof(em_phyclust_struct));
 	empcs->code_type = pcs->code_type;
 	empcs->ncode = pcs->ncode;
+	empcs->missing_index = pcs->missing_index;
+	empcs->missing_flag = pcs->missing_flag;
 	empcs->N_X_org = N_X_org;
 	empcs->N_X_unique = pcs->N_X_unique;
 	empcs->N_X = N_X;
@@ -39,7 +41,8 @@ em_phyclust_struct* initialize_em_phyclust_struct(phyclust_struct *pcs){
 	empcs->Mu = allocate_int_2D_AP(K); 
 	for(i = 0; i < K; i++){
 		empcs->Mu[i] = allocate_int_1D(L); 
-		/* This loop will be replaced by initialization functions. */
+		/* This loop will be replaced by initialization functions.
+		 * pcs->MU have 0 as default, and are assigend for exhausted EM. */
 		for(j = 0; j < L; j++){
 			empcs->Mu[i][j] = pcs->Mu[i][j];
 		}
@@ -56,13 +59,18 @@ em_phyclust_struct* initialize_em_phyclust_struct(phyclust_struct *pcs){
 	empcs->Eta = allocate_double_1D(K); 
 	empcs->log_Eta = allocate_double_1D(K); 
 	empcs->count_Mu_X = allocate_int_RT_4D(N_X, pcs->K, pcs->ncode, pcs->ncode);
+	if(empcs->missing_flag){
+		empcs->count_Mu_X_missing = allocate_int_RT_3D(N_X, pcs->K, pcs->ncode);
+	}
 
 	for(i = 0; i < K; i++){
 		empcs->Eta[i] = pcs->Eta[i];
 		empcs->log_Eta[i] = log(pcs->Eta[i]);
 	}
 	empcs->logL_observed = 0.0;
-	update_count_Mu_X(empcs);
+
+	reset_Mu_non_seg_site(empcs);	/* Reset Mu for non-segregating sites. */
+	initialize_count_Mu_X_and_missing(empcs);
 	return(empcs);
 } /* End of initialize_em_phyclust_struct(). */
 
@@ -75,6 +83,9 @@ void free_em_phyclust_struct(em_phyclust_struct *empcs){
 	free(empcs->Eta);
 	free(empcs->log_Eta);
 	free_int_RT_4D(empcs->N_X, empcs->K, empcs->ncode, empcs->count_Mu_X);
+	if(empcs->missing_flag){
+		free_int_RT_3D(empcs->N_X, empcs->K, empcs->count_Mu_X_missing);
+	}
 	free(empcs);
 } /* End of free_em_phyclust_struct(). */
 
@@ -85,7 +96,8 @@ em_phyclust_struct* duplicate_em_phyclust_struct(em_phyclust_struct *org_empcs){
 	new_empcs = (em_phyclust_struct*) malloc(sizeof(em_phyclust_struct));
 	new_empcs->code_type = org_empcs->code_type;
 	new_empcs->ncode = org_empcs->ncode;
-
+	new_empcs->missing_index = org_empcs->missing_index;
+	new_empcs->missing_flag = org_empcs->missing_flag;
 	new_empcs->N_X_org = org_empcs->N_X_org;
 	new_empcs->N_X_unique = org_empcs->N_X_unique;
 	new_empcs->N_X = N_X;
@@ -121,6 +133,9 @@ em_phyclust_struct* duplicate_em_phyclust_struct(em_phyclust_struct *org_empcs){
 	new_empcs->Eta = allocate_double_1D(K);
 	new_empcs->log_Eta = allocate_double_1D(K);
 	new_empcs->count_Mu_X = allocate_int_RT_4D(org_empcs->N_X, org_empcs->K, org_empcs->ncode, org_empcs->ncode);
+	if(org_empcs->missing_flag){
+		new_empcs->count_Mu_X_missing = allocate_int_RT_3D(org_empcs->N_X, org_empcs->K, org_empcs->ncode);
+	}
 
 	copy_empcs(org_empcs, new_empcs);
 	return(new_empcs);

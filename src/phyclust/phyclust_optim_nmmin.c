@@ -45,11 +45,13 @@ void free_nm_struct(nm_struct *nms){
 	free(nms);
 } /* End of free_nm_struct(). */
 
-void phyclust_optim_nmmin(nm_struct *nms){
-	optim_nmmin(nms->n_param, nms->Bvec, nms->X, nms->Fmin, nms->fminfn,
-		nms->fail, nms->abstol, nms->reltol, nms->ex,
-		nms->alpha, nms->beta, nms->gamma, nms->trace,
-		nms->fncount, nms->maxit);
+int phyclust_optim_nmmin(nm_struct *nms){
+	int ret_stop = 0;
+	ret_stop = optim_nmmin(nms->n_param, nms->Bvec, nms->X, nms->Fmin, nms->fminfn,
+			nms->fail, nms->abstol, nms->reltol, nms->ex,
+			nms->alpha, nms->beta, nms->gamma, nms->trace,
+			nms->fncount, nms->maxit);
+	return(ret_stop);
 } /* End of phyclust_optim_nmmin(). */
 
 
@@ -130,7 +132,7 @@ static double** matrix(int nrh, int nch){
 
 
 /* Nelder-Mead */
-void optim_nmmin(int n, double *Bvec, double *X, double *Fmin,
+int optim_nmmin(int n, double *Bvec, double *X, double *Fmin,
 	   /* optimfn fminfn, */
 	   double (*fminfn)(int, double*, void*),
 	   /* Rboolean *fail, */
@@ -173,10 +175,9 @@ void optim_nmmin(int n, double *Bvec, double *X, double *Fmin,
 	*fncount = 0;
 	/* *fail = FALSE; */
 	*fail = 0;
-	return;
+	return(1);
     }
-    if (trace)
-	printf("  Nelder-Mead direct search function minimizer\n");
+    if (trace) printf("  Nelder-Mead direct search function minimizer\n");
     P = matrix(n, n+1);
     /* *fail = FALSE; */
     *fail = 0;
@@ -184,8 +185,8 @@ void optim_nmmin(int n, double *Bvec, double *X, double *Fmin,
     if (!R_FINITE(f)) {
 	/* error(_("function cannot be evaluated at initial parameters")); */
 	*fail = 1;
-	printf("function cannot be evaluated at initial parameters\n");
-	exit(1);
+	if (trace) printf("function cannot be evaluated at initial parameters\n");
+	return(1);
     } else {
 	if (trace) printf("function value for initial parameters = %f\n", f);
 	funcount = 1;
@@ -328,8 +329,7 @@ void optim_nmmin(int n, double *Bvec, double *X, double *Fmin,
 			if (size < oldsize) {
 			    oldsize = size;
 			} else {
-			    if (trace)
-				printf("Polytope size measure not decreased in shrink\n");
+			    if (trace) printf("Polytope size measure not decreased in shrink\n");
 			    *fail = 10;
 			    break;
 			}
@@ -354,5 +354,6 @@ void optim_nmmin(int n, double *Bvec, double *X, double *Fmin,
     free(P);
     if (funcount > maxit) *fail = 1;
     *fncount = funcount;
+    return(0);
 } /* End of optim_nmmin(). */
 

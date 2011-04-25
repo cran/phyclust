@@ -11,7 +11,8 @@
 
 
 /* Initial a phyclust structure without assigning data X.
- * Assign X later by calling update_phyclust_struct() to update pcs. */
+ * Assign X later by calling update_phyclust_struct() to update pcs.
+ * Assign MISSING_CODE by code_type. */
 phyclust_struct* initialize_phyclust_struct(int code_type, int N_X_org, int L, int K){
 	int i;
 	phyclust_struct *pcs = NULL;
@@ -19,8 +20,9 @@ phyclust_struct* initialize_phyclust_struct(int code_type, int N_X_org, int L, i
 	pcs = (phyclust_struct*) malloc(sizeof(phyclust_struct));
 	pcs->code_type = code_type;
 	pcs->ncode = NCODE[code_type];
+	pcs->missing_index = MISSING_INDEX[code_type];	/* For missings. */
+	pcs->missing_flag = 0;				/* Assigned by update_phyclust_struct(). */
 	pcs->n_param = K - 1 + K * L;
-	pcs->compress_method = 1;
 	pcs->N_X_org = N_X_org;
 	pcs->N_X_unique = 0;				/* Assigned by update_phyclust_struct(). */
 	pcs->N_X = 0;					/* Assigned by update_phyclust_struct(). */
@@ -66,11 +68,6 @@ void free_phyclust_struct(phyclust_struct *pcs){
 	free(pcs->map_X_org_to_X_unique);
 	free(pcs->map_X_unique_to_X_org);
 	free(pcs->replication_X_unique);
-	if(pcs->compress_method == 0){
-		free(pcs->X);
-		free(pcs->map_X_org_to_X);
-		free(pcs->replication_X);
-	}
 	free(pcs->seg_site_id);
 	free_int_RT(pcs->K, pcs->Mu);
 	free(pcs->Eta);
@@ -83,13 +80,11 @@ void free_phyclust_struct(phyclust_struct *pcs){
 
 /* After assigning the data X_org, this function will extract the information
  * and update the pcs including: N_X_unique, N_X, X, map_X_to_X_org, replication_X, map_X_unique_to_X_org,
- * seg_site_id, and N_seg_site.
- * If compress_method = 0, then no compress_method for X. */
-void update_phyclust_struct(phyclust_struct *pcs, int compress_method){
-	int i, n_X_org, l, flag, N_X_org = pcs->N_X_org, N_X_unique, L = pcs->L;
+ * seg_site_id, and N_seg_site. */
+void update_phyclust_struct(phyclust_struct *pcs){
+	int i, n_X, l, flag, flag_missing, N_X_org = pcs->N_X_org, N_X_unique, L = pcs->L;
 	int map_X_unique_to_X_org[N_X_org], replication_X_unique[N_X_org], seg_site_id[L], N_seg_site = 0;
 
-	pcs->compress_method = compress_method;
 	pcs->map_X_org_to_X_unique = allocate_int_1D(N_X_org);
 
 	/* Assign N_X_unique and map_X_unique_to_X_org. */
@@ -100,17 +95,17 @@ void update_phyclust_struct(phyclust_struct *pcs, int compress_method){
 	map_X_unique_to_X_org[0] = 0;
 	replication_X_unique[0] = 1;
 	N_X_unique = 1;
-	for(n_X_org = 1; n_X_org < N_X_org; n_X_org++){
+	for(n_X = 1; n_X < N_X_org; n_X++){
 		flag = 1;
 		for(i = 0; i < N_X_unique; i++){
-			if(!(edist_D_HAMMING(L, pcs->X_org[n_X_org], pcs->X_org[map_X_unique_to_X_org[i]]) > 0)){
+			if(!(edist_D_HAMMING(L, pcs->X_org[n_X], pcs->X_org[map_X_unique_to_X_org[i]]) > 0)){
 				flag = 0;
 				break;
 			}
 		}
-		pcs->map_X_org_to_X_unique[n_X_org] = i;
+		pcs->map_X_org_to_X_unique[n_X] = i;
 		if(flag){
-			map_X_unique_to_X_org[N_X_unique++] = n_X_org;
+			map_X_unique_to_X_org[N_X_unique++] = n_X;
 		}
 		replication_X_unique[i]++;
 	}
@@ -126,39 +121,49 @@ void update_phyclust_struct(phyclust_struct *pcs, int compress_method){
 	pcs->N_X_unique = N_X_unique;
 
 	/* Copy to pcs. */
-	if(compress_method == 1){
-		pcs->N_X = pcs->N_X_unique;
-		pcs->X = pcs->X_unique;
-		pcs->map_X_org_to_X = pcs->map_X_org_to_X_unique;
-		pcs->map_X_to_X_org = pcs->map_X_unique_to_X_org;
-		pcs->replication_X = pcs->replication_X_unique;
-	} else if(compress_method == 0){
-		pcs->N_X = N_X_org;
-		pcs->X = allocate_int_2D_AP(N_X_org);
-		pcs->map_X_org_to_X = allocate_int_1D(N_X_org);
-		pcs->map_X_to_X_org = pcs->map_X_org_to_X; 
-		pcs->replication_X = allocate_int_1D(N_X_org);
-		for(i = 0; i < N_X_org; i++){
-			pcs->X[i] = pcs->X_org[i];
-			pcs->map_X_org_to_X[i] = i;
-			pcs->replication_X[i] = 1;
-		}
-	} else{
-		fprintf(stderr, "PE: The compress method is not found.\n");
-		exit(1);
-	}
+	pcs->N_X = pcs->N_X_unique;
+	pcs->X = pcs->X_unique;
+	pcs->map_X_org_to_X = pcs->map_X_org_to_X_unique;
+	pcs->map_X_to_X_org = pcs->map_X_unique_to_X_org;
+	pcs->replication_X = pcs->replication_X_unique;
 
 
-	/* Assign seg_site_id, and N_seg_site. */
-	for(l = 0; l < L; l++){
-		flag = 0;
-		for(n_X_org = 1; n_X_org < pcs->N_X_org; n_X_org++){
-			if(pcs->X_org[n_X_org][l] != pcs->X_org[0][l]){
-				flag |= 1;
+	/* Assign missing_flag. */
+	flag_missing = 0;
+	for(n_X = 0; n_X < pcs->N_X; n_X++){
+		for(l = 0; l < L; l++){
+			if(pcs->X_org[n_X][l] == pcs->missing_index){
+				flag_missing = 1;
 				break;
 			}
 		}
-		if(flag){
+		if(flag_missing){
+			break;
+		}
+	}
+	/* Copy to pcs. */
+	pcs->missing_flag = flag_missing;
+
+
+	/* Assign seg_site_id, and N_seg_site. If all are missing, set as seg_site. */
+	for(l = 0; l < L; l++){
+		flag = 0;
+		flag_missing = 0;
+
+		if(pcs->X[0][l] == pcs->missing_index){
+			flag_missing = 1;
+		}
+		for(n_X = 1; n_X < pcs->N_X; n_X++){
+			if(pcs->X[n_X][l] != pcs->X[0][l]){
+				flag |= 1;
+				break;
+			}
+			if(pcs->X[n_X][l] == pcs->missing_index){
+				flag_missing++;
+			}
+		}
+
+		if(flag || flag_missing == pcs->N_X){	/* All are missing, set as seg_site. */
 			seg_site_id[N_seg_site++] = l;
 		}
 	}

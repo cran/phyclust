@@ -7,14 +7,14 @@
   return a list object with class \code{seq.data}.
 }
 \usage{
-bootstrap.seq.data(pcobj, min.n.class = 1)
+bootstrap.seq.data(ret.phyclust, min.n.class = 1)
 }
 \arguments{
-  \item{pcobj}{a phyclust object in \code{Class phyclust}.}
+  \item{ret.phyclust}{a phyclust object in \code{Class phyclust}.}
   \item{min.n.class}{minimum number of sequences for a cluster.}
 }
 \details{
-  \code{pcobj} is a phyclust object in \code{Class phyclust} which is usually
+  \code{ret.phyclust} is a phyclust object in \code{Class phyclust} which is usually
   fitted by \code{phyclust}, or returned by \code{phyclust.m.step}.
 
   \code{min.n.class} is a boundary condition to avoid degenerate clusters

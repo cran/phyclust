@@ -32,7 +32,7 @@ SEXP R_phyclust_em_step(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
 	double *C_vect;
 	em_control *EMC;
 	phyclust_struct *pcs;
-	Q_matrix_array *QA, *tmp_QA = NULL;
+	Q_matrix_array *new_QA, *org_QA, *tmp_QA = NULL;
 	em_phyclust_struct *empcs, *tmp_empcs = NULL;
 	em_fp *EMFP;
 
@@ -42,7 +42,8 @@ SEXP R_phyclust_em_step(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
 	int C_protect_length;
 	
 	/* Declare variables for processing. */
-	int i, *tmp_ptr;
+	int i, j, *tmp_ptr;
+	double *tmp_ptr_double;
 
 	/* Set initial values. */
 	C_N_X_org = INTEGER(R_N_X_org);
@@ -57,43 +58,53 @@ SEXP R_phyclust_em_step(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
 	EMC->code_type = INTEGER(R_code_type)[0];
 	update_em_control(EMC);
 
-	/* Assign data. */
+	/* Assign data, read only. */
 	pcs = R_initialize_phyclust_struct(EMC->code_type, *C_N_X_org, *C_L, *C_K);
 	emobj = initialize_emptr(emptr, pcs);
 	tmp_ptr = INTEGER(R_X);
 	for(i = 0; i < *C_N_X_org; i++){
-		pcs->X_org[i] = tmp_ptr;
+		pcs->X_org[i] = tmp_ptr;			/* Assign poiners. */
 		tmp_ptr += *C_L;
 	}
-	tmp_ptr = INTEGER(R_Mu);
+
+	/* Assign parameters. Updates are required, so make a copy. */
+	tmp_ptr = INTEGER(R_Mu);				/* Read only. */
 	for(i = 0; i < *C_K; i++){
-		pcs->Mu[i] = tmp_ptr;
-		tmp_ptr += *C_L;
+		for(j = 0; j < *C_L; j++){
+			pcs->Mu[i][j] = *tmp_ptr;		/* Copy from the original input. */
+			tmp_ptr++;
+		}
 	}
-	pcs->Eta = REAL(R_Eta);
-	update_phyclust_struct(pcs, 1);		/* 1 for using unique sequences. */
+	tmp_ptr_double = REAL(R_Eta);				/* Read only. */
+	for(i = 0; i < *C_K; i++){
+		pcs->Eta[i] = *tmp_ptr_double;			/* Copy from the original input. */
+		tmp_ptr_double++;
+	}
+	update_phyclust_struct(pcs);
 	empcs = initialize_em_phyclust_struct(pcs);
 	EMFP = initialize_em_fp(EMC, pcs);
 
 	/* Assign QA. */
-	QA = initialize_Q_matrix_array(EMC->code_type, *C_K, EMC->substitution_model, EMC->identifier);
-	QA->Convert_vect_to_Q_matrix_array(C_vect, QA);
-	QA->Update_log_Pt(QA);
+	org_QA = initialize_Q_matrix_array(EMC->code_type, *C_K, EMC->substitution_model, EMC->identifier);
+	org_QA->Convert_vect_to_Q_matrix_array(C_vect, org_QA);	/* Copy from the original input. */
+	org_QA->Update_log_Pt(org_QA);
+	new_QA = duplicate_Q_matrix_array(org_QA);
 
 	/* Compute. */
-	E_step_simple(empcs, QA);
-	M_step_simple(empcs, QA, EMC, EMFP, tmp_empcs, tmp_QA);
-	empcs->logL_observed = EMFP->LogL_observed(empcs, QA);
+	E_step_simple(empcs, new_QA);
+	M_step_simple(empcs, new_QA, org_QA, EMC, EMFP, tmp_empcs, tmp_QA);
+	empcs->logL_observed = EMFP->LogL_observed(empcs, new_QA);
 	EMFP->Copy_empcs_to_pcs(empcs, pcs);
 
 	/* For return. */
-	copy_all_to_emptr(pcs, QA, EMC, emptr);
+	copy_all_to_emptr(pcs, new_QA, EMC, emptr);
 
 	/* Free memory and release protectation. */
 	free_em_control(EMC);
 	R_free_phyclust_struct(pcs);
 	free_em_fp(EMFP);
-	free_Q_matrix_array(QA);
+	free_Q_matrix_array(new_QA);
+	free_Q_matrix_array(org_QA);
 	free_em_phyclust_struct(empcs);
 	C_protect_length = emptr->C_protect_length;
 	free(emptr);
@@ -155,26 +166,28 @@ SEXP R_phyclust_e_step(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
 	EMC->code_type = INTEGER(R_code_type)[0];
 	update_em_control(EMC);
 
-	/* Assign data. */
+	/* Assign data, read only. */
 	pcs = R_initialize_phyclust_struct(EMC->code_type, *C_N_X_org, *C_L, *C_K);
 	tmp_ptr = INTEGER(R_X);
 	for(i = 0; i < *C_N_X_org; i++){
-		pcs->X_org[i] = tmp_ptr;
+		pcs->X_org[i] = tmp_ptr;			/* Assign pointers. */
 		tmp_ptr += *C_L;
 	}
-	tmp_ptr = INTEGER(R_Mu);
+
+	/* Assign parameters. No updates are required, so make a link. */
+	tmp_ptr = INTEGER(R_Mu);				/* Read only. */
 	for(i = 0; i < *C_K; i++){
 		pcs->Mu[i] = tmp_ptr;
 		tmp_ptr += *C_L;
 	}
-	pcs->Eta = REAL(R_Eta);
-	update_phyclust_struct(pcs, 1);		/* 1 for using unique sequences. */
+	pcs->Eta = REAL(R_Eta);					/* Read only. */
+	update_phyclust_struct(pcs);
 	empcs = initialize_em_phyclust_struct(pcs);
 	EMFP = initialize_em_fp(EMC, pcs);
 
 	/* Assign QA. */
 	QA = initialize_Q_matrix_array(EMC->code_type, *C_K, EMC->substitution_model, EMC->identifier);
-	QA->Convert_vect_to_Q_matrix_array(C_vect, QA);
+	QA->Convert_vect_to_Q_matrix_array(C_vect, QA);		/* Copy from the original input. */
 	QA->Update_log_Pt(QA);
 
 	/* Assign returns. */
@@ -213,7 +226,8 @@ SEXP R_phyclust_e_step(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
      R_L: SEXP[1], length of sequences.
      R_X: SEXP[1], sequences.
      R_K: SEXP[1], number of clusters.
-     R_Z_normalized: SEXP[1], Z_normalized.
+     R_vect: SEXP[1], vect contains pi, kappa, and Tt. (posterior)
+     R_Z_normalized: SEXP[1], Z_normalized. (posterior)
      R_substitution_model: SEXP[1], substitution model.
      R_identifier: SEXP[1], identifier.
      R_code_type: SEXP[1], code_type.
@@ -221,14 +235,14 @@ SEXP R_phyclust_e_step(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
      ret: a list contains everythings returned from phyclust in C.
 */
 SEXP R_phyclust_m_step(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
-		SEXP R_Z_normalized,
+		SEXP R_vect, SEXP R_Z_normalized,
 		SEXP R_substitution_model, SEXP R_identifier, SEXP R_code_type){
 	/* Declare variables for calling C. */
 	int *C_N_X_org, *C_L, *C_K;
-	double *C_Z_normalized;
+	double *C_vect, *C_Z_normalized;
 	em_control *EMC;
 	phyclust_struct *pcs;
-	Q_matrix_array *QA, *tmp_QA = NULL;
+	Q_matrix_array *new_QA, *org_QA, *tmp_QA = NULL;
 	em_phyclust_struct *empcs, *tmp_empcs = NULL;
 	em_fp *EMFP;
 
@@ -244,6 +258,7 @@ SEXP R_phyclust_m_step(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
 	C_N_X_org = INTEGER(R_N_X_org);
 	C_L = INTEGER(R_L);
 	C_K = INTEGER(R_K);
+	C_vect = REAL(R_vect);
 	C_Z_normalized = REAL(R_Z_normalized);
 
 	/* Assign controler. */
@@ -253,7 +268,7 @@ SEXP R_phyclust_m_step(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
 	EMC->code_type = INTEGER(R_code_type)[0];
 	update_em_control(EMC);
 
-	/* Assign data. */
+	/* Assign data, read only. */
 	pcs = R_initialize_phyclust_struct(EMC->code_type, *C_N_X_org, *C_L, *C_K);
 	emobj = initialize_emptr(emptr, pcs);
 	tmp_ptr = INTEGER(R_X);
@@ -267,28 +282,32 @@ SEXP R_phyclust_m_step(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
 		}
 	}
 	assign_class(pcs);
-	assign_Mu_by_class(pcs->N_X_org, pcs->K, pcs->L, pcs->ncode, pcs->class_id, pcs->X_org, pcs->Mu);
-	update_phyclust_struct(pcs, 1);		/* 1 for using unique sequences. */
+	assign_Mu_by_class(pcs->N_X_org, pcs->K, pcs->L, pcs->ncode, pcs->missing_index, pcs->class_id, pcs->X_org, pcs->Mu);
+	update_phyclust_struct(pcs);
 	empcs = initialize_em_phyclust_struct(pcs);
 	EMFP = initialize_em_fp(EMC, pcs);
 
 	/* Assign QA. */
-	QA = initialize_Q_matrix_array(EMC->code_type, *C_K, EMC->substitution_model, EMC->identifier);
+	org_QA = initialize_Q_matrix_array(EMC->code_type, *C_K, EMC->substitution_model, EMC->identifier);
+	org_QA->Convert_vect_to_Q_matrix_array(C_vect, org_QA);
+	org_QA->Update_log_Pt(org_QA);
+	new_QA = duplicate_Q_matrix_array(org_QA);
 
 	/* Compute. */
 	EMFP->Copy_pcs_to_empcs(pcs, empcs);
-	M_step_simple(empcs, QA, EMC, EMFP, tmp_empcs, tmp_QA);
-	empcs->logL_observed = EMFP->LogL_observed(empcs, QA);
+	M_step_simple(empcs, new_QA, org_QA, EMC, EMFP, tmp_empcs, tmp_QA);
+	empcs->logL_observed = EMFP->LogL_observed(empcs, new_QA);
 	EMFP->Copy_empcs_to_pcs(empcs, pcs);
 
 	/* For return. */
-	copy_all_to_emptr(pcs, QA, EMC, emptr);
+	copy_all_to_emptr(pcs, new_QA, EMC, emptr);
 
 	/* Free memory and release protectation. */
 	free_em_control(EMC);
 	R_free_phyclust_struct(pcs);
 	free_em_fp(EMFP);
-	free_Q_matrix_array(QA);
+	free_Q_matrix_array(new_QA);
+	free_Q_matrix_array(org_QA);
 	free_em_phyclust_struct(empcs);
 	C_protect_length = emptr->C_protect_length;
 	free(emptr);

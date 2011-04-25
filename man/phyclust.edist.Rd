@@ -14,8 +14,6 @@ phyclust.edist(X, edist.model = .edist.model[1])
 \details{
   \code{X} should be a numerical matrix containing sequence data that
   can be transfered by \code{code2nid} or \code{code2sid}.
-
-  \strong{Note}: gaps \code{-} are not supported yet, drop them from data.
 }
 \value{
   This function returns a object with class \code{dist}.
@@ -23,7 +21,6 @@ phyclust.edist(X, edist.model = .edist.model[1])
 \section{ToDo(s)}{
   \itemize{
     \item incorporate \code{dist.dna} of \pkg{ape}.
-    \item implement codes for gaps \code{-}.
   }
 }
 \references{

@@ -1,6 +1,6 @@
 ### This file contains functions for PARAMETERIC BOOTSTRAP that generate
-### star trees based on an pcobj fitted by phyclust(), and generate sequences
-### according to the star trees.
+### star trees based on an ret.phyclust fitted by phyclust(), and generate
+### sequences according to the star trees.
 
 bootstrap.star.tree <- function(n.tip, height = NULL){
   if(n.tip > 1){
@@ -25,26 +25,26 @@ bootstrap.star.tree <- function(n.tip, height = NULL){
   star.tree
 } # End of bootstrap.star.tree().
 
-bootstrap.star.trees <- function(pcobj, min.n.class = 1){
-  if(min.n.class * pcobj$K >= pcobj$N.X.org){
-    stop("min.n.class * pcobj$k >= pcobj$N.X.org")
+bootstrap.star.trees <- function(ret.phyclust, min.n.class = 1){
+  if(min.n.class * ret.phyclust$K >= ret.phyclust$N.X.org){
+    stop("min.n.class * ret.phyclust$k >= ret.phyclust$N.X.org")
   }
 
   repeat{
-    n.class <- rmultinom(1, pcobj$N.X.org, pcobj$Eta)
+    n.class <- rmultinom(1, ret.phyclust$N.X.org, ret.phyclust$Eta)
     if(all(n.class >= min.n.class)){
       n.class <- as.vector(n.class)
       break
     }
   }
 
-  Tt <- pcobj$QA$Tt
+  Tt <- ret.phyclust$QA$Tt
   if(length(Tt) == 1){		# EE or VE
-    Tt <- rep(Tt, pcobj$K)
+    Tt <- rep(Tt, ret.phyclust$K)
   }
 
   star.trees <- NULL
-  for(k in 1:pcobj$K){
+  for(k in 1:ret.phyclust$K){
     star.trees[[k]] <- bootstrap.star.tree(n.class[k], height = Tt[k])
   }
 
@@ -67,16 +67,16 @@ bootstrap.merge.seq <- function(seqs, code.type = .code.type[1]){
   da
 } # End of bootstrap.merge.seq().
 
-bootstrap.star.trees.seq <- function(pcobj, min.n.class = 1){
-  star.trees <- bootstrap.star.trees(pcobj, min.n.class = min.n.class)
-  seq.boot <- bootstrap.seq(pcobj, star.trees)
+bootstrap.star.trees.seq <- function(ret.phyclust, min.n.class = 1){
+  star.trees <- bootstrap.star.trees(ret.phyclust, min.n.class = min.n.class)
+  seq.boot <- bootstrap.seq(ret.phyclust, star.trees)
   list(trees = star.trees, seq = seq.boot)
 } # End of bootstrap.star.trees.seq().
 
-bootstrap.seq.data <- function(pcobj, min.n.class = 1){
-  ret.all <- bootstrap.star.trees.seq(pcobj, min.n.class)
-  ret.new <- paste(pcobj$N.X.org, pcobj$L, sep = " ")
-  for(i in 1:pcobj$K){
+bootstrap.seq.data <- function(ret.phyclust, min.n.class = 1){
+  ret.all <- bootstrap.star.trees.seq(ret.phyclust, min.n.class)
+  ret.new <- paste(ret.phyclust$N.X.org, ret.phyclust$L, sep = " ")
+  for(i in 1:ret.phyclust$K){
     ret.new <- c(ret.new, ret.all$seq[[i]][-1])
   }
   class(ret.new) <- "seqgen"

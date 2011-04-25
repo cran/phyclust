@@ -12,19 +12,20 @@ struct _phyclust_struct{
 /* Fixed variables, used in initial and duplicate functions. */
 	/* Define code type. */
 	int		code_type;		/* NUCLEOTIDE/SNP. */
-	int		ncode;			/* = NN/NNG(4/5) or NSNP/NSNPG(2/3). */
+	int		ncode;			/* = NN or NSNP, indicates the dimension. */
+	int		missing_index;		/* = NNG or NSNPG, indicates the missing index. */
+	int		missing_flag;		/* = 0 or 1 for data without missing or with missing. */
 	/* Storage. */
 	int		n_param;		/* Number of parameters, including Mu's, and eta's. */
-	int		compress_method;	/* 1 for compress, 0 otherwise.*/
 	int		N_X_org;		/* Number of original sequences. */
 	int		N_X_unique;		/* Number of unique sequnces, used for initialization only*/
 	int		N_X;			/* Number of sequences. */
-	int		N_seg_site;		/* Total segregating sites. */
+	int		N_seg_site;		/* Total segregating sites, including all are missing. */
 	int		L;			/* Number of loci. */
 	int		K;			/* Number of clusters. */
 	int		**X_org;		/* Original data pointer, dim = N_X_org * L. */
 	int		**X_unique;		/* Unique data pointer, dim = N_X_unique * L. */
-	int		**X;			/* Data pointer, dim = N_X * L if compress_method = 1, dim = N_X_org * L otherwise. */
+	int		**X;			/* Data pointer, dim = N_X * L. */
 	int		*map_X_org_to_X_unique;	/* Map indexes from X_org to X_unique, dim = N_X_org, used for initialization only. */
 	int		*map_X_unique_to_X_org;	/* Map indexes from X_unique to X_org, dim = N_X_unique, used for initialization only. */
 	int		*replication_X_unique;	/* Count replications of each unique sequence, dim = N_X_unique. */
@@ -51,7 +52,7 @@ struct _phyclust_struct{
 
 phyclust_struct* initialize_phyclust_struct(int code_type, int N_X_org, int L, int K);
 void free_phyclust_struct(phyclust_struct *pcs);
-void update_phyclust_struct(phyclust_struct *pcs, int compress_method);
+void update_phyclust_struct(phyclust_struct *pcs);
 
 
 /* ----- Summary tool. ----- */

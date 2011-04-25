@@ -14,8 +14,9 @@ phyclust_struct* R_initialize_phyclust_struct(int code_type, int N_X_org, int L,
 	pcs = (phyclust_struct*) malloc(sizeof(phyclust_struct));
 	pcs->code_type = code_type;
 	pcs->ncode = NCODE[code_type];
+	pcs->missing_index = MISSING_INDEX[code_type];
+	pcs->missing_flag = 0;
 	pcs->n_param = K - 1 + K * L;
-	pcs->compress_method = 1;
 	pcs->N_X_org = N_X_org;
 	pcs->N_X_unique = 0;
 	pcs->N_X = 0;
@@ -54,11 +55,6 @@ void R_free_phyclust_struct(phyclust_struct *pcs){
 	free(pcs->map_X_org_to_X_unique);
 	free(pcs->map_X_unique_to_X_org);
 	free(pcs->replication_X_unique);
-	if(pcs->compress_method == 0){
-		free(pcs->X);
-		free(pcs->map_X_org_to_X);
-		free(pcs->replication_X);
-	}
 	free(pcs->seg_site_id);
 	free(pcs->Mu);
 	free(pcs->Z_normalized);

@@ -34,7 +34,7 @@ struct _nm_struct{
 /* File: phyclust_optim_nmmin.c */
 nm_struct* initialize_nm_struct(int n);
 void free_nm_struct(nm_struct *nms);
-void phyclust_optim_nmmin(nm_struct *nms);
+int phyclust_optim_nmmin(nm_struct *nms);
 
 
 
@@ -76,14 +76,14 @@ typedef double optimfn(int, double *, void *);
 
 
 /* Nelder-Mead */
-void optim_nmmin(int n, double *Bvec, double *X, double *Fmin,
-	   /* optimfn fminfn, */
-	   double (*fminfn)(int, double*, void*),
-	   /* Rboolean *fail,*/
-	   int *fail,
-	   double abstol, double reltol, void *ex,
-	   double alpha, double bet, double gamm, int trace,
-	   int *fncount, int maxit);
+int optim_nmmin(int n, double *Bvec, double *X, double *Fmin,
+	/* optimfn fminfn, */
+	double (*fminfn)(int, double*, void*),
+	/* Rboolean *fail,*/
+	int *fail,
+	double abstol, double reltol, void *ex,
+	double alpha, double bet, double gamm, int trace,
+	int *fncount, int maxit);
 /* int n		= number of parameters
    double *Bvec		= initial values (pointer to 1-D array of n elements)
    double *X		= final value (pointer to 1-D array of n elements)

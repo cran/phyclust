@@ -26,10 +26,10 @@ Matrix \code{ret$org.code} contains the original data, e.g. A,G,C,T for
 nucleotide, and
 \code{ret$org} contains the data formatted for the computer, e.g. 0,1,2,3 for nucleotide.
 Matrix \code{ret$org} is translated from \code{ret$org.code}
-according to the standard encoding (\S\ref{sec:coding}) of the chosen data type and most calculations are done with \code{ret$org}.
+according to the standard encoding (Section~\ref{sec:coding}) of the chosen data type and most calculations are done with \code{ret$org}.
 
 \pkg{Phyclust} outputs sequence data in two formats:
-PHYLIP or FASTA (\S\ref{sec:save}).
+PHYLIP or FASTA (Section~\ref{sec:save}).
 
 
 
@@ -87,7 +87,7 @@ AF314262     gatcctcagg gccctctgga aagtgaccag tggtgcaggg tcctccggca
 
 By default, function \code{read.phylip()} will read in a PHYLIP file and
 assume the file contains nucleotide sequences. It will read in sequences,
-translate them using the encoding (\S\ref{sec:coding}), and
+translate them using the encoding (Section~\ref{sec:coding}), and
 store them in a list object of class \code{seq.data}.
 The following example reads the Pony 524 dataset.
 \begin{Code}

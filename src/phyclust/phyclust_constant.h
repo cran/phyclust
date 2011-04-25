@@ -21,25 +21,27 @@
 
 /* Nucleotides. */
 #define NN 4								/* Number of nucleotides. */
-#define NNG 5								/* Number of nucleotides with gap. */
+#define NNG 5								/* Index of nucleotides with gap. */
 enum {A, G, C, T, GAP};							/* Nucleotides. */
 static const char NUCLEOTIDE_CODE[NNG]  = {'A', 'G', 'C', 'T', '-'};
+static const char NUCLEOTIDE_lower[NNG]  = {'a', 'g', 'c', 't', '-'};
 static const char NUCLEOTIDE_ID[NNG]    = {'0', '1', '2', '3', '4'};
 
 /* SNPs. */
 #define NSNP 2								/* Number of SNPs. */
-#define NSNPG 3								/* Number of SNPs with unknown. */
+#define NSNPG 3								/* Index of SNPs with unknown. */
 enum {NL, SU, UN};							/* Normal/Substitution/Unknown. */
 static const char SNP_CODE[NSNPG] = {'0', '1', '-'};
 static const char SNP_ID[NSNPG] = {'1', '2', '-'};
 
 /* CODEs. */
-#define N_CODE_TYPE 2
+#define N_CODE_TYPE 2							/* Total number of code type. */
 enum {NUCLEOTIDE, SNP};							/* Number of codes. */
 static char VARIABLE_IS_NOT_USED *CODE_TYPE[N_CODE_TYPE] =
 	{"NUCLEOTIDE", "SNP"};
-static const int NCODE[N_CODE_TYPE] = {NN, NSNP};
+static const int NCODE[N_CODE_TYPE] = {NN, NSNP};			/* Indicate the dimension. */
 #define PRINT_CODE_TYPE 0						/* 0 for CODE, 1 for CODE_ID. */
+static const int MISSING_INDEX[N_CODE_TYPE] = {NN, NSNP};		/* Indicate the missing index. */
 
 
 /* EM procedures. */
@@ -98,10 +100,19 @@ static char VARIABLE_IS_NOT_USED *BOUNDARY_METHOD[N_BOUNDARY_METHOD] =
 #define exit(a) error("%d\n", a)
 #endif
 
+
 /* EM Debugging only. */
-#define EMDEBUG 0		/* 4 */		/* 0 for no output, >0 for em steps, >1 for m step, >2 for nm, >3 for -logpL. */
+#define EMDEBUG 0		/* 0 for no output, 1 for em steps, >1 for m step, >2 for nm, >3 for -logpL.
+				 * 0 = 0000 for no output,
+				 * 1 = 0001 for em steps,
+				 * 2 = 0010 for m step,
+				 * 4 = 0100 for nm step,
+				 * 8 = 1000 for -logpL. */
 #define INITDEBUG 0		/* 1 */		/* 0 for no output, >0 for tracing initialization. */
 #define verbosity_em_step 0	/* 3 */		/* 0 for no output, >0 for print information. */
 #define verbosity_exhaust_EM 0	/* 1 */		/* 0 for no output, >0 for print information. */
+#define PRINT_ERROR 0		/* 1 */		/* 0 for no output, >0 for error messages. */
+
 
 #endif	/* End of __PHYCLUST_CONSTANT_. */
+

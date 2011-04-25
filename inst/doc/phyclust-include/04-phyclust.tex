@@ -148,7 +148,7 @@ a result (\code{class.id}) of the \code{phyclust()} function
 or known, in the case of simulation (\code{ms+seqgen}).
 The \pkg{ms}+\pkg{seq-gen} simulation procedure within \pkg{phyclust} produces 
 sequences with names \\
-``\code{class.id-sequence.id},'' so the \proglang{R}
+``\code{sequence.id-class.id},'' so the \proglang{R}
 function \code{gsub()} (for details, type \code{?gsub}) can be used
 to extract the sequence classification (\code{class id}).
 In this section, we demonstrate visualization of a simulated dataset, where
@@ -156,12 +156,10 @@ the clusters are know.
 Similar figures can be produced for real datasets with clusters estimated by \code{phyclust()}.
 
 The following code produces the plot of Figure~\ref{fig:toydots}.
-Each row represents a sequence in the same order as they appear in the dataset,
-and each column represents a site.
-By default, it will show all changes with respect to the first sequence of the first cluster,
-which is only the first sequence of \code{X} if the data were sorted by the classification id.
-If the \code{X.class} is omitted (i.e. \code{plotdots(X)}), then it shows changes with respect to the first
-sequence of the dataset.
+Each row represents a sequence and each column represents a site.
+By default, it will show all changes with respect to the consensus sequence.
+If the \code{X.class} is omitted, then it draws in the original order of data,
+otherwise in the cluster order.
 \begin{Code}
 > seq.data.toy
 code.type: NUCLEOTIDE, n.seq: 100, seq.len: 200.
@@ -172,7 +170,7 @@ code.type: NUCLEOTIDE, n.seq: 100, seq.len: 200.
 
 The chosen sequence is fully colored, with green, blue, purple and red representing 
 nucleotides A, G, C, and T.
-All other sequences show only mutant sites compared to the reference sequence.
+All other sequences show only mutant sites compared to the consensus sequence.
 The dashed lines separate the clusters.
 The bottom row indicates the segregating sites, i.e.\ those sites containing
 at least one mutation.

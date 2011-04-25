@@ -1,13 +1,15 @@
-\name{seq.data.toy}
+\name{seq.data}
 \alias{seq.data.toy}
+\alias{seq.data.missing}
 \alias{Class seq.data}
 \alias{Data Toy}
 \docType{data}
 \title{A toy dataset in class seq.data}
 \description{
-   A toy dataset with 100 nucleotide sequences and 200 sites in 4 clusters.
+   A toy dataset, \code{seq.data.toy}, with 100 nucleotide sequences
+   and 200 sites in 4 clusters.
+   \code{seq.data.missing} contains some missings indicated by "-".
 }
-\usage{seq.data.toy}
 \format{
   This data contains a list with a \code{seq.data} structure described
   in the \sQuote{Details} section.
@@ -42,6 +44,11 @@
 \examples{
 \dontrun{
 seq.data.toy
+seq.data.missing
+
+par(mfrow = c(1, 2))
+plotdots(seq.data.toy$org)
+plotdots(seq.data.missing$org)
 }
 }
 \keyword{datasets}

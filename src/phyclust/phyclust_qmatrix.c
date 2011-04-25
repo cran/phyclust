@@ -20,10 +20,16 @@ Q_matrix* initialize_Q_matrix(int code_type, int substitution_model){
 	Q->lower_bound = allocate_double_1D(1);
 	Q->upper_bound = allocate_double_1D(1);
 
+	Q->Pt = allocate_double_2D_AP(NCODE[code_type]);
+	for(i = 0; i < NCODE[code_type]; i++){
+		Q->Pt[i] = allocate_double_1D(NCODE[code_type]);
+	}
 	Q->log_Pt = allocate_double_2D_AP(NCODE[code_type]);
 	for(i = 0; i < NCODE[code_type]; i++){
 		Q->log_Pt[i] = allocate_double_1D(NCODE[code_type]);
 	}
+	Q->H = allocate_double_1D(NCODE[code_type]);
+
 	Q->pi = allocate_double_1D(NCODE[code_type]);
 	Q->kappa = allocate_double_1D(1);
 	Q->Tt = allocate_double_1D(1);
@@ -52,7 +58,9 @@ void free_Q_matrix(Q_matrix *Q){
 	free(Q->n_param);
 	free(Q->lower_bound);
 	free(Q->upper_bound);
+	free_double_RT(*Q->ncode, Q->Pt);
 	free_double_RT(*Q->ncode, Q->log_Pt);
+	free(Q->H);
 	free(Q->ncode);
 	free(Q->pi);
 	free(Q->kappa);
@@ -156,7 +164,6 @@ void assign_FP_to_Q_matrix(int substitution_model, Q_matrix *Q){
 } /* End of assign_FP_to_Q_matrix(). */
 
 Q_matrix* repoint_Q_matrix(Q_matrix *Q_from){
-	int i;
 	Q_matrix *Q_to;
 
 	Q_to = (Q_matrix*) malloc(sizeof(Q_matrix));
@@ -167,11 +174,9 @@ Q_matrix* repoint_Q_matrix(Q_matrix *Q_from){
 	assign_FP_to_Q_matrix(*Q_to->substitution_model, Q_to);
 	Q_to->lower_bound = Q_from->lower_bound;
 	Q_to->upper_bound = Q_from->upper_bound;
-
-	Q_to->log_Pt = allocate_double_2D_AP(*Q_from->ncode);
-	for(i = 0; i < *Q_from->ncode; i++){
-		Q_to->log_Pt[i] = Q_from->log_Pt[i];
-	}
+	Q_to->Pt = Q_from->Pt;
+	Q_to->log_Pt = Q_from->log_Pt;
+	Q_to->H = Q_from->H;
 	Q_to->pi = Q_from->pi;
 	Q_to->kappa = Q_from->kappa;
 	Q_to->Tt = Q_from->Tt;
@@ -191,12 +196,33 @@ Q_matrix* repoint_Q_matrix(Q_matrix *Q_from){
  * log_Pt[1]: x != y.
  * */
 void Update_log_Pt_JC69(Q_matrix *Q){
-	double A, log_Pt[2];
+	double A, Pt[2], log_Pt[2];
 
 	A = exp(-4 * *Q->Tt);
-	log_Pt[0] = log(0.25 + 0.75 * A);
-	log_Pt[1] = log(0.25 - 0.25 * A);
+	Pt[0] = 0.25 + 0.75 * A;
+	Pt[1] = 0.25 - 0.25 * A;
+	log_Pt[0] = log(Pt[0]);
+	log_Pt[1] = log(Pt[1]);
 
+	/* Compute transition probabilities. */
+	Q->Pt[0][0] = Pt[0];
+	Q->Pt[0][1] = Pt[1];
+	Q->Pt[0][2] = Pt[1];
+	Q->Pt[0][3] = Pt[1];
+	Q->Pt[1][0] = Pt[1];
+	Q->Pt[1][1] = Pt[0];
+	Q->Pt[1][2] = Pt[1];
+	Q->Pt[1][3] = Pt[1];
+	Q->Pt[2][0] = Pt[1];
+	Q->Pt[2][1] = Pt[1];
+	Q->Pt[2][2] = Pt[0];
+	Q->Pt[2][3] = Pt[1];
+	Q->Pt[3][0] = Pt[1];
+	Q->Pt[3][1] = Pt[1];
+	Q->Pt[3][2] = Pt[1];
+	Q->Pt[3][3] = Pt[0];
+
+	/* Compute log transition probabilities. */
 	Q->log_Pt[0][0] = log_Pt[0];
 	Q->log_Pt[0][1] = log_Pt[1];
 	Q->log_Pt[0][2] = log_Pt[1];
@@ -213,6 +239,9 @@ void Update_log_Pt_JC69(Q_matrix *Q){
 	Q->log_Pt[3][1] = log_Pt[1];
 	Q->log_Pt[3][2] = log_Pt[1];
 	Q->log_Pt[3][3] = log_Pt[0];
+
+	/* Compute negative entropies. */
+	Update_H(Q);
 } /* End of Update_log_Pt_JC69(). */
 
 /*   A G C T        A G C T
@@ -230,14 +259,36 @@ void Update_log_Pt_JC69(Q_matrix *Q){
  * C 2 2 0 1
  * T 2 2 1 0 */
 void Update_log_Pt_K80(Q_matrix *Q){
-	double exp_A, exp_B, log_Pt[3];
+	double exp_A, exp_B, Pt[3], log_Pt[3];
 
 	exp_A = exp(-4 * *Q->Tt);
 	exp_B = 2 * exp(-2 * (*Q->kappa + 1) * *Q->Tt);
+	Pt[0] = (1 + exp_A + exp_B) * 0.25;
+	Pt[1] = (1 + exp_A - exp_B) * 0.25;
+	Pt[2] = (1 - exp_A) * 0.25;
 	log_Pt[0] = log((1 + exp_A + exp_B) * 0.25);
 	log_Pt[1] = log((1 + exp_A - exp_B) * 0.25);
 	log_Pt[2] = log((1 - exp_A) * 0.25);
 
+	/* Compute transition probabilities. */
+	Q->Pt[0][0] = Pt[0];
+	Q->Pt[0][1] = Pt[1];
+	Q->Pt[0][2] = Pt[2];
+	Q->Pt[0][3] = Pt[2];
+	Q->Pt[1][0] = Pt[1];
+	Q->Pt[1][1] = Pt[0];
+	Q->Pt[1][2] = Pt[2];
+	Q->Pt[1][3] = Pt[2];
+	Q->Pt[2][0] = Pt[2];
+	Q->Pt[2][1] = Pt[2];
+	Q->Pt[2][2] = Pt[0];
+	Q->Pt[2][3] = Pt[1];
+	Q->Pt[3][0] = Pt[2];
+	Q->Pt[3][1] = Pt[2];
+	Q->Pt[3][2] = Pt[1];
+	Q->Pt[3][3] = Pt[0];
+
+	/* Compute log transition probabilities. */
 	Q->log_Pt[0][0] = log_Pt[0];
 	Q->log_Pt[0][1] = log_Pt[1];
 	Q->log_Pt[0][2] = log_Pt[2];
@@ -254,6 +305,9 @@ void Update_log_Pt_K80(Q_matrix *Q){
 	Q->log_Pt[3][1] = log_Pt[2];
 	Q->log_Pt[3][2] = log_Pt[1];
 	Q->log_Pt[3][3] = log_Pt[0];
+
+	/* Compute negative entropies. */
+	Update_H(Q);
 } /* End of Update_log_Pt_K80(). */
 
 /*      A    G    C    T
@@ -292,22 +346,44 @@ void Update_log_Pt_F81(Q_matrix *Q){
 	pi_C_delta_CT_exp_lambda_4_t = Q->pi[2] * delta_CT * exp_lambda_3_t;
 	pi_T_delta_CT_exp_lambda_4_t = Q->pi[3] * delta_CT * exp_lambda_3_t;
 
-	Q->log_Pt[0][0] = log(pi_A_Delta_CTAG + pi_G_delta_AG_exp_lambda_3_t);
-	Q->log_Pt[0][1] = log(pi_G_Delta_CTAG - pi_G_delta_AG_exp_lambda_3_t);
-	Q->log_Pt[0][2] = log(Q->pi[2] * Delta);
-	Q->log_Pt[0][3] = log(Q->pi[3] * Delta);
-	Q->log_Pt[1][0] = log(pi_A_Delta_CTAG - pi_A_delta_AG_exp_lambda_3_t);
-	Q->log_Pt[1][1] = log(pi_G_Delta_CTAG + pi_A_delta_AG_exp_lambda_3_t);
+	/* Compute transition probabilities. */
+	Q->Pt[0][0] = pi_A_Delta_CTAG + pi_G_delta_AG_exp_lambda_3_t;
+	Q->Pt[0][1] = pi_G_Delta_CTAG - pi_G_delta_AG_exp_lambda_3_t;
+	Q->Pt[0][2] = Q->pi[2] * Delta;
+	Q->Pt[0][3] = Q->pi[3] * Delta;
+	Q->Pt[1][0] = pi_A_Delta_CTAG - pi_A_delta_AG_exp_lambda_3_t;
+	Q->Pt[1][1] = pi_G_Delta_CTAG + pi_A_delta_AG_exp_lambda_3_t;
+	Q->Pt[1][2] = Q->Pt[0][2];
+	Q->Pt[1][3] = Q->Pt[0][3];
+	Q->Pt[2][0] = Q->pi[0] * Delta;
+	Q->Pt[2][1] = Q->pi[1] * Delta;
+	Q->Pt[2][2] = pi_C_Delta_AGCT + pi_T_delta_CT_exp_lambda_4_t;
+	Q->Pt[2][3] = pi_T_Delta_AGCT - pi_T_delta_CT_exp_lambda_4_t;
+	Q->Pt[3][0] = Q->Pt[2][0];
+	Q->Pt[3][1] = Q->Pt[2][1];
+	Q->Pt[3][2] = pi_C_Delta_AGCT - pi_C_delta_CT_exp_lambda_4_t;
+	Q->Pt[3][3] = pi_T_Delta_AGCT + pi_C_delta_CT_exp_lambda_4_t;
+
+	/* Compute log transition probabilities. */
+	Q->log_Pt[0][0] = log(Q->Pt[0][0]);
+	Q->log_Pt[0][1] = log(Q->Pt[0][1]);
+	Q->log_Pt[0][2] = log(Q->Pt[0][2]);
+	Q->log_Pt[0][3] = log(Q->Pt[0][3]);
+	Q->log_Pt[1][0] = log(Q->Pt[1][0]);
+	Q->log_Pt[1][1] = log(Q->Pt[1][1]);
 	Q->log_Pt[1][2] = Q->log_Pt[0][2];
 	Q->log_Pt[1][3] = Q->log_Pt[0][3];
-	Q->log_Pt[2][0] = log(Q->pi[0] * Delta);
-	Q->log_Pt[2][1] = log(Q->pi[1] * Delta);
-	Q->log_Pt[2][2] = log(pi_C_Delta_AGCT + pi_T_delta_CT_exp_lambda_4_t);
-	Q->log_Pt[2][3] = log(pi_T_Delta_AGCT - pi_T_delta_CT_exp_lambda_4_t);
+	Q->log_Pt[2][0] = log(Q->Pt[2][0]);
+	Q->log_Pt[2][1] = log(Q->Pt[2][1]);
+	Q->log_Pt[2][2] = log(Q->Pt[2][2]);
+	Q->log_Pt[2][3] = log(Q->Pt[2][3]);
 	Q->log_Pt[3][0] = Q->log_Pt[2][0];
 	Q->log_Pt[3][1] = Q->log_Pt[2][1];
-	Q->log_Pt[3][2] = log(pi_C_Delta_AGCT - pi_C_delta_CT_exp_lambda_4_t);
-	Q->log_Pt[3][3] = log(pi_T_Delta_AGCT + pi_C_delta_CT_exp_lambda_4_t);
+	Q->log_Pt[3][2] = log(Q->Pt[3][2]);
+	Q->log_Pt[3][3] = log(Q->Pt[3][3]);
+
+	/* Compute negative entropies. */
+	Update_H(Q);
 } /* End of Update_log_Pt_F81(). */
 
 /*        A      G      C      T             A      G      C      T
@@ -347,22 +423,44 @@ void Update_log_Pt_HKY85(Q_matrix *Q){
 	pi_C_delta_CT_exp_lambda_4_t = Q->pi[2] * delta_CT * exp_lambda_4_t;
 	pi_T_delta_CT_exp_lambda_4_t = Q->pi[3] * delta_CT * exp_lambda_4_t;
 
-	Q->log_Pt[0][0] = log(pi_A_Delta_CTAG + pi_G_delta_AG_exp_lambda_3_t);
-	Q->log_Pt[0][1] = log(pi_G_Delta_CTAG - pi_G_delta_AG_exp_lambda_3_t);
-	Q->log_Pt[0][2] = log(Q->pi[2] * Delta);
-	Q->log_Pt[0][3] = log(Q->pi[3] * Delta);
-	Q->log_Pt[1][0] = log(pi_A_Delta_CTAG - pi_A_delta_AG_exp_lambda_3_t);
-	Q->log_Pt[1][1] = log(pi_G_Delta_CTAG + pi_A_delta_AG_exp_lambda_3_t);
+	/* Compute transition probabilities. */
+	Q->Pt[0][0] = pi_A_Delta_CTAG + pi_G_delta_AG_exp_lambda_3_t;
+	Q->Pt[0][1] = pi_G_Delta_CTAG - pi_G_delta_AG_exp_lambda_3_t;
+	Q->Pt[0][2] = Q->pi[2] * Delta;
+	Q->Pt[0][3] = Q->pi[3] * Delta;
+	Q->Pt[1][0] = pi_A_Delta_CTAG - pi_A_delta_AG_exp_lambda_3_t;
+	Q->Pt[1][1] = pi_G_Delta_CTAG + pi_A_delta_AG_exp_lambda_3_t;
+	Q->Pt[1][2] = Q->Pt[0][2];
+	Q->Pt[1][3] = Q->Pt[0][3];
+	Q->Pt[2][0] = Q->pi[0] * Delta;
+	Q->Pt[2][1] = Q->pi[1] * Delta;
+	Q->Pt[2][2] = pi_C_Delta_AGCT + pi_T_delta_CT_exp_lambda_4_t;
+	Q->Pt[2][3] = pi_T_Delta_AGCT - pi_T_delta_CT_exp_lambda_4_t;
+	Q->Pt[3][0] = Q->Pt[2][0];
+	Q->Pt[3][1] = Q->Pt[2][1];
+	Q->Pt[3][2] = pi_C_Delta_AGCT - pi_C_delta_CT_exp_lambda_4_t;
+	Q->Pt[3][3] = pi_T_Delta_AGCT + pi_C_delta_CT_exp_lambda_4_t;
+
+	/* Compute log transition probabilities. */
+	Q->log_Pt[0][0] = log(Q->Pt[0][0]);
+	Q->log_Pt[0][1] = log(Q->Pt[0][1]);
+	Q->log_Pt[0][2] = log(Q->Pt[0][2]);
+	Q->log_Pt[0][3] = log(Q->Pt[0][3]);
+	Q->log_Pt[1][0] = log(Q->Pt[1][0]);
+	Q->log_Pt[1][1] = log(Q->Pt[1][1]);
 	Q->log_Pt[1][2] = Q->log_Pt[0][2];
 	Q->log_Pt[1][3] = Q->log_Pt[0][3];
-	Q->log_Pt[2][0] = log(Q->pi[0] * Delta);
-	Q->log_Pt[2][1] = log(Q->pi[1] * Delta);
-	Q->log_Pt[2][2] = log(pi_C_Delta_AGCT + pi_T_delta_CT_exp_lambda_4_t);
-	Q->log_Pt[2][3] = log(pi_T_Delta_AGCT - pi_T_delta_CT_exp_lambda_4_t);
+	Q->log_Pt[2][0] = log(Q->Pt[2][0]);
+	Q->log_Pt[2][1] = log(Q->Pt[2][1]);
+	Q->log_Pt[2][2] = log(Q->Pt[2][2]);
+	Q->log_Pt[2][3] = log(Q->Pt[2][3]);
 	Q->log_Pt[3][0] = Q->log_Pt[2][0];
 	Q->log_Pt[3][1] = Q->log_Pt[2][1];
-	Q->log_Pt[3][2] = log(pi_C_Delta_AGCT - pi_C_delta_CT_exp_lambda_4_t);
-	Q->log_Pt[3][3] = log(pi_T_Delta_AGCT + pi_C_delta_CT_exp_lambda_4_t);
+	Q->log_Pt[3][2] = log(Q->Pt[3][2]);
+	Q->log_Pt[3][3] = log(Q->Pt[3][3]);
+
+	/* Compute negative entropies. */
+	Update_H(Q);
 } /* End of Update_log_Pt_HKY85(). */
 
 /*   0 1        0 1
@@ -376,16 +474,28 @@ void Update_log_Pt_HKY85(Q_matrix *Q){
  * log_Pt[1]: x != y.
  * */
 void Update_log_Pt_SNP_JC69(Q_matrix *Q){
-	double A, log_Pt[2];
+	double A, Pt[2], log_Pt[2];
 
 	A = exp(-2 * *Q->Tt);
-	log_Pt[0] = log(0.5 + 0.5 * A);
-	log_Pt[1] = log(0.5 - 0.5 * A);
+	Pt[0] = 0.5 + 0.5 * A;
+	Pt[1] = 0.5 - 0.5 * A;
+	log_Pt[0] = log(Pt[0]);
+	log_Pt[1] = log(Pt[1]);
 
+	/* Compute transition probabilities. */
+	Q->Pt[0][0] = Pt[0];
+	Q->Pt[0][1] = Pt[1];
+	Q->Pt[1][0] = Pt[1];
+	Q->Pt[1][1] = Pt[0];
+
+	/* Compute log transition probabilities. */
 	Q->log_Pt[0][0] = log_Pt[0];
 	Q->log_Pt[0][1] = log_Pt[1];
 	Q->log_Pt[1][0] = log_Pt[1];
 	Q->log_Pt[1][1] = log_Pt[0];
+
+	/* Compute negative entropies. */
+	Update_H(Q);
 } /* End of Update_log_Pt_SNP_JC69(). */
 
 /*      0    1           0    1
@@ -400,11 +510,35 @@ void Update_log_Pt_SNP_F81(Q_matrix *Q){
 
 	A = exp(-*Q->Tt);
 
-	Q->log_Pt[0][0] = log(Q->pi[0] + Q->pi[1] * A);
-	Q->log_Pt[0][1] = log(Q->pi[1] - Q->pi[1] * A);
-	Q->log_Pt[1][0] = log(Q->pi[0] - Q->pi[0] * A);
-	Q->log_Pt[1][1] = log(Q->pi[1] + Q->pi[0] * A);
+	/* Compute transition probabilities. */
+	Q->Pt[0][0] = Q->pi[0] + Q->pi[1] * A;
+	Q->Pt[0][1] = Q->pi[1] - Q->pi[1] * A;
+	Q->Pt[1][0] = Q->pi[0] - Q->pi[0] * A;
+	Q->Pt[1][1] = Q->pi[1] + Q->pi[0] * A;
+
+	/* Compute log transition probabilities. */
+	Q->log_Pt[0][0] = log(Q->Pt[0][0]);
+	Q->log_Pt[0][1] = log(Q->Pt[0][1]);
+	Q->log_Pt[1][0] = log(Q->Pt[1][0]);
+	Q->log_Pt[1][1] = log(Q->Pt[1][1]);
+
+	/* Compute negative entropies. */
+	Update_H(Q);
 } /* End of Update_log_Pt_SNP_F81(). */
+
+
+
+
+/* Compute negative entropies. */
+void Update_H(Q_matrix *Q){
+	int i, j;
+	for(i = 0; i < *Q->ncode; i++){
+		Q->H[i] = 0.0;
+		for(j = 0; j < *Q->ncode; j++){
+			Q->H[i] = Q->H[i] + Q->Pt[i][j] * Q->log_Pt[i][j];
+		}
+	}
+} /* End of Update_H(). */
 
 
 
@@ -655,7 +789,9 @@ void Print_Q_matrix_SNP_F81(Q_matrix *Q){
 
 /* ----- For copy. ----- */
 void copy_Q_matrix(Q_matrix *Q_from, Q_matrix *Q_to){
+	copy_double_RT(NCODE[*Q_from->code_type], NCODE[*Q_from->code_type], Q_from->Pt, Q_to->Pt);
 	copy_double_RT(NCODE[*Q_from->code_type], NCODE[*Q_from->code_type], Q_from->log_Pt, Q_to->log_Pt);
+	copy_double_1D(NCODE[*Q_from->code_type], Q_from->H, Q_to->H);
 	copy_double_1D(NCODE[*Q_from->code_type], Q_from->pi, Q_to->pi);
 	*Q_to->kappa = *Q_from->kappa;
 	*Q_to->Tt = *Q_from->Tt;
@@ -684,6 +820,30 @@ void print_log_Pt(Q_matrix *Q){
 		printf("\n");
 	}
 } /* End of print_log_Pt(). */
+
+void print_Pt(Q_matrix *Q){
+	int s_from, s_to;
+
+	printf("Pt:\n");
+	for(s_from = 0; s_from < NCODE[*Q->code_type]; s_from++){
+		printf("    ");
+		for(s_to = 0; s_to < NCODE[*Q->code_type]; s_to++){
+			printf(" %f", Q->Pt[s_from][s_to]);
+		}
+		printf("\n");
+	}
+} /* End of print_Pt(). */
+
+void print_H(Q_matrix *Q){
+	int s_from;
+
+	printf("H:\n");
+	printf("    ");
+	for(s_from = 0; s_from < NCODE[*Q->code_type]; s_from++){
+		printf(" %f", Q->H[s_from]);
+	}
+	printf("\n");
+} /* End of print_Pt(). */
 
 void print_Q(Q_matrix *Q){
 	int s;

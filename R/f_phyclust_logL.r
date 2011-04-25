@@ -10,9 +10,9 @@ phyclust.logL <- function(X, ret.phyclust = NULL,
       stop("Parameters are not specified correctly.")
     } else{
       ret.phyclust <- list(K = K, Eta = Eta, Mu = Mu,
-                           QA = list(pi = pi, kappa = kappa, Tt = Tt),
+                           QA = list(pi = pi, kappa = kappa, Tt = Tt,
+                                     identifier = identifier),
                            substitution.model = substitution.model,
-                           identifier = identifier,
                            code.type = code.type)
     }
   } else{

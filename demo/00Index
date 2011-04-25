@@ -5,4 +5,5 @@ simu_ms			phyclust	An example of ms().
 simu_seqgen_anc		phyclust	An example of seqgen().
 simu_seqgen_anc_SNP	phyclust	An example of seqgen() for SNP.
 toy			phyclust	An example of toy dataset.
+toy_missing		phyclust	An example of toy dataset with missing.
 tzeng2005		phyclust	An example of Crohn's disease dataset.

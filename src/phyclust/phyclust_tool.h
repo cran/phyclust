@@ -35,8 +35,11 @@ double** allocate_s_double_LT(int n_X);		/* sequential double lower triangular a
 double** allocate_s_double_LT_pam(int n_X);	/* sequential double lower triangular array for PAM. */
 
 /* Special storage. */
-int**** allocate_int_RT_4D(int N_X, int K, int nrow, int ncol);		/* int 4D RT. */
-void free_int_RT_4D(int N_X, int K, int nrow, int ****RT4D);		/* free 4D RT. */
+int**** allocate_int_RT_4D(int N_X, int K, int nrow, int ncol);				/* int 4D RT. */
+void free_int_RT_4D(int N_X, int K, int nrow, int ****RT4D);				/* free 4D RT. */
 void copy_int_RT_4D(int N_X, int K, int nrow, int ncol, int ****from, int ****to);	/* copy 4D RT. */
+int*** allocate_int_RT_3D(int N_X, int K, int ncode);					/* int 3D RT. */
+void free_int_RT_3D(int N_X, int K, int ***RT3D);					/* free 3D RT. */
+void copy_int_RT_3D(int N_X, int K, int ncode, int ***from, int ***to);			/* copy 3D RT. */
 
 #endif	/* End of __PHYCLUST_TOOL_. */

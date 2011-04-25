@@ -15,25 +15,25 @@ em_control* initialize_em_control(){
 	em_control *EMC;
 
 	EMC = (em_control*) malloc(sizeof(em_control));
-	EMC->exhaust_iter = 10;
+	EMC->exhaust_iter = 1;
 	EMC->fixed_iter = 5;
 	EMC->short_iter = 100;
 	EMC->EM_iter = 1000;
 	EMC->short_eps = 1e-2;
-	EMC->EM_eps = 1e-10;
+	EMC->EM_eps = 1e-8;
 
-	EMC->cm_reltol = 1e-16;
+	EMC->cm_reltol = 1e-10;
 	EMC->cm_maxit = 5000;
 
-	EMC->nm_abstol_Mu_given_QA = 1e-16;	/* for update_flag = 0. */
-	EMC->nm_abstol_QA_given_Mu = 1e-16;	/* for update_flag = 1. */
-	EMC->nm_reltol_Mu_given_QA = 1e-16;
-	EMC->nm_reltol_QA_given_Mu = 1e-16;
+	EMC->nm_abstol_Mu_given_QA = 1e-10;	/* for update_flag = 0. */
+	EMC->nm_abstol_QA_given_Mu = 1e-10;	/* for update_flag = 1. */
+	EMC->nm_reltol_Mu_given_QA = 1e-10;
+	EMC->nm_reltol_QA_given_Mu = 1e-10;
 	EMC->nm_maxit_Mu_given_QA = 500;
 	EMC->nm_maxit_QA_given_Mu = 5000;
 	EMC->est_non_seg_site = 0;		/* 1 for original case, 0 for skip. */
 
-	EMC->max_init_iter = 100;
+	EMC->max_init_iter = 50;
 	EMC->min_n_class = 1;
 	EMC->init_procedure = exhaustEM;
 	EMC->init_method = randomMu;

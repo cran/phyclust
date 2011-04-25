@@ -21,8 +21,6 @@
   \code{X} should be a numerical matrix containing sequence data that
   can be transfered by \code{code2nid} or \code{code2sid}.
 
-  \strong{Note}: gaps \code{-} are not supported yet, drop them from data.
-
   \code{EMC} contains all options used for EM algorithms.
 
   \code{manual.id} manually input class ids as an initialization only for
@@ -32,7 +30,7 @@
   FALSE, then the 'X' should be have the dimension \eqn{L\times K}{L*K}.
 }
 \value{
-  An list with class \code{phyclust} will be returned containing
+  A list with class \code{phyclust} will be returned containing
   several elements as the following:
 
   \item{'N.X.org'}{number of sequences in the \code{X} matrix.}
@@ -79,7 +77,6 @@
 \section{ToDo(s)}{
   \itemize{
     \item make a general class for \code{Q} and \code{QA}.
-    \item implement codes for gaps \code{-}.
   }
 }
 \references{
@@ -96,14 +93,16 @@
 }
 \examples{
 \dontrun{
+X <- seq.data.toy$org
+
 set.seed(1234)
-(ret.1 <- phyclust(seq.data.toy$org, 3))
+(ret.1 <- phyclust(X, 3))
 
 EMC.2 <- .EMC
 EMC.2$substitution.model <- "HKY85"
 # the same as EMC.2 <- .EMControl(substitution.model = "HKY85")
 
-(ret.2 <- phyclust(seq.data.toy$org, 3, EMC = EMC.2))
+(ret.2 <- phyclust(X, 3, EMC = EMC.2))
 }
 }
 \keyword{programming}

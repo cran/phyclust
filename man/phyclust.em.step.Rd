@@ -26,19 +26,12 @@ phyclust.em.step(X, ret.phyclust = NULL, K = NULL, Eta = NULL,
   \code{X} should be a numerical matrix containing sequence data that
   can be transfered by \code{code2nid} or \code{code2sid}.
 
-  \strong{Note}: gaps \code{-} are not supported yet, drop them from data.
-
   Either input \code{ret.phyclust} or all other arguments for this function.
-  \code{ret.phyclust} can be obtain either from an EM iteration of
+  \code{ret.phyclust} can be obtained either from an EM iteration of
   \code{phyclust} or from a M step of \code{phyclust.m.step}.
 }
 \value{
   This function return an object with class \code{phyclust}.
-}
-\section{ToDo(s)}{
-  \itemize{
-    \item implement codes for gaps \code{-}.
-  }
 }
 \references{
   Phylogenetic Clustering Website:
@@ -49,6 +42,7 @@ phyclust.em.step(X, ret.phyclust = NULL, K = NULL, Eta = NULL,
 }
 \seealso{
   \code{\link{phyclust}},
+  \code{\link{phyclust.e.step}},
   \code{\link{phyclust.m.step}}.
 }
 \examples{
@@ -57,9 +51,10 @@ set.seed(1234)
 EMC.1 <- .EMC
 EMC.1$EM.iter <- 1
 # the same as EMC.1 <- .EMControl(EM.iter = 1)
+X <- seq.data.toy$org
 
-ret.1 <- phyclust(seq.data.toy$org, 2, EMC = EMC.1)
-ret.2 <- phyclust.em.step(seq.data.toy$org, ret.phyclust = ret.1)
+ret.1 <- phyclust(X, 2, EMC = EMC.1)
+ret.2 <- phyclust.em.step(X, ret.phyclust = ret.1)
 str(ret.2)
 }
 }

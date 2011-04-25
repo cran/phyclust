@@ -63,60 +63,46 @@ em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
 	}
 
 	/* Update functions. */
-	if(pcs->N_X < pcs->N_X_org){	/* Some are not unique. */
-		/* In "phyclust_em.c". */
-		EMFP->E_step_and_logL_observed = &E_step_and_logL_observed_NU;
-		switch(EMC->boundary_method){
-			case IGNORE:
-				EMFP->Update_Eta_given_Z = &Update_Eta_given_Z_IGNORE_NU;
-				break;
-			case ADJUST:
-				EMFP->Update_Eta_given_Z = &Update_Eta_given_Z_ADJUST_NU;
-				break;
-			default:
-				fprintf(stderr, "PE: The boundary method is not found.\n");
-				exit(1);
-		}
-		/* In "phyclust_em_tool.h". */
-		EMFP->LogL_observed = &LogL_observed_NU;
-		EMFP->LogL_complete = &LogL_complete_NU;
-		EMFP->LogL_profile = &LogL_profile_NU;
-		EMFP->Copy_empcs_to_pcs = &Copy_empcs_to_pcs_NU;
-		EMFP->Copy_pcs_to_empcs = &Copy_pcs_to_empcs_NU;
-		/* In "phyclust_logpL.c". */
+	/* In "phyclust_em.c". */
+	EMFP->E_step_and_logL_observed = &E_step_and_logL_observed;
+	switch(EMC->boundary_method){
+		case IGNORE:
+			EMFP->Update_Eta_given_Z = &Update_Eta_given_Z_IGNORE;
+			break;
+		case ADJUST:
+			EMFP->Update_Eta_given_Z = &Update_Eta_given_Z_ADJUST;
+			break;
+		default:
+			fprintf(stderr, "PE: The boundary method is not found.\n");
+			exit(1);
+	}
+	/* In "phyclust_em_tool.h". */
+	EMFP->LogL_observed = &LogL_observed;
+	if(pcs->missing_flag){
+		EMFP->LogL_complete = &LogL_complete_missing;
+		EMFP->LogL_profile = &LogL_profile_missing;
+	} else{
+		EMFP->LogL_complete = &LogL_complete;
+		EMFP->LogL_profile = &LogL_profile;
+	}
+	EMFP->Copy_empcs_to_pcs = &Copy_empcs_to_pcs;
+	EMFP->Copy_pcs_to_empcs = &Copy_pcs_to_empcs;
+
+	/* In "phyclust_logpL.c". */
+	if(pcs->missing_flag){
+		EMFP->Compute_R = &Compute_R_missing;
 		if(EMC->est_non_seg_site != 0){
-			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_full_NU;
+			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_full_missing;
 		} else{
-			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_skip_non_seg_NU;
+			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_skip_non_seg_missing;
 		}
-		EMFP->Compute_R = &Compute_R_NU;
-	} else{				/* All are unique. */
-		/* In "phyclust_em.c". */
-		EMFP->E_step_and_logL_observed = &E_step_and_logL_observed_AU;
-		switch(EMC->boundary_method){
-			case IGNORE:
-				EMFP->Update_Eta_given_Z = &Update_Eta_given_Z_IGNORE_AU;
-				break;
-			case ADJUST:
-				EMFP->Update_Eta_given_Z = &Update_Eta_given_Z_ADJUST_AU;
-				break;
-			default:
-				fprintf(stderr, "PE: The boundary method is not found.\n");
-				exit(1);
-		}
-		/* In "phyclust_em_tool.h". */
-		EMFP->LogL_observed = &LogL_observed_AU;
-		EMFP->LogL_complete = &LogL_complete_AU;
-		EMFP->LogL_profile = &LogL_profile_AU;
-		EMFP->Copy_empcs_to_pcs = &Copy_empcs_to_pcs_AU;
-		EMFP->Copy_pcs_to_empcs = &Copy_pcs_to_empcs_AU;
-		/* In "phyclust_logpL.c". */
+	} else{
+		EMFP->Compute_R = &Compute_R;
 		if(EMC->est_non_seg_site != 0){
-			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_full_AU;
+			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_full;
 		} else{
-			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_skip_non_seg_AU;
+			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_skip_non_seg;
 		}
-		EMFP->Compute_R = &Compute_R_AU;
 	}
 	
 	return(EMFP);

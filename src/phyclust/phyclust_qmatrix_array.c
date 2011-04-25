@@ -30,13 +30,19 @@ Q_matrix_array* initialize_Q_matrix_array(int code_type, int K, int substitution
 	/* Allocate QA as a template. */
 	QA->Q[0] = (Q_matrix*) malloc(sizeof(Q_matrix));
 	QA->Q[0]->check_param = allocate_int_1D(1);
+	QA->Q[0]->Pt = allocate_double_2D_AP(QA->ncode);
+	for(i = 0; i < QA->ncode; i++){
+		QA->Q[0]->Pt[i] = allocate_double_1D(QA->ncode);
+	}
 	QA->Q[0]->log_Pt = allocate_double_2D_AP(QA->ncode);
 	for(i = 0; i < QA->ncode; i++){
 		QA->Q[0]->log_Pt[i] = allocate_double_1D(QA->ncode);
 	}
+	QA->Q[0]->H = allocate_double_1D(QA->ncode);
 	QA->Q[0]->pi = allocate_double_1D(QA->ncode);
 	QA->Q[0]->kappa = allocate_double_1D(1);
 	QA->Q[0]->Tt = allocate_double_1D(1);
+
 	/* Assign initialized value. */
 	QA->Q[0]->code_type = &QA->code_type;
 	QA->Q[0]->ncode = &QA->ncode;
@@ -52,7 +58,7 @@ Q_matrix_array* initialize_Q_matrix_array(int code_type, int K, int substitution
 	*QA->Q[0]->Tt = 1.0;
 	*QA->Q[0]->check_param = 1;
 
-	/* EE has a common storage for log_Pt, but EV, VE, VV have their own. */
+	/* EE has a common storage for Pt, log_Pt, but EV, VE, VV have their own. */
 	switch(identifier){
 		case EE:	/* Q's are the same, Tt's are the same. */
 			QA->total_n_param = *QA->Q[0]->n_param;
@@ -74,9 +80,13 @@ Q_matrix_array* initialize_Q_matrix_array(int code_type, int K, int substitution
 			QA->Copy_Q_matrix_array = &Copy_Q_matrix_array_EV;
 			for(k = 1; k < K; k++){
 				QA->Q[k] = repoint_Q_matrix(QA->Q[0]);
+				QA->Q[k]->Pt = allocate_double_2D_AP(*QA->Q[0]->ncode);
+				QA->Q[k]->log_Pt = allocate_double_2D_AP(*QA->Q[0]->ncode);
 				for(i = 0; i < QA->ncode; i++){
+					QA->Q[k]->Pt[i] = allocate_double_1D(QA->ncode);
 					QA->Q[k]->log_Pt[i] = allocate_double_1D(QA->ncode);
 				}
+				QA->Q[k]->H = allocate_double_1D(QA->ncode);
 				QA->Q[k]->Tt = allocate_double_1D(1);
 				QA->Q[k]->check_param = allocate_int_1D(1);
 				*QA->Q[k]->Tt = 1.0;
@@ -92,9 +102,13 @@ Q_matrix_array* initialize_Q_matrix_array(int code_type, int K, int substitution
 			QA->Copy_Q_matrix_array = &Copy_Q_matrix_array_VE;
 			for(k = 1; k < K; k++){
 				QA->Q[k] = repoint_Q_matrix(QA->Q[0]);
+				QA->Q[k]->Pt = allocate_double_2D_AP(*QA->Q[0]->ncode);
+				QA->Q[k]->log_Pt = allocate_double_2D_AP(*QA->Q[0]->ncode);
 				for(i = 0; i < QA->ncode; i++){
+					QA->Q[k]->Pt[i] = allocate_double_1D(QA->ncode);
 					QA->Q[k]->log_Pt[i] = allocate_double_1D(QA->ncode);
 				}
+				QA->Q[k]->H = allocate_double_1D(QA->ncode);
 				QA->Q[k]->pi = allocate_double_1D(QA->ncode);
 				QA->Q[k]->kappa = allocate_double_1D(1);
 				QA->Q[k]->check_param = allocate_int_1D(1);
@@ -114,9 +128,13 @@ Q_matrix_array* initialize_Q_matrix_array(int code_type, int K, int substitution
 			QA->Copy_Q_matrix_array = &Copy_Q_matrix_array_VV;
 			for(k = 1; k < K; k++){
 				QA->Q[k] = repoint_Q_matrix(QA->Q[0]);
+				QA->Q[k]->Pt = allocate_double_2D_AP(*QA->Q[0]->ncode);
+				QA->Q[k]->log_Pt = allocate_double_2D_AP(*QA->Q[0]->ncode);
 				for(i = 0; i < QA->ncode; i++){
+					QA->Q[k]->Pt[i] = allocate_double_1D(QA->ncode);
 					QA->Q[k]->log_Pt[i] = allocate_double_1D(QA->ncode);
 				}
+				QA->Q[k]->H = allocate_double_1D(QA->ncode);
 				QA->Q[k]->pi = allocate_double_1D(QA->ncode);
 				QA->Q[k]->kappa = allocate_double_1D(1);
 				QA->Q[k]->Tt = allocate_double_1D(1);
@@ -145,14 +163,15 @@ void free_Q_matrix_array(Q_matrix_array *QA){
 
 	switch(QA->identifier){
 		case EE:	/* Q's are the same, Tt's are the same. */
+			free_double_RT(QA->ncode, QA->Q[0]->Pt);
 			free_double_RT(QA->ncode, QA->Q[0]->log_Pt);
+			free(QA->Q[0]->H);
 			free(QA->Q[0]->pi);
 			free(QA->Q[0]->kappa);
 			free(QA->Q[0]->Tt);
 			free(QA->Q[0]->check_param);
 			free(QA->Q[0]);
 			for(k = 1; k < K; k++){
-				free(QA->Q[k]->log_Pt);
 				free(QA->Q[k]);
 			}
 			break;
@@ -160,7 +179,9 @@ void free_Q_matrix_array(Q_matrix_array *QA){
 			free(QA->Q[0]->pi);
 			free(QA->Q[0]->kappa);
 			for(k = 0; k < K; k++){
+				free_double_RT(QA->ncode, QA->Q[k]->Pt);
 				free_double_RT(QA->ncode, QA->Q[k]->log_Pt);
+				free(QA->Q[k]->H);
 				free(QA->Q[k]->Tt);
 				free(QA->Q[k]->check_param);
 				free(QA->Q[k]);
@@ -169,7 +190,9 @@ void free_Q_matrix_array(Q_matrix_array *QA){
 		case VE:	/* Q's are different, Tt's are the same. */
 			free(QA->Q[0]->Tt);
 			for(k = 0; k < K; k++){
+				free_double_RT(QA->ncode, QA->Q[k]->Pt);
 				free_double_RT(QA->ncode, QA->Q[k]->log_Pt);
+				free(QA->Q[k]->H);
 				free(QA->Q[k]->pi);
 				free(QA->Q[k]->kappa);
 				free(QA->Q[k]->check_param);
@@ -178,7 +201,9 @@ void free_Q_matrix_array(Q_matrix_array *QA){
 			break;
 		case VV:	/* Q's are different, Tt's are different. */
 			for(k = 0; k < K; k++){
+				free_double_RT(QA->ncode, QA->Q[k]->Pt);
 				free_double_RT(QA->ncode, QA->Q[k]->log_Pt);
+				free(QA->Q[k]->H);
 				free(QA->Q[k]->pi);
 				free(QA->Q[k]->kappa);
 				free(QA->Q[k]->Tt);
@@ -380,6 +405,8 @@ void Convert_Q_matrix_array_to_vect_VV(Q_matrix_array *QA, double *vect){
 void Copy_Q_matrix_array_EE(Q_matrix_array *QA_from, Q_matrix_array *QA_to){
 	QA_to->check_param = QA_from->check_param;
 	copy_double_RT(QA_from->ncode, QA_from->ncode, QA_from->Q[0]->log_Pt, QA_to->Q[0]->log_Pt);
+	copy_double_RT(QA_from->ncode, QA_from->ncode, QA_from->Q[0]->Pt, QA_to->Q[0]->Pt);
+	copy_double_1D(QA_from->ncode, QA_from->Q[0]->H, QA_to->Q[0]->H);
 	copy_double_1D(QA_from->ncode, QA_from->Q[0]->pi, QA_to->Q[0]->pi);
 	*QA_to->Q[0]->kappa = *QA_from->Q[0]->kappa;
 	*QA_to->Q[0]->Tt = *QA_from->Q[0]->Tt;
@@ -394,7 +421,9 @@ void Copy_Q_matrix_array_EV(Q_matrix_array *QA_from, Q_matrix_array *QA_to){
 	copy_double_1D(QA_from->ncode, QA_from->Q[0]->pi, QA_to->Q[0]->pi);
 	*QA_to->Q[0]->kappa = *QA_from->Q[0]->kappa;
 	for(k = 0; k < QA_from->K; k++){
+		copy_double_RT(QA_from->ncode, QA_from->ncode, QA_from->Q[k]->Pt, QA_to->Q[k]->Pt);
 		copy_double_RT(QA_from->ncode, QA_from->ncode, QA_from->Q[k]->log_Pt, QA_to->Q[k]->log_Pt);
+		copy_double_1D(QA_from->ncode, QA_from->Q[k]->H, QA_to->Q[k]->H);
 		*QA_to->Q[k]->Tt = *QA_from->Q[k]->Tt;
 		*QA_to->Q[k]->check_param = *QA_from->Q[k]->check_param;
 	}
@@ -406,7 +435,9 @@ void Copy_Q_matrix_array_VE(Q_matrix_array *QA_from, Q_matrix_array *QA_to){
 
 	QA_to->check_param = QA_from->check_param;
 	for(k = 0; k < QA_from->K; k++){
+		copy_double_RT(QA_from->ncode, QA_from->ncode, QA_from->Q[k]->Pt, QA_to->Q[k]->Pt);
 		copy_double_RT(QA_from->ncode, QA_from->ncode, QA_from->Q[k]->log_Pt, QA_to->Q[k]->log_Pt);
+		copy_double_1D(QA_from->ncode, QA_from->Q[k]->H, QA_to->Q[k]->H);
 		copy_double_1D(QA_from->ncode, QA_from->Q[k]->pi, QA_to->Q[k]->pi);
 		*QA_to->Q[k]->kappa = *QA_from->Q[k]->kappa;
 		*QA_to->Q[k]->check_param = *QA_from->Q[k]->check_param;
@@ -420,7 +451,9 @@ void Copy_Q_matrix_array_VV(Q_matrix_array *QA_from, Q_matrix_array *QA_to){
 
 	QA_to->check_param = QA_from->check_param;
 	for(k = 0; k < QA_from->K; k++){
+		copy_double_RT(QA_from->ncode, QA_from->ncode, QA_from->Q[k]->Pt, QA_to->Q[k]->Pt);
 		copy_double_RT(QA_from->ncode, QA_from->ncode, QA_from->Q[k]->log_Pt, QA_to->Q[k]->log_Pt);
+		copy_double_1D(QA_from->ncode, QA_from->Q[k]->H, QA_to->Q[k]->H);
 		copy_double_1D(QA_from->ncode, QA_from->Q[k]->pi, QA_to->Q[k]->pi);
 		*QA_to->Q[k]->kappa = *QA_from->Q[k]->kappa;
 		*QA_to->Q[k]->Tt = *QA_from->Q[k]->Tt;

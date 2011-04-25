@@ -5,7 +5,6 @@ citEntry(
   title = "Phylogenetic Clustering with R package phyclust",
   author = personList(as.person("W.-C. Chen")),
   year = "2010",
-  note = "R package version 0.1-2",
   url = "http://thirteen-01.stat.iastate.edu/snoweye/phyclust/",
   textVersion = "W.-C. Chen (2010). Phylogenetic Clustering with R package phyclust"
 )

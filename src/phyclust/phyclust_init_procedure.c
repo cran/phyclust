@@ -30,7 +30,7 @@ void init_em_step(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, em_
 	double lower_bound_org, lower_bound_unique;
 
 	if(pcs->K * EMC->min_n_class >= pcs->N_X_unique){
-		fprintf(stderr, "PE: K is too huge.\n");
+		fprintf(stderr, "PE: K is too huge.");
 		exit(1);
 	}
 	lower_bound_org = (double) EMC->min_n_class / (double) pcs->N_X_org;
@@ -50,7 +50,7 @@ void init_em_step(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, em_
 	update_em_control(EMC);
 	update_Q_matrix_array(QA, pcs);
 
-	#if EMDEBUG > 0
+	#if (EMDEBUG & 1) == 1
 		printf("init proc: %s, method: %s, sub model: %s, dist: %s.\n",
 		INIT_PROCEDURE[EMC->init_procedure], INIT_METHOD[EMC->init_method],
 		SUBSTITUTION_MODEL[EMC->substitution_model], EDISTANCE_MODEL[EMC->edist_model]);
@@ -78,14 +78,18 @@ void init_em_step(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, em_
 /* For models using empirical pi's in Q. */
 void update_Q_matrix_array(Q_matrix_array *QA, phyclust_struct *pcs){
 	int s, n_X_org, l, k, flag = 0;
-	double pi[QA->ncode], total = (double)(pcs->N_X_org * pcs->L), sum = 0.0;
+	double pi[QA->ncode], total = 0.0, sum = 0.0;
 
 	for(s = 0; s < QA->ncode; s++){
 		pi[s] = 0;
 	}
 	for(n_X_org = 0; n_X_org < pcs->N_X_org; n_X_org++){
 		for(l = 0; l < pcs->L; l++){
+			if(pcs->X_org[n_X_org][l] == pcs->missing_index){	/* For missings. */
+				continue;
+			}
 			pi[pcs->X_org[n_X_org][l]]++;
+			total++;
 		}
 	}
 	for(s = 0; s < (QA->ncode - 1); s++){
@@ -118,6 +122,7 @@ void update_Q_matrix_array(Q_matrix_array *QA, phyclust_struct *pcs){
 
 /* Initialization procedure. */
 void exhaust_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, em_fp *EMFP){
+	int init_flag = 0, init_iter = 0;
 	int converge_iter = 0, converge_inner_iter = 0, converge_cm_iter = 0;
 	int iter = 1, exhaust_iter = org_EMC->exhaust_iter;
 	Q_matrix_array *new_QA;
@@ -137,7 +142,18 @@ void exhaust_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EM
 	#elif verbosity_exhaust_EM > 0
 		printf("\n");
 	#endif
-	EMFP->Update_init(new_empcs, new_QA, new_EMC, EMFP);
+	init_flag = EMFP->Update_init(new_empcs, new_QA, new_EMC, EMFP);
+
+	if(exhaust_iter == 1 && init_flag > 0){
+	 	free_Q_matrix_array(new_QA);
+		free_em_control(new_EMC);
+		free_em_phyclust_struct(org_empcs);
+		free_em_phyclust_struct(new_empcs);
+		fprintf(stderr, "PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
+				INIT_METHOD[org_EMC->init_method]);
+		exit(1);
+	}
+
 	EMFP->Em_step(new_empcs, new_QA, new_EMC, EMFP);
 	copy_empcs(new_empcs, org_empcs);
 	org_QA->Copy_Q_matrix_array(new_QA, org_QA);
@@ -156,7 +172,17 @@ void exhaust_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EM
 		#elif verbosity_exhaust_EM > 0
 			printf("\n");
 		#endif
-		EMFP->Update_init(new_empcs, new_QA, new_EMC, EMFP);
+		init_flag = 1;
+		init_iter = 0;
+		while(init_flag > 0 && init_iter < org_EMC->max_init_iter){
+			init_flag = EMFP->Update_init(new_empcs, new_QA, new_EMC, EMFP);
+			init_iter++;
+		}
+		if(init_flag > 0){
+			iter++;
+			continue;
+		}
+
 		EMFP->Em_step(new_empcs, new_QA, new_EMC, EMFP);
 		converge_iter += new_EMC->converge_iter;
 		converge_inner_iter += new_EMC->converge_inner_iter;
@@ -169,6 +195,17 @@ void exhaust_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EM
 			copy_EMC(new_EMC, org_EMC);
 		}
 	}
+
+	if(org_empcs->logL_observed == -Inf){
+		free_Q_matrix_array(new_QA);
+		free_em_control(new_EMC);
+		free_em_phyclust_struct(org_empcs);
+		free_em_phyclust_struct(new_empcs);
+		fprintf(stderr, "PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
+				INIT_METHOD[org_EMC->init_method]);
+		exit(1);
+	}
+
 	org_EMC->converge_iter = converge_iter;
 	org_EMC->converge_inner_iter = converge_inner_iter;
 	org_EMC->converge_cm_iter = converge_cm_iter;
@@ -187,6 +224,7 @@ void exhaust_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EM
 
 
 void Rnd_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, em_fp *EMFP){
+	int init_flag = 0, init_iter = 0;
 	int converge_iter = 0, converge_inner_iter = 0, converge_cm_iter = 0;
 	int iter = 0, short_iter = org_EMC->short_iter, EM_iter = org_EMC->EM_iter;
 	double EM_eps = org_EMC->EM_eps;
@@ -202,18 +240,19 @@ void Rnd_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, e
 	org_empcs = initialize_em_phyclust_struct(pcs);
 	new_empcs = initialize_em_phyclust_struct(pcs);
 
-	EMFP->Update_init(new_empcs, new_QA, new_EMC, EMFP);
-	EMFP->Em_step(new_empcs, new_QA, new_EMC, EMFP);
-	converge_iter += new_EMC->converge_iter;
-	converge_inner_iter += new_EMC->converge_inner_iter;
-	converge_cm_iter += new_EMC->converge_cm_iter;
+	org_empcs->logL_observed = -Inf;
+	for(iter = 0; iter < short_iter; iter++){
+		init_flag = 1;
+		init_iter = 0;
+		while(init_flag > 0 && init_iter < org_EMC->max_init_iter){
+			init_flag = EMFP->Update_init(new_empcs, new_QA, new_EMC, EMFP);
+			init_iter++;
+		}
+		if(init_flag > 0){
+			iter++;
+			continue;
+		}
 
-	copy_empcs(new_empcs, org_empcs);
-	org_QA->Copy_Q_matrix_array(new_QA, org_QA);
-	copy_EMC(new_EMC, org_EMC);
-
-	for(iter = 1; iter < short_iter; iter++){
-		EMFP->Update_init(new_empcs, new_QA, new_EMC, EMFP);
 		EMFP->Em_step(new_empcs, new_QA, new_EMC, EMFP);
 		converge_iter += new_EMC->converge_iter;
 		converge_inner_iter += new_EMC->converge_inner_iter;
@@ -224,6 +263,16 @@ void Rnd_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, e
 			org_QA->Copy_Q_matrix_array(new_QA, org_QA);
 			copy_EMC(new_EMC, org_EMC);
 		}
+	}
+
+	if(org_empcs->logL_observed == -Inf){
+		free_Q_matrix_array(new_QA);
+		free_em_control(new_EMC);
+		free_em_phyclust_struct(org_empcs);
+		free_em_phyclust_struct(new_empcs);
+		fprintf(stderr, "PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
+				INIT_METHOD[org_EMC->init_method]);
+		exit(1);
 	}
 
 	org_EMC->EM_iter = EM_iter;
@@ -244,6 +293,7 @@ void Rnd_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, e
 
 
 void Rndp_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, em_fp *EMFP){
+	int init_flag = 0, init_iter = 0;
 	int converge_iter = 0, converge_inner_iter = 0, converge_cm_iter = 0;
 	int iter = 0, short_iter = org_EMC->short_iter, EM_iter = org_EMC->EM_iter, fixed_iter = org_EMC->fixed_iter;
 	double EM_eps = org_EMC->EM_eps;
@@ -259,19 +309,19 @@ void Rndp_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, 
 	org_empcs = initialize_em_phyclust_struct(pcs);
 	new_empcs = initialize_em_phyclust_struct(pcs);
 
-	EMFP->Update_init(new_empcs, new_QA, new_EMC, EMFP);
-	EMFP->Em_step(new_empcs, new_QA, new_EMC, EMFP);
-	converge_iter += new_EMC->converge_iter;
-	converge_inner_iter += new_EMC->converge_inner_iter;
-	converge_cm_iter += new_EMC->converge_cm_iter;
-
-	copy_empcs(new_empcs, org_empcs);
-	org_QA->Copy_Q_matrix_array(new_QA, org_QA);
-	copy_EMC(new_EMC, org_EMC);
-	iter += fixed_iter;
-
+	org_empcs->logL_observed = -Inf;
 	while(iter < short_iter){
-		EMFP->Update_init(new_empcs, new_QA, new_EMC, EMFP);
+		init_flag = 1;
+		init_iter = 0;
+		while(init_flag > 0 && init_iter < org_EMC->max_init_iter){
+			init_flag = EMFP->Update_init(new_empcs, new_QA, new_EMC, EMFP);
+			init_iter++;
+		}
+		if(init_flag > 0){
+			iter++;
+			continue;
+		}
+
 		EMFP->Em_step(new_empcs, new_QA, new_EMC, EMFP);
 		converge_iter += new_EMC->converge_iter;
 		converge_inner_iter += new_EMC->converge_inner_iter;
@@ -283,6 +333,16 @@ void Rndp_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, 
 			copy_EMC(new_EMC, org_EMC);
 		}
 		iter += fixed_iter;
+	}
+
+	if(org_empcs->logL_observed == -Inf){
+		free_Q_matrix_array(new_QA);
+		free_em_control(new_EMC);
+		free_em_phyclust_struct(org_empcs);
+		free_em_phyclust_struct(new_empcs);
+		fprintf(stderr, "PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
+				INIT_METHOD[org_EMC->init_method]);
+		exit(1);
 	}
 
 	org_EMC->EM_iter = EM_iter;
@@ -303,6 +363,7 @@ void Rndp_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, 
 
 
 void em_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, em_fp *EMFP){
+	int init_flag = 0, init_iter = 0;
 	int converge_iter = 0, converge_inner_iter = 0, converge_cm_iter = 0;
 	int short_iter = org_EMC->short_iter;
 	double short_eps = org_EMC->short_eps;
@@ -315,19 +376,19 @@ void em_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, em
 	org_empcs = initialize_em_phyclust_struct(pcs);
 	new_empcs = initialize_em_phyclust_struct(pcs);
 
-	EMFP->Update_init(new_empcs, new_QA, new_EMC, EMFP);
-	EMFP->Short_em_step(new_empcs, new_QA, new_EMC, EMFP);
-	converge_iter += new_EMC->converge_iter;
-	converge_inner_iter += new_EMC->converge_inner_iter;
-	converge_cm_iter += new_EMC->converge_cm_iter;
-
-	copy_empcs(new_empcs, org_empcs);
-	org_QA->Copy_Q_matrix_array(new_QA, org_QA);
-	copy_EMC(new_EMC, org_EMC);
-	new_EMC->short_iter -= new_EMC->converge_iter;
-
+	org_empcs->logL_observed = -Inf;
 	while(new_EMC->short_iter > 0){
-		EMFP->Update_init(new_empcs, new_QA, new_EMC, EMFP);
+		init_flag = 1;
+		init_iter = 0;
+		while(init_flag > 0 && init_iter < org_EMC->max_init_iter){
+			init_flag = EMFP->Update_init(new_empcs, new_QA, new_EMC, EMFP);
+			init_iter++;
+		}
+		if(init_flag > 0){
+			new_EMC->short_iter--;
+			continue;
+		}
+
 		EMFP->Short_em_step(new_empcs, new_QA, new_EMC, EMFP);
 		converge_iter += new_EMC->converge_iter;
 		converge_inner_iter += new_EMC->converge_inner_iter;
@@ -339,6 +400,16 @@ void em_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, em
 			copy_EMC(new_EMC, org_EMC);
 		}
 		new_EMC->short_iter -= new_EMC->converge_iter;
+	}
+
+	if(org_empcs->logL_observed == -Inf){
+		free_Q_matrix_array(new_QA);
+		free_em_control(new_EMC);
+		free_em_phyclust_struct(org_empcs);
+		free_em_phyclust_struct(new_empcs);
+		fprintf(stderr, "PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
+				INIT_METHOD[org_EMC->init_method]);
+		exit(1);
 	}
 
 	org_EMC->short_iter = short_iter;

@@ -293,7 +293,7 @@ SEXP R_phyclust(SEXP R_N_X_org, SEXP R_L, SEXP R_K, SEXP R_X, SEXP R_EMC, SEXP R
 			pcs->class_id[i] = C_manual_id[i];
 		}
 	}
-	update_phyclust_struct(pcs, 1);		/* 1 for using unique sequences. */
+	update_phyclust_struct(pcs);
 	EMFP = initialize_em_fp(EMC, pcs);
 
 	/* Assign QA. */

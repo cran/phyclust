@@ -14,7 +14,7 @@ struct _Q_matrix_array{
 /* Fixed variables in all Q_matrix. */
 	/* Define code type. */
 	int	code_type;		/* NUCLEOTIDE/SNP. */
-	int	ncode;			/* = NN/NNG(4/5) or NSNP/NSNPG(2/3). */
+	int	ncode;			/* = NN or NSNP. */
 	/* Configuration of QA. */	
 	int	K;			/* Number of clusters. */
 	int	identifier;		/* EE, EV, VE, VV. */
@@ -26,7 +26,7 @@ struct _Q_matrix_array{
 	double	upper_bound;		/* Upper bound of pi. */
 
 	/* For computation used in em_step(). */
-	void	(*Update_log_Pt)(Q_matrix_array*);			/* A function point to log_Pt_<substitution_model>(). */
+	void	(*Update_log_Pt)(Q_matrix_array*);		/* A function point to log_Pt_<substitution_model>(). */
 	void	(*Check_param)(Q_matrix_array*);		/* Check paramaters. */
 	void	(*Convert_vect_to_Q_matrix_array)(double*, Q_matrix_array*);	/* Convert vector to QA. */
 	void	(*Convert_Q_matrix_array_to_vect)(Q_matrix_array*, double*);	/* Convert QA to vector. */

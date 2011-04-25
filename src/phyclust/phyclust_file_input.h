@@ -13,7 +13,7 @@ typedef struct _input_struct		input_struct;
 struct _input_struct{
 	/* Define code type. */
 	int	code_type;			/* NUCLEOTIDE/SNP. */
-	int	ncode;				/* = NN or NSNP. */
+	int	ncode;				/* = NN or NSNP, indicates the dimension. */
 	/* Constant points to input_struct *ins. */
 	int	N_X_org;			/* Number of sequences. */
 	int	L;				/* Number of loci. */

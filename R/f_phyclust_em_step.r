@@ -12,9 +12,9 @@ phyclust.em.step <- function(X, ret.phyclust = NULL,
       stop("Parameters are not specified correctly.")
     } else{
       ret.phyclust <- list(K = K, Eta = Eta, Mu = Mu,
-                           QA = list(pi = pi, kappa = kappa, Tt = Tt),
+                           QA = list(pi = pi, kappa = kappa, Tt = Tt,
+                                     identifier = identifier),
                            substitution.model = substitution.model,
-                           identifier = identifier,
                            code.type = code.type)
     }
   } else{
@@ -100,16 +100,17 @@ phyclust.e.step <- function(X, ret.phyclust = NULL,
 
 ### M-step: return a object with phyclust class.
 phyclust.m.step <- function(X, ret.phyclust = NULL,
-    K = NULL, Z.normalized = NULL,
+    K = NULL, pi = NULL, kappa = NULL, Tt = NULL, Z.normalized = NULL,
     substitution.model = NULL, identifier = NULL, code.type = NULL){
   if(is.null(ret.phyclust)){
-    if(is.null(K) || is.null(Z.normalized) ||
-       is.null(substitution.model) ||
+    if(is.null(K) || is.null(Tt) ||
+       is.null(Z.normalized) || is.null(substitution.model) ||
        is.null(identifier) || is.null(code.type)){
       stop("Parameters are not specified correctly.")
     } else{
       ret.phyclust <- list(K = K,
-                           QA = list(identifier = identifier),
+                           QA = list(pi = pi, kappa = kappa, Tt = Tt,
+                                     identifier = identifier),
                            Z.normalized = Z.normalized,
                            substitution.model = substitution.model,
                            code.type = code.type)
@@ -120,11 +121,14 @@ phyclust.m.step <- function(X, ret.phyclust = NULL,
     }
   }
 
+  vect <- convert.QA.to.vect(ret.phyclust)
+
   ret <- .Call("R_phyclust_m_step",
                as.integer(nrow(X)),
                as.integer(ncol(X)),
                as.integer(t(X)),
                as.integer(ret.phyclust$K),
+               as.double(vect),
                as.double(t(ret.phyclust$Z.normalized)),
                as.integer(which(ret.phyclust$substitution.model ==
                                 as.character(.substitution$model)) - 1),

@@ -2,25 +2,25 @@
 
 ### Control for EM.
 .EMControl <- function(
-    exhaust.iter = 10,
+    exhaust.iter = 1,
     fixed.iter = 5,
     short.iter = 100,
     EM.iter = 1000,
     short.eps = 1e-2,
-    EM.eps = 1e-10,
+    EM.eps = 1e-8,
 
-    cm.reltol = 1e-16,
+    cm.reltol = 1e-10,
     cm.maxit = 5000,
 
-    nm.abstol.Mu.given.QA = 1e-16,
-    nm.reltol.Mu.given.QA = 1e-16,
+    nm.abstol.Mu.given.QA = 1e-10,
+    nm.reltol.Mu.given.QA = 1e-10,
     nm.maxit.Mu.given.QA = 500,
-    nm.abstol.QA.given.Mu = 1e-16,
-    nm.reltol.QA.given.Mu = 1e-16,
+    nm.abstol.QA.given.Mu = 1e-10,
+    nm.reltol.QA.given.Mu = 1e-10,
     nm.maxit.QA.given.Mu = 5000,
     est.non.seg.site = FALSE,
 
-    max.init.iter = 100,
+    max.init.iter = 50,
     init.procedure = .init.procedure[1],
     init.method = .init.method[1],
     substitution.model = .substitution$model[1],

@@ -2,59 +2,59 @@
 
 ### Print phyclust
 print.phyclust <- function(x, digits = max(4, getOption("digits") - 3), ...){
-  pcobj <- x
+  ret.phyclust <- x
 
   options(digits = digits)
   init <- NULL
 
-  if(!is.null(pcobj$conv)){
+  if(!is.null(ret.phyclust$conv)){
     my.cat("Phyclust Results:\n",
-           "code type: ", pcobj$code.type,
-           ", em method: ", pcobj$em.method,
-           ", boundary method: ", pcobj$boundary.metho, ".\n",
-           "init procedure: ", pcobj$init.procedure,
-           ", method: ", pcobj$init.method, ".\n",
-           "model substitution: ", pcobj$substitution.model,
-           ", distance: ", pcobj$edist.model, ".\n",
-           "iter: ", pcobj$conv$iter,
-           " ", pcobj$conv$inner.iter,
-           " ", pcobj$conv$cm.iter,
-           ", convergence: ", pcobj$conv$flag,
-           ", check.param: ", pcobj$conv$check.param, ".\n",
-           "eps: ", pcobj$conv$eps,
-           ", error: ", pcobj$conv$error, ".\n")
+           "code type: ", ret.phyclust$code.type,
+           ", em method: ", ret.phyclust$em.method,
+           ", boundary method: ", ret.phyclust$boundary.metho, ".\n",
+           "init procedure: ", ret.phyclust$init.procedure,
+           ", method: ", ret.phyclust$init.method, ".\n",
+           "model substitution: ", ret.phyclust$substitution.model,
+           ", distance: ", ret.phyclust$edist.model, ".\n",
+           "iter: ", ret.phyclust$conv$iter,
+           " ", ret.phyclust$conv$inner.iter,
+           " ", ret.phyclust$conv$cm.iter,
+           ", convergence: ", ret.phyclust$conv$flag,
+           ", check.param: ", ret.phyclust$conv$check.param, ".\n",
+           "eps: ", ret.phyclust$conv$eps,
+           ", error: ", ret.phyclust$conv$error, ".\n")
   }
       
-  my.cat("N.X.org: ", pcobj$N.X.org,
-         ", N.X.unique: ", pcobj$N.X.unique,
-         ", L: ", pcobj$L,
-         ", K: ", pcobj$K,
-         ", p: ", pcobj$p,
-         ", N.seg.site: ", pcobj$N.seg.site, ".\n",
-         "logL: ", pcobj$logL)
-  if(!is.null(pcobj$bic)) my.cat(", bic: ", pcobj$bic)
-  if(!is.null(pcobj$aic)) my.cat(", aic: ", pcobj$aic)
-  if(!is.null(pcobj$icl)) my.cat(", icl: ", pcobj$icl)
+  my.cat("N.X.org: ", ret.phyclust$N.X.org,
+         ", N.X.unique: ", ret.phyclust$N.X.unique,
+         ", L: ", ret.phyclust$L,
+         ", K: ", ret.phyclust$K,
+         ", p: ", ret.phyclust$p,
+         ", N.seg.site: ", ret.phyclust$N.seg.site, ".\n",
+         "logL: ", ret.phyclust$logL)
+  if(!is.null(ret.phyclust$bic)) my.cat(", bic: ", ret.phyclust$bic)
+  if(!is.null(ret.phyclust$aic)) my.cat(", aic: ", ret.phyclust$aic)
+  if(!is.null(ret.phyclust$icl)) my.cat(", icl: ", ret.phyclust$icl)
   my.cat("\n")
-  my.cat("identifier: ", pcobj$QA$identifier, "\n")
-  cat("  Eta:", pcobj$Eta, "\n")
-  if(!is.null(pcobj$Q$pi)){
+  my.cat("identifier: ", ret.phyclust$QA$identifier, "\n")
+  cat("  Eta:", ret.phyclust$Eta, "\n")
+  if(!is.null(ret.phyclust$Q$pi)){
     my.cat("  pi:\n")
-    my.print(pcobj$Q$pi)
+    my.print(ret.phyclust$Q$pi)
   }
-  if(!is.null(pcobj$Q$kappa)) cat("  kappa:", pcobj$Q$kappa, "\n")
-  cat("  Tt:", pcobj$Q$Tt, "\n")
-  if(!is.null(pcobj$n.class)) cat("  n.class:", pcobj$n.class, "\n")
+  if(!is.null(ret.phyclust$Q$kappa)) cat("  kappa:", ret.phyclust$Q$kappa, "\n")
+  cat("  Tt:", ret.phyclust$Q$Tt, "\n")
+  if(!is.null(ret.phyclust$n.class)) cat("  n.class:", ret.phyclust$n.class, "\n")
 } # End of print.phyclust().
 
 summary.phyclust <- function(object, ...){
-  pcobj <- object
+  ret.phyclust <- object
 
-  print.phyclust(pcobj)
+  print.phyclust(ret.phyclust)
   cat("Mu:\n")
-  for(i in 1:pcobj$K){
-    cat("   ", as.character(.nucleotide$code[pcobj$Mu[i,] + 1]), "\n")
+  for(i in 1:ret.phyclust$K){
+    cat("   ", as.character(.nucleotide$code[ret.phyclust$Mu[i,] + 1]), "\n")
   }
-  cat("Class id:", pcobj$class.id, "\n")
+  cat("Class id:", ret.phyclust$class.id, "\n")
 } # End of summary.phyclust().
 

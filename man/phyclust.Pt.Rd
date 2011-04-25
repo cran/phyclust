@@ -5,14 +5,12 @@
   This computes transition probabilities of \code{phyclust} given time.
 }
 \usage{
-phyclust.Pt(Q, Tt, substitution.model = .substitution$model[1],
-            log = FALSE)
+phyclust.Pt(Q, Tt, substitution.model = .substitution$model[1])
 }
 \arguments{
   \item{Q}{a list according to the substitution model.}
   \item{Tt}{total evolution time, \eqn{t}{t}.}
   \item{substitution.model}{substitution model.}
-  \item{log}{TRUE for log of transition probabilities.}
 }
 \details{
   The major models for \code{Q} are:
@@ -30,12 +28,16 @@ phyclust.Pt(Q, Tt, substitution.model = .substitution$model[1],
   Q matrix array.
 }
 \value{
-  This function returns a transition probability matrix of \code{phyclust}.
+  A list with class \code{Pt} will be returned containin several
+  ememelts as the following:
+
+  \item{'Pt'}{a transition probability matrix.}
+  \item{'log.Pt'}{a log transition probability matrix.}
+  \item{'H'}{a negative entropy, \code{diag(Pt \%*\% t(log.Pt))}.}
 }
 \section{ToDo(s)}{
   \itemize{
     \item vectorize \code{Tt} for repeated computation in C.
-    \item make a general class for \code{Q} and \code{QA}.
   }
 }
 \references{

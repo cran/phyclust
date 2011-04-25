@@ -75,7 +75,9 @@ struct _em_phyclust_struct{
 /* Fixed variables, used in initial and duplicate functions, copy or point to pcs. */
 	/* Define code type. */
 	int		code_type;		/* NUCLEOTIDE/SNP. */
-	int		ncode;			/* = NN/NNG(4/5) or NSNP/NSNPG(2/3). */
+	int		ncode;			/* = NN or NSNP, indicates the dimension. */
+	int		missing_index;		/* = NNG or NSNPG, indicates the missing index. */
+	int		missing_flag;		/* = 0 or 1 for data without missing or with missing. */
 	/* Constant points to phylcust_struct *pcs. */
 	int		N_X_org;		/* Number of original sequences. */
 	int		N_X_unique;		/* Number of unique sequnces, used for initialization only*/
@@ -108,7 +110,8 @@ struct _em_phyclust_struct{
 	double		logL_observed;		/* Observed logL. */
 
 	/* Computing storage. */
-	int		****count_Mu_X;		/* Used in update_Z_modified(), logL_observed(), update_count_Mu_X(). */
+	int		****count_Mu_X;		/* Used in update_Z_modified(), logL_observed(), initialize_count_Mu_X_and_missing(). */
+	int		***count_Mu_X_missing;	/* Used in update_Z_modified(), logL_observed(), initialize_count_Mu_X_and_missing(). */
 };
 
 em_phyclust_struct* initialize_em_phyclust_struct(phyclust_struct *pcs);
@@ -117,32 +120,32 @@ em_phyclust_struct* duplicate_em_phyclust_struct(em_phyclust_struct *org_empcs);
 
 /* E_step's. */
 void e_step_with_stable_exp(int *K, double *a_Z_normalized, double *total_sum, double *scale_exp, int *flag_out_range);
-void E_step_and_logL_observed_AU(em_phyclust_struct *empcs, Q_matrix_array *QA);
-void E_step_and_logL_observed_NU(em_phyclust_struct *empcs, Q_matrix_array *QA);
+void E_step_and_logL_observed(em_phyclust_struct *empcs, Q_matrix_array *QA);
 void E_step_simple(em_phyclust_struct *empcs, Q_matrix_array *QA);
 
 /* m_step's. */
-int M_step_simple(em_phyclust_struct *empcs, Q_matrix_array *new_QA, em_control *EMC, em_fp *EMFP, em_phyclust_struct *tmp_empcs, Q_matrix_array *tmp_QA);
+int M_step_simple(em_phyclust_struct *empcs, Q_matrix_array *new_QA, Q_matrix_array *QA_H, em_control *EMC, em_fp *EMFP,
+		em_phyclust_struct *tmp_empcs, Q_matrix_array *tmp_QA);		/* tmp_QA unused */
 /* All CM steps require to set EMC->update_flag = 1. */
-int M_step_CM(em_phyclust_struct *empcs, Q_matrix_array *new_QA, em_control *EMC, em_fp *EMFP, em_phyclust_struct *tmp_empcs, Q_matrix_array *tmp_QA);
-int M_step_ACM(em_phyclust_struct *empcs, Q_matrix_array *new_QA, em_control *EMC, em_fp *EMFP, em_phyclust_struct *tmp_empcs, Q_matrix_array *tmp_QA);
+int M_step_CM(em_phyclust_struct *empcs, Q_matrix_array *new_QA, Q_matrix_array *QA_H, em_control *EMC, em_fp *EMFP,
+		em_phyclust_struct *tmp_empcs, Q_matrix_array *tmp_QA);
+int M_step_ACM(em_phyclust_struct *empcs, Q_matrix_array *new_QA, Q_matrix_array *QA_H, em_control *EMC, em_fp *EMFP,
+		em_phyclust_struct *tmp_empcs, Q_matrix_array *tmp_QA);		/* tmp_QA unused */
 
 /* Method to update Eta.
- * AU = all unique (treating all sequences are distinct).
- * NU = not unique (deal with summarized unique sequences).
  * IGNORE = ignore the results and stop if Eta's are out of boundary.
  * ADJUST = adjust the Eta's to be fixed on the boundary. */
-int Update_Eta_given_Z_ADJUST_AU(em_phyclust_struct *empcs, em_control *EMC);
-int Update_Eta_given_Z_ADJUST_NU(em_phyclust_struct *empcs, em_control *EMC);
-int Update_Eta_given_Z_IGNORE_AU(em_phyclust_struct *empcs, em_control *EMC);
-int Update_Eta_given_Z_IGNORE_NU(em_phyclust_struct *empcs, em_control *EMC);
+int Update_Eta_given_Z_ADJUST(em_phyclust_struct *empcs, em_control *EMC);
+int Update_Eta_given_Z_IGNORE(em_phyclust_struct *empcs, em_control *EMC);
 
 /* This special function updates empcs->Z_modified (log and unnormalized). */
 void update_Z_modified(em_phyclust_struct *empcs, Q_matrix_array *QA);
 
 /* Check convergence. */
-int Check_convergence_em(em_phyclust_struct *new_empcs, em_phyclust_struct *org_empcs, em_control *EMC);
-int Check_convergence_org(em_phyclust_struct *new_empcs, em_phyclust_struct *org_empcs, em_control *EMC);
+int Check_convergence_em(em_phyclust_struct *new_empcs, em_phyclust_struct *org_empcs, Q_matrix_array *new_QA,
+		Q_matrix_array *org_QA, Q_matrix_array *QA_H, em_control *EMC);
+int Check_convergence_org(em_phyclust_struct *new_empcs, em_phyclust_struct *org_empcs, Q_matrix_array *new_QA,
+		Q_matrix_array *org_QA, Q_matrix_array *QA_H, em_control *EMC);
 
 /* Different EM methods. */
 void Em_step(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP);
@@ -153,28 +156,29 @@ void Short_em_step(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EM
 struct _em_fp{
 /* Deal with different initialization methods. */
 	/* In "phyclust_init_method.c". */
-	void	(*Update_init)(em_phyclust_struct*, Q_matrix_array*, em_control*, em_fp*);	/* Initialization method. */
+	int	(*Update_init)(em_phyclust_struct*, Q_matrix_array*, em_control*, em_fp*);	/* Initialization method. */
 
 /* Deal with different EM algorithms. */
-	/* In "phyclust_em.c". */
-	int	(*M_step)(em_phyclust_struct*, Q_matrix_array*, em_control*, em_fp*, em_phyclust_struct*, Q_matrix_array*);		/* M_step. */
-	int	(*Check_convergence)(em_phyclust_struct*, em_phyclust_struct*, em_control*);	/* Check convergence. */
+	/* In "phyclust_em_step.c". */
+	int	(*M_step)(em_phyclust_struct*, Q_matrix_array*, Q_matrix_array*, em_control*, em_fp*, em_phyclust_struct*,
+			Q_matrix_array*);							/* M_step. */
+	int	(*Check_convergence)(em_phyclust_struct*, em_phyclust_struct*, Q_matrix_array*, Q_matrix_array*,
+			Q_matrix_array*, em_control*);						/* Check convergence. */
 	void	(*Em_step)(em_phyclust_struct*, Q_matrix_array*, em_control*, em_fp*);		/* Em_step. */
 	void	(*Short_em_step)(em_phyclust_struct*, Q_matrix_array*, em_control*, em_fp*);	/* Short_em_step. */
-
-/* Deal with unique or non-unique sequences. */
-	/* In "phyclust_em.c". */
-	void	(*E_step_and_logL_observed)(em_phyclust_struct*, Q_matrix_array*);			/* LogL by E_step. */
-	int	(*Update_Eta_given_Z)(em_phyclust_struct*, em_control*);		/* Update Eta given Z. */
+	void	(*E_step_and_logL_observed)(em_phyclust_struct*, Q_matrix_array*);		/* LogL by E_step. */
+	int	(*Update_Eta_given_Z)(em_phyclust_struct*, em_control*);			/* Update Eta given Z. */
 	/* In "phyclust_em_tool.h". */
-	double	(*LogL_observed)(em_phyclust_struct*, Q_matrix_array*);		/* Observed logL. */
-	double	(*LogL_complete)(em_phyclust_struct*, Q_matrix_array*);		/* Complete logL. */
-	double	(*LogL_profile)(em_phyclust_struct*, Q_matrix_array*);		/* Complete logL. */
-	void	(*Copy_empcs_to_pcs)(em_phyclust_struct*, phyclust_struct*);	/* copy empcs to pcs. */
-	void	(*Copy_pcs_to_empcs)(phyclust_struct*, em_phyclust_struct*);	/* copy empcs to pcs. */
+	double	(*LogL_observed)(em_phyclust_struct*, Q_matrix_array*);				/* Observed logL. */
+	double	(*LogL_complete)(em_phyclust_struct*, Q_matrix_array*, Q_matrix_array*);	/* Complete logL. */
+	double	(*LogL_profile)(em_phyclust_struct*, Q_matrix_array*, Q_matrix_array*);		/* Profile logL. */
+	void	(*Copy_empcs_to_pcs)(em_phyclust_struct*, phyclust_struct*);			/* copy empcs to pcs. */
+	void	(*Copy_pcs_to_empcs)(phyclust_struct*, em_phyclust_struct*);			/* copy empcs to pcs. */
+
+/* Deal with missing or non-missing sequences. */
 	/* In "phyclust_logpL.c". */
-	void	(*Update_Mu_given_QA)(em_phyclust_struct*, Q_matrix_array*);	/* Update Mu given QA in logpL. */
-	double	(*Compute_R)(em_phyclust_struct*);				/* Update function R(). */
+	void	(*Update_Mu_given_QA)(em_phyclust_struct*, Q_matrix_array*, Q_matrix_array*);	/* Update Mu given QA in logpL. */
+	double	(*Compute_R)(em_phyclust_struct*, Q_matrix_array*, Q_matrix_array*);		/* Update function R(). */
 };
 
 em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs);

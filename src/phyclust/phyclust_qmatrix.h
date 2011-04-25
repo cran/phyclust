@@ -12,7 +12,7 @@ struct _Q_matrix{
 /* Fixed variables, used in initial and duplicate functions. */
 	/* Define code type. */
 	int	*code_type;					/* NUCLEOTIDE/SNP. */
-	int	*ncode;						/* = NN/NNG(4/5) or NSNP/NSNPG(2/3). */
+	int	*ncode;						/* = NN or NSNP. */
 	/* Configuration of Q. */	
 	int	*substitution_model;				/* Substitution model. JC69, K80, or HKY85. */
 	int	*n_param;					/* Number of parameters including Q and Tt. */
@@ -26,7 +26,9 @@ struct _Q_matrix{
 	double  *lower_bound;					/* lower bound of parameters, default 1e-10. */
 	double  *upper_bound;					/* uper bound of parameters, default 1 - lower_bound. */
 /* Dynamical variables, used in copy functions only. */
+	double	**Pt;						/* Transition probabilities, dim = ncode * ncode. */
 	double	**log_Pt;					/* Log of transition probabilities, dim = ncode * ncode. */
+	double  *H;						/* Negative of entropy, rowSums(Pt * log_Pt). */
 	double	*pi;						/* pi for A, G, C, and T, dim = ncode. */
 	double	*kappa;						/* kappa. */
 	double	*Tt;						/* Total evolution time. */
@@ -47,6 +49,9 @@ void Update_log_Pt_F81(Q_matrix *Q);
 void Update_log_Pt_HKY85(Q_matrix *Q);
 void Update_log_Pt_SNP_JC69(Q_matrix *Q);
 void Update_log_Pt_SNP_F81(Q_matrix *Q);
+
+/* This function update H. */
+void Update_H(Q_matrix *Q);
 
 /* These functions check vectors. */
 void Check_param_JC69(double *vect, Q_matrix *Q);
@@ -96,6 +101,8 @@ void reset_Q_matrix(Q_matrix *Q);
 
 /* ----- For debug. ----- */
 void print_log_Pt(Q_matrix *Q);
+void print_Pt(Q_matrix *Q);
+void print_H(Q_matrix *Q);
 void print_Q(Q_matrix *Q);
 
 #endif	/* End of __PHYCLSUT_Q_MATRIX_. */

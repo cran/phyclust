@@ -96,16 +96,20 @@ double (*get_edist_D(int edist_model))(int, int*, int*){
 } /* End of (*get_edist_D(int edist_model))(). */
 
 double edist_D_JC69(int L, int *x, int *mu){
-	int i, diff = 0;
+	int i, diff = 0, L_NOGAP = L;
 	double d;
 
 	for(i = 0; i < L; i++){
+		if(x[i] == GAP || mu[i] == GAP){
+			L_NOGAP--;
+			continue;
+		}
 		if(x[i] != mu[i]){
 			diff++;
 		}
 	}
 
-	d = 1.0 - 4.0/3.0 * (double) diff / (double) L;
+	d = 1.0 - 4.0/3.0 * (double) diff / (double) L_NOGAP;
 	if(d > 0){
 		/*
 		d = -0.75 * log(d);
@@ -118,10 +122,14 @@ double edist_D_JC69(int L, int *x, int *mu){
 } /* End of edist_D_JC69(). */
 
 double edist_D_K80(int L, int *x, int *mu){
-	int i;
+	int i, L_NOGAP = L;
 	double PQ = 0.0, P = 0, Q = 0, d_1, d_2;
 
 	for(i = 0; i < L; i++){
+		if(x[i] == GAP || mu[i] == GAP){
+			L_NOGAP--;
+			continue;
+		}
 		if(x[i] != mu[i]){
 			PQ++;
 		}
@@ -130,8 +138,8 @@ double edist_D_K80(int L, int *x, int *mu){
 			P++;
 		}
 	}
-	Q = (PQ - P) / (double) L;
-	P = P / (double) L;
+	Q = (PQ - P) / (double) L_NOGAP;
+	P = P / (double) L_NOGAP;
 
 	d_1 = 1 - 2 * P - Q;
         d_2 = 1 - 2 * Q;

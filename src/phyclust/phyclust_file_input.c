@@ -54,11 +54,8 @@ int nucleotide_to_id(char x){
 		case 'T': case 't':
 			ret = T;
 			break;
-		case '-':
-			ret = GAP;
-			break;
 		default:
-			fprintf(stderr, "PW: unrecognized nucleotide %c\n", x);
+			/* fprintf(stderr, "PW: unrecognized nucleotide %c\n", x); */
 			ret = GAP;
 			break;
 	}
@@ -246,7 +243,7 @@ int snp_to_id(char x){
 			ret = SU;
 			break;
 		default:
-			fprintf(stderr, "PW: unrecognized nucleotide %c\n", x);
+			/* fprintf(stderr, "PW: unrecognized nucleotide %c\n", x); */
 			ret = UN;
 			break;
 	}

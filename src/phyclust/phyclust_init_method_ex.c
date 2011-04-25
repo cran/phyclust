@@ -47,7 +47,6 @@ void Update_init_k_medoids_X_org(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 
 		if(check_all_min_n_class(K, empcs->n_class, EMC->min_n_class)){
 			init_m_step(empcs, QA, EMC, EMFP);
-			/* empcs->add_logL = update_add_logL(empcs, QA) + 600.0; */
 			init_logL_observed = EMFP->LogL_observed(empcs, QA);
 			if(is_finite(init_logL_observed)){
 				break;
@@ -56,10 +55,10 @@ void Update_init_k_medoids_X_org(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 	}
 
 	if(init_iter > EMC->max_init_iter){
-		printf("Initialization is not valid for min_n_class = %d. (%s)\n", EMC->min_n_class, INIT_METHOD[EMC->init_method]);
+		printf("Initialization is not valid for min_n_class = %d. (%s)\n", EMC->min_n_class,
+				INIT_METHOD[EMC->init_method]);
 		printf("Reach the maximum initial iterations. (%s)\n", INIT_METHOD[EMC->init_method]);
 		init_m_step(empcs, QA, EMC, EMFP);
-		/* empcs->add_logL = update_add_logL(empcs, QA) + 600.0; */
 		init_logL_observed = EMFP->LogL_observed(empcs, QA);
 		if(!is_finite(init_logL_observed)){
 			printf("Initial logL_observed is not finit. (%s)\n", INIT_METHOD[EMC->init_method]);
@@ -98,7 +97,8 @@ void Update_init_k_medoids_X_unique(em_phyclust_struct *empcs, Q_matrix_array *Q
 			for(k = 0; k < K; k++){
 				empcs->Z_normalized[n_X][k] = 0.0;
 			}
-			empcs->Z_normalized[n_X][class_id_unique[empcs->map_X_org_to_X_unique[empcs->map_X_to_X_org[n_X]]]] = 1.0;
+			empcs->Z_normalized[n_X][class_id_unique[empcs->map_X_org_to_X_unique[empcs->map_X_to_X_org[n_X]]]]
+				= 1.0;
 		}
 		for(n_X_unique = 0; n_X_unique < N_X_unique; n_X_unique++){
 			empcs->n_class[class_id_unique[n_X_unique]] += empcs->replication_X_unique[n_X_unique];
@@ -106,7 +106,6 @@ void Update_init_k_medoids_X_unique(em_phyclust_struct *empcs, Q_matrix_array *Q
 
 		if(check_all_min_n_class(K, empcs->n_class, EMC->min_n_class)){
 			init_m_step(empcs, QA, EMC, EMFP);
-			/* empcs->add_logL = update_add_logL(empcs, QA) + 600.0; */
 			init_logL_observed = EMFP->LogL_observed(empcs, QA);
 			if(is_finite(init_logL_observed)){
 				break;
@@ -115,10 +114,10 @@ void Update_init_k_medoids_X_unique(em_phyclust_struct *empcs, Q_matrix_array *Q
 	}
 
 	if(init_iter > EMC->max_init_iter){
-		printf("Initialization is not valid for min_n_class = %d. (%s)\n", EMC->min_n_class, INIT_METHOD[EMC->init_method]);
+		printf("Initialization is not valid for min_n_class = %d. (%s)\n", EMC->min_n_class,
+				INIT_METHOD[EMC->init_method]);
 		printf("Reach the maximum initial iterations. (%s)\n", INIT_METHOD[EMC->init_method]);
 		init_m_step(empcs, QA, EMC, EMFP);
-		/* empcs->add_logL = update_add_logL(empcs, QA) + 600.0; */
 		init_logL_observed = EMFP->LogL_observed(empcs, QA);
 		if(!is_finite(init_logL_observed)){
 			printf("Initial logL_observed is not finit. (%s)\n", INIT_METHOD[EMC->init_method]);
@@ -164,14 +163,14 @@ void Update_init_pam_X_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_
 
 	if(check_all_min_n_class(K, empcs->n_class, EMC->min_n_class)){
 		init_m_step(empcs, QA, EMC, EMFP);
-		/* empcs->add_logL = update_add_logL(empcs, QA) + 600.0; */
 		init_logL_observed = EMFP->LogL_observed(empcs, QA);
 		if(!is_finite(init_logL_observed)){
 			printf("Initial logL_observed is not finit. (%s)\n", INIT_METHOD[EMC->init_method]);
 			exit(1);
 		}
 	} else{
-		printf("Initialization is not valid for min_n_class = %d. (%s)\n", EMC->min_n_class, INIT_METHOD[EMC->init_method]);
+		printf("Initialization is not valid for min_n_class = %d. (%s)\n", EMC->min_n_class,
+				INIT_METHOD[EMC->init_method]);
 		exit(1);
 	}
 

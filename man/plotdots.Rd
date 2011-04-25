@@ -6,13 +6,15 @@
   the sequences are by drawing dots with different colors for all mutations.
 }
 \usage{
-plotdots(X, X.class = NULL, diff.only = TRUE, fill = FALSE,
-    label = TRUE, xlim = NULL, main = "Dots Plot",
-    xlab = "Sites", ylab = "Sequences", ...)
+plotdots(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
+    diff.only = TRUE, fill = FALSE, label = TRUE, xlim = NULL,
+    main = "Dots Plot", xlab = "Sites", ylab = "Sequences", ...)
 }
 \arguments{
   \item{X}{numerical data matrix with \eqn{N}{N} rows/sequences and \eqn{L}{L} columns/sites.}
   \item{X.class}{class ids indicated for all sequences.}
+  \item{Mu}{a center sequence with length \eqn{L}{L}.}
+  \item{code.type}{either "NUCLEOTIDE" (default) or "SNP".}
   \item{diff.only}{draw the segregating sites only, default = TRUE.}
   \item{fill}{fill in all dots, default = FALSE.}
   \item{label}{indicate segregating sites, default = TRUE.}
@@ -23,13 +25,15 @@ plotdots(X, X.class = NULL, diff.only = TRUE, fill = FALSE,
   \item{\dots}{other options passed to \code{plot}.}
 }
 \details{
-  The first sequences/rows in \code{X} will be drawn entirely on dots plots
-  in colors which are "green3", "blue2", "\#CC00CC", "red2", and "white",
+  The first rows in \code{Mu} will be drawn entirely on dots plots
+  in colors which are "green3", "blue2", "\#CC00CC", "red2", and "black",
   according the ids + 1. If \code{fill} is FALSE, other sequences will be
   drawn by the mutation sites comparing to the first sequences. Otherwise,
   they be drawn entirely.
 
   If \code{X.class} is set, the sequences will be drawn in cluster order.
+
+  If \code{Mu} is \code{NULL}, the consensus sequence of \code{X} will be drawn.
 
   If \code{label} is TRUE, the bottom row will be drawn in color "orange"
   to indicate segregating sites.
