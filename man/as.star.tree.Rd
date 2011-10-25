@@ -41,7 +41,7 @@ as.star.tree(rooted.tree, keep.bifurcation = TRUE)
   \url{http://thirteen-01.stat.iastate.edu/snoweye/phyclust/}
 }
 \author{
-  Wei-Chen Chen \email{snoweye@iastate.edu}
+  Wei-Chen Chen \email{phyclust@gmail.com}
 }
 \seealso{
   \code{\link{ms}},

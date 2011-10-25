@@ -17,6 +17,7 @@ void assign_Mu_by_class(int N_X_org, int K, int L, int ncode, int missing_index,
 
 /* consensus_Mu[L]. */
 void find_consensus_Mu(int N_X_org, int L, int ncode, int missing_index, int **X_org, int *consensus_Mu);
+void find_consensus_Mu_WIMISSING(int N_X_org, int L, int ncode, int missing_index, int **X_org, int *consensus_Mu);
 
 
 /* Initialization functions.

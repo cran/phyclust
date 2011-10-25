@@ -27,6 +27,7 @@ double (*get_edist_D(int edist_model))(int, int*, int*);
 double edist_D_JC69(int L, int *x, int *mu);
 double edist_D_K80(int L, int *x, int *mu);
 double edist_D_HAMMING(int L, int *x, int *mu);
+double edist_D_HAMMING_WOGAP(int L, int *x, int *mu);
 
 /* Tools. */
 double get_pair_edist_UT(edist_struct *eds, int u, int v);

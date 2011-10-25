@@ -2,16 +2,17 @@
 \alias{find.consensus}
 \title{Find the consensus sequence}
 \description{
-  Based on the input data, this function will seach all data along
-  all sites to find a ceonsensus sequence which may be or may not be
+  Based on the input data, this function will search all data along
+  all sites to find a consensus sequence which may be or may not be
   one of the data.
 }
 \usage{
-find.consensus(X, code.type = .code.type[1])
+find.consensus(X, code.type = .code.type[1], with.missing = FALSE)
 }
 \arguments{
   \item{X}{nid/sid matrix with \eqn{N}{N} rows/sequences and \eqn{L}{L} columns/sites.}
   \item{code.type}{either "NUCLEOTIDE" (default) or "SNP".}
+  \item{with.missing}{FALSE (default) for no missing in consensus sequence.}
 }
 \details{
   \code{X} should be a numerical matrix containing sequence data that

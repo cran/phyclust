@@ -32,13 +32,13 @@
   Hugot, J.P., et al. (2001).
 }
 \seealso{
-  \code{\link{read.phylip.snp}}.
+  \code{\link{read.phylip}}.
 }
 \examples{
 \dontrun{
 data.path <- paste(.libPaths()[1], "/phyclust/data/crohn.phy", sep = "")
 # edit(file = data.path)
-my.snp <- read.phylip.snp(data.path)
+my.snp <- read.phylip(data.path, code.type = "SNP")
 str(my.snp)
 }
 }

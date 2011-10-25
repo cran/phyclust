@@ -87,6 +87,9 @@ double (*get_edist_D(int edist_model))(int, int*, int*){
 		case D_HAMMING:
 			return(&edist_D_HAMMING);
 			break;
+		case D_HAMMING_WOGAP:
+			return(&edist_D_HAMMING_WOGAP);
+			break;
 		default:
 			fprintf(stderr, "PE: Evolution distance model is not found.\n");
 			exit(1);
@@ -165,6 +168,18 @@ double edist_D_HAMMING(int L, int *x, int *mu){
 
 	return((double) diff);
 } /* End of edist_D_HAMMING(). */
+
+double edist_D_HAMMING_WOGAP(int L, int *x, int *mu){
+	int i, diff = 0;
+
+	for(i = 0; i < L; i++){
+		if(x[i] != mu[i] && x[i] != GAP && mu[i] != GAP){
+			diff++;
+		}
+	}
+
+	return((double) diff);
+} /* End of edist_D_HAMMING_WOGAP(). */
 
 
 

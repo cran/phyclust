@@ -9,8 +9,10 @@
   Transfer nucleotide ids (0, 1, 2, 3, 4) and SNP ids (0, 1, 2).
 }
 \usage{
+### S3 methods for a list, vector or matrix (default).
 code2snp(codeseq)
 snp2code(snpseq, half = TRUE)
+
 nid2sid(nidseq)
 sid2nid(sidseq, half = TRUE)
 }
@@ -23,7 +25,7 @@ sid2nid(sidseq, half = TRUE)
   \item{sidseq}{a numerical vector contains SNP ids, 0, 1, or 2.}
 }
 \details{
-  This function is based on the internal object \code{.nucleotide} and 
+  These functions are based on the internal object \code{.nucleotide} and 
   \code{.snp} to transfer nucleotide codes and SNPs.
   For \code{code2snp}, A, G are transfered to 1, and C, T are transfered to 2.
   For \code{snp2code}, 1 is transfered half to A and G, and 2 is transfered
@@ -42,7 +44,7 @@ sid2nid(sidseq, half = TRUE)
   \url{http://thirteen-01.stat.iastate.edu/snoweye/phyclust/}
 }
 \author{
-  Wei-Chen Chen \email{snoweye@iastate.edu}
+  Wei-Chen Chen \email{phyclust@gmail.com}
 }
 \seealso{
   \code{\link{.nucleotide}},
@@ -55,16 +57,28 @@ sid2nid(sidseq, half = TRUE)
 \examples{
 \dontrun{
 # For codes
-a <- c("A", "C", "G", "-", "T")
-code2snp(a)
-snp2code(code2snp(a))
-snp2code(code2snp(a), half = FALSE)
+a.vector <- c("A", "C", "G", "-", "T")
+code2snp(a.vector)
+snp2code(code2snp(a.vector))
+snp2code(code2snp(a.vector), half = FALSE)
 
 # For ids
-b <- c(0, 2, 1, 4, 3)
-nid2sid(b)
-sid2nid(nid2sid(b))
-sid2nid(nid2sid(b), half = FALSE)
+a.sid.vector <- c(0, 2, 1, 4, 3)
+nid2sid(a.sid.vector)
+sid2nid(nid2sid(a.sid.vector))
+sid2nid(nid2sid(a.sid.vector), half = FALSE)
+
+# Test list
+a.list <- list(a, a)
+code2snp(a.list)
+snp2code(code2snp(a.list))
+snp2code(code2snp(a.list), half = FALSE)
+
+# Test matrix
+a.matrix <- rbind(a, a)
+code2snp(a.matrix)
+snp2code(code2snp(a.matrix))
+snp2code(code2snp(a.matrix), half = FALSE)
 }
 }
 \keyword{programming}

@@ -2,10 +2,11 @@
 ### Plot the difference for all sequences based on the first sequence.
 
 plotdots <- function(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
-    diff.only = TRUE, fill = FALSE, label = TRUE, xlim = NULL,
+    diff.only = TRUE, fill = FALSE, label = TRUE,
+    with.missing = FALSE, xlim = NULL, ylim = NULL,
     main = "Dots Plot", xlab = "Sites", ylab = "Sequences", ...){
   if(sum(code.type %in% .code.type) != 1){
-    stop("code.type is not found.")
+    stop("The code.type is not found.")
   }
 
   if(! is.null(X.class)){
@@ -21,7 +22,7 @@ plotdots <- function(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
   }
 
   if(is.null(Mu)){
-    Mu <- find.consensus(X, code.type = code.type)
+    Mu <- find.consensus(X, code.type = code.type, with.missing = with.missing)
   } else{
     if(length(Mu) != ncol(X)){
       stop("length(Mu) != L.")
@@ -37,53 +38,86 @@ plotdots <- function(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
   N <- nrow(X)
   L <- ncol(X)
 
-  if(is.null(xlim)) xlim <- c(1, L + 1)
-  if(label){
-    ylim <- c(N + 3, -1)
-  } else{
-    ylim <- c(N + 1, -1)
+  if(is.null(xlim)){
+    xlim <- c(1, L + 1)
+#  } else{
+#    if(xlim[1] < 1){
+#      xlim[1] <- 1
+#    }
   }
-
-  plot(NULL, NULL, type = "n", xlim = xlim, ylim = ylim,
-       main = main, xlab = xlab, ylab = ylab)
-
-  my.col <- c("green3", "blue2", "#CC00CC", "red2", "black")
-  flag.diff <- rowSums(t(X) != Mu) > 0
-
-  for(j in 1:L){
-    x.left <- j
-    y.top <- -1
-    rect(x.left, y.top + 2, x.left + 1, y.top,
-         col = my.col[Mu[j] + 1], border = NA)
-  }
-  abline(h = y.top + 2, lty = 3, lwd = 0.5)
-
-  for(i in 1:N){
-    for(j in 1:L){
-      if(diff.only){
-         if(! flag.diff[j]) next
-      }
-      x.left <- j
-      y.top <- i
-      if(X[i, j] != Mu[j]){
-        rect(x.left, y.top + 1, x.left + 1, y.top,
-             col = my.col[X[i, j] + 1], border = NA)
-      } else{
-        if(fill & flag.diff[j]){
-          rect(x.left, y.top + 1, x.left + 1, y.top,
-               col = my.col[X[i, j] + 1], border = NA)
-        }
-      }
+  if(is.null(ylim)){
+    if(label){
+      ylim <- c(N + 3, -3)
+    } else{
+      ylim <- c(N + 1, -1)
     }
   }
 
+  if(code.type == .code.type[1]){
+    my.col <- c("green3", "blue2", "#CC00CC", "red2", "gray")
+  } else if(code.type == .code.type[2]){
+    my.col <- c("green3", "blue2", "gray")
+  } else{
+    stop("code.type is not implemented.")
+  }
+
+
+  X <- X + 1
+  Mu <- Mu + 1
+  plot(NULL, NULL, type = "n", xlim = xlim, ylim = ylim,
+       main = main, xlab = xlab, ylab = ylab)
+
+  ### Consensus sequence.
+  y.top <- -3
+  for(j in 1:L){
+    x.left <- j
+    rect(x.left, y.top + 4, x.left + 1, y.top,
+         col = my.col[Mu[j]], border = NA)
+  }
+  abline(h = y.top + 4, lty = 3, lwd = 0.5)
+
+  ### Different sites.
+  plot.column.fill <- function(j){
+    x.left <- j
+    x.right <- j + 1
+    tmp.X.col <- my.col[X[, j]]
+    for(i in 1:N){
+      rect(x.left, i + 1, x.right, i, col = tmp.X.col[i], border = NA)
+    }
+  }
+  plot.column <- function(j){
+    x.left <- j
+    x.right <- j + 1
+    tmp.X <- X[, j]
+    tmp.X.col <- my.col[tmp.X]
+    for(i in which(tmp.X != Mu[j])){
+      rect(x.left, i + 1, x.right, i, col = tmp.X.col[i], border = NA)
+    }
+  }
+
+  flag.diff <- rowSums(t(X) != Mu) > 0
+  if(xlim[2] > L){
+    xlim[2] <- L
+  } else if(xlim[1] < 1){
+    xlim[1] <- 1
+  }
+  J <- xlim[1]:xlim[2]
+  if(diff.only){
+    J <- J[flag.diff[J]]
+  }
+  if(fill){
+    lapply(J, plot.column.fill)
+  } else{
+    lapply(J, plot.column)
+  }
+
+  ### Segregating sites.
   if(label){
-    i <- N + 1
+    y.top <- N + 1
     for(j in 1:L){
       x.left <- j
-      y.top <- i
       if(flag.diff[j]){
-        rect(x.left, y.top + 2, x.left + 1, y.top, col = "orange", border = NA)
+        rect(x.left, y.top + 4, x.left + 1, y.top, col = "orange", border = NA)
       }
     }
     abline(h = y.top, lty = 3, lwd = 0.5)
@@ -91,3 +125,4 @@ plotdots <- function(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
 
   if(! is.null(X.class)) abline(h = X.nc.cum + 1, lty = 3, lwd = 0.5)
 } # End of plotdots().
+

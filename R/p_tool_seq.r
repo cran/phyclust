@@ -5,17 +5,17 @@ gen.seq.HKY <- function(rooted.tree, pi, kappa, L, rate.scale = 1,
     stop("A rooted tree is required.")
   }
   if(length(pi) != 4 || sum(pi) != 1 || any(pi <= 0) || any(pi >= 1)){
-    stop("pi is not correct.")
+    stop("The pi is not correct.")
   }
   if(length(kappa) != 1 || kappa <= 0){
-    stop("kappa is not correct.")
+    stop("The kappa is not correct.")
   }
   if(rate.scale <= 0){
-    stop("rate.scale is not correct.")
+    stop("The rate.scale is not correct.")
   }
   if(!is.null(anc.seq)){
     if(any(!anc.seq %in% .nucleotide$nid[1:4]) || length(anc.seq) != L){
-      stop("anc.seq is not correct.")
+      stop("The anc.seq is not correct.")
     }
   }
 
@@ -68,14 +68,14 @@ gen.seq.SNP <- function(rooted.tree, pi, L, rate.scale = 1,
     stop("A rooted tree is required")
   }
   if(length(pi) != 2 || sum(pi) != 1 || any(pi <= 0) || any(pi >= 1)){
-    stop("pi is not correct.")
+    stop("The pi is not correct.")
   }
   if(rate.scale <= 0){
-    stop("rate.scale is not correct.")
+    stop("The rate.scale is not correct.")
   }
   if(!is.null(anc.seq)){
     if(any(!anc.seq %in% .snp$sid[1:2]) || length(anc.seq) != L){
-      stop("anc.seq is not correct.")
+      stop("The anc.seq is not correct.")
     }
   }
 

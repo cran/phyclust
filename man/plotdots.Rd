@@ -7,8 +7,9 @@
 }
 \usage{
 plotdots(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
-    diff.only = TRUE, fill = FALSE, label = TRUE, xlim = NULL,
-    main = "Dots Plot", xlab = "Sites", ylab = "Sequences", ...)
+    diff.only = TRUE, fill = FALSE, label = TRUE, with.missing = FALSE,
+    xlim = NULL, ylim = NULL, main = "Dots Plot", xlab = "Sites",
+    ylab = "Sequences", ...)
 }
 \arguments{
   \item{X}{numerical data matrix with \eqn{N}{N} rows/sequences and \eqn{L}{L} columns/sites.}
@@ -18,7 +19,9 @@ plotdots(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
   \item{diff.only}{draw the segregating sites only, default = TRUE.}
   \item{fill}{fill in all dots, default = FALSE.}
   \item{label}{indicate segregating sites, default = TRUE.}
+  \item{with.missing}{pass to \code{find.consensus} if \code{Mu} is \code{NULL}, default = FALSE}
   \item{xlim}{limit of x-axis.}
+  \item{ylim}{limit of y-axis.}
   \item{main}{main label, default = "Dots Plot".}
   \item{xlab}{x-axis label, default = "Sites". }
   \item{ylab}{y-axis label, default = "Sequences". }
@@ -37,9 +40,11 @@ plotdots(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
 
   If \code{label} is TRUE, the bottom row will be drawn in color "orange"
   to indicate segregating sites.
+
+  \code{with.missing} is only used when \code{Mu} is \code{NULL}.
 }
 \value{
-  A dot plot will be drawn.
+  A dots plot will be drawn.
 }
 \references{
   Phylogenetic Clustering Website:

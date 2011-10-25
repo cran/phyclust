@@ -1,7 +1,7 @@
 ### This file contains functions for compute evolution distances.
 
 phyclust.edist <- function(X, edist.model = .edist.model[1]){
-  if(is.vector(X)) stop("X should be a matrix and nrow > 1.")
+  if(is.vector(X)) stop("The X should be a matrix and nrow > 1.")
 
   if(edist.model[1] %in% .edist.model){
     edist.model <- which(edist.model[1] == .edist.model) - 1

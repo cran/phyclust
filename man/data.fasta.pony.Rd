@@ -33,7 +33,7 @@
 \dontrun{
 data.path <- paste(.libPaths()[1], "/phyclust/data/pony625.fas", sep = "")
 # edit(file = data.path)
-my.pony.625 <- read.fasta.nucleotide(data.path)
+my.pony.625 <- read.fasta(data.path)
 str(my.pony.625)
 }
 }

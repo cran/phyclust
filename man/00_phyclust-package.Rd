@@ -16,7 +16,8 @@
   Several evolution models are also developed.
   \code{ms} and \code{seq-gen} are two useful programs to generate
   coalescent trees and sequences, and both are merged into \pkg{phyclust}.
-  Tzeng's method for haplotype grouping are also incorporated into \pkg{phyclust}.
+  Tzeng's method for haplotype grouping are also incorporated into
+  \pkg{phyclust}.
 
   Type \code{help(package = phyclust)} to see a list of major
   functions for which further documentations are available. The on-line

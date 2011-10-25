@@ -8,7 +8,7 @@
 \description{
    A toy dataset, \code{seq.data.toy}, with 100 nucleotide sequences
    and 200 sites in 4 clusters.
-   \code{seq.data.missing} contains some missings indicated by "-".
+   \code{seq.data.missing} contains some missing values indicated by "-".
 }
 \format{
   This data contains a list with a \code{seq.data} structure described

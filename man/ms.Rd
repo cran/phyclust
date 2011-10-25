@@ -17,7 +17,7 @@ ms(nsam = NULL, nreps = 1, opts = NULL)
 }
 \details{
   This function directly reuses the C code of \code{ms} by arguments
-  as input from the stdin. The options \code{opts} is followed from the
+  as input from the STDIN. The options \code{opts} is followed from the
   original \code{ms} except \code{nsam} and \code{nreps}.
 
   For examples, options commonly used in \code{phyclust} are:
@@ -30,7 +30,7 @@ ms(nsam = NULL, nreps = 1, opts = NULL)
   sequences. 
 }
 \value{
-  This function returns a vector, and each element stores one line of stdout
+  This function returns a vector, and each element stores one line of STDOUT
   of \code{ms} separated by newline, and store as a class \code{ms}.
   The details of output format can found on the website
   \url{http://home.uchicago.edu/~rhudson1/source.html} and its manual.

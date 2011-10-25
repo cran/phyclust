@@ -6,6 +6,7 @@
   Transfer nucleotide codes (A, G, C, T, -) and nucleotide ids (0, 1, 2, 3, 4).
 }
 \usage{
+### S3 methods for a list, vector or matrix (default).
 code2nid(codeseq)
 nid2code(nidseq, lower.case = TRUE)
 }
@@ -15,7 +16,7 @@ nid2code(nidseq, lower.case = TRUE)
   \item{lower.case}{transfer in lower cases.}
 }
 \details{
-  This function is based on the internal object \code{.nucleotide} to
+  These functions are based on the internal object \code{.nucleotide} to
   transfer codes and nids.
 }
 \value{
@@ -27,7 +28,7 @@ nid2code(nidseq, lower.case = TRUE)
   \url{http://thirteen-01.stat.iastate.edu/snoweye/phyclust/}
 }
 \author{
-  Wei-Chen Chen \email{snoweye@iastate.edu}
+  Wei-Chen Chen \email{phyclust@gmail.com}
 }
 \seealso{
   \code{\link{.nucleotide}},

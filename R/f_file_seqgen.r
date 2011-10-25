@@ -27,20 +27,21 @@ read.seqgen <- function(text, byrow = TRUE, code.type = .code.type[1]){
 ### Split the data by reading blocks and rejoin them by sequences.
   phylip$seqname <- org.names
   if(code.type[1] == "NUCLEOTIDE"){
-    phylip$org.code <- matrix(org, ncol = phylip$seqlen, nrow = phylip$nseq)
-    phylip$org <- matrix(code2nid(org), ncol = phylip$seqlen, nrow = phylip$nseq)
+    phylip$org.code <- matrix(org, nrow = phylip$nseq, ncol = phylip$seqlen)
+    phylip$org <- code2nid(org)
   } else if(code.type[1] == "SNP"){
     org <- code2snp(org)
-    phylip$org.code <- matrix(org, ncol = phylip$seqlen, nrow = phylip$nseq)
-    phylip$org <- matrix(snp2sid(org), ncol = phylip$seqlen, nrow = phylip$nseq)
+    phylip$org.code <- matrix(org, nrow = phylip$nseq, ncol = phylip$seqlen)
+    phylip$org <- snp2sid(org)
   } else{
-    stop("code.type is not found.")
+    stop("The code.type is not found.")
   }
 
   if(!byrow){
     phylip$org.code <- t(phylip$org.code)
     phylip$org <- t(phylip$org)
   }
+  phylip$byrow <- byrow
 
   class(phylip) <- "seq.data"
   phylip
@@ -52,6 +53,7 @@ print.seq.data <- function(x, ...){
   cat("code.type: ", seq.data$code.type,
       ", n.seq: ", seq.data$nseq,
       ", seq.len: ", seq.data$seqlen,
+      ", byrow: ", seq.data$byrow,
       ".\n", sep = "")
 }
 

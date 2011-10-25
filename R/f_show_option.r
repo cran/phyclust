@@ -1,6 +1,7 @@
 ### This file contains function to show all possible options in phyclust.
 
 .show.option <- function(){
+  my.cat("Options available in phyclust:")
   my.cat("boundary method: ", paste(.boundary.method, collapse = ", "), "\n")
   my.cat("code type: ", paste(.code.type, collapse = ", "), "\n")
   my.cat("edist model: ", paste(.edist.model, collapse = ", "), "\n")

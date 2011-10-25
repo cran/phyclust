@@ -1,10 +1,9 @@
 \name{file.read}
 \alias{read.fasta}
-\alias{read.fasta.nucleotide}
+\alias{read.fasta.format}
 \alias{read.phylip}
-\alias{read.phylip.nucleotide}
-\alias{read.phylip.snp}
-\title{Read data from files by formats and return a seq.data}
+\alias{read.phylip.format}
+\title{Read data from files by formats and return a seq.data object}
 \description{
   Two major file formats are supported in \pkg{phyclust},
   \code{Format phylip} and \code{Format fasta}.
@@ -12,33 +11,41 @@
   return an object in \code{Class seq.data}.
 }
 \usage{
-read.fasta(filename, byrow = TRUE, code.type = .code.type[1])
-read.fasta.nucleotide(filename, byrow = TRUE)
+read.fasta(filename, byrow = TRUE, code.type = .code.type[1], aligned = TRUE,
+           sep = "")
+read.fasta.format(filename, byrow = TRUE, aligned = TRUE, sep = "")
 
-read.phylip(filename, byrow = TRUE, code.type = .code.type[1])
-read.phylip.nucleotide(filename, byrow = TRUE)
-read.phylip.snp(filename, byrow = TRUE)
+read.phylip(filename, byrow = TRUE, code.type = .code.type[1], sep = "")
+read.phylip.format(filename, byrow = TRUE, sep = "")
 }
 \arguments{
   \item{filename}{a file name where data is read from.}
   \item{byrow}{advanced option, default = TRUE.}
   \item{code.type}{either "NUCLEOTIDE" (default) or "SNP".}
+  \item{aligned}{indicate aligned data.}
+  \item{sep}{use to split sites, "" (default) and "," for "CODON".}
 }
 \details{
-  \code{read.fasta} and \code{read.phylip} are for nucleotide data, and
-  \code{read.phylip.snp} is for SNP data.
+  For unaligned sequences, \code{read.fasta} returns a list storing data.
+  \code{read.phylip} is only for aligned data and returns a matrix.
+
+  \code{read.fasta.format} and \code{read.phylip.format} will read in
+  original coding without any transformation as \code{code.type = NULL}
+  in \code{write.fasta} and \code{write.phylip}. Suppose these functions
+  return an object \code{ret}, one can write other functions \code{ret2aa()}
+  to post transform the coding and replace \code{ret$org} by the results of
+  \code{ret2aa(ret$org.code)}.
 
   \code{byrow} indicates the data will be store by row or not. Usually,
   the default is TRUE. The FALSE is only for advance users
   with careful manipulations and for speeding up the bootstraps.
+
+  \code{sep} can specify a character which is used to split sites in file.
+  By default, "" denote no character between sites. Only "CODON" id requires
+  a character to avoid ambiguity
 }
 \value{
   Return an object in \code{Class seq.data}.
-}
-\section{ToDo(s)}{
-  \itemize{
-    \item implement \code{read.fasta.snp}.
-  }
 }
 \references{
   Phylogenetic Clustering Website:

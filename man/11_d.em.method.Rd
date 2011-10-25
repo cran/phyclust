@@ -15,7 +15,7 @@
   \code{EM} (default) stands for the standard EM algorithm, \code{ECM}
   stands for Expectation/Conditional Maximization algorithm, and \code{AECM}
   stands for Alternating ECM algorithm.
-  The performance is roughly about \code{AECM} > \code{EM} ~ \code{ECM} wich
+  The performance is roughly about \code{AECM} > \code{EM} ~ \code{ECM} which
   are dependent on the separations of data set.
 }
 \references{

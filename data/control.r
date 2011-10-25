@@ -9,9 +9,9 @@
   code.type = c(rep("NUCLEOTIDE", 4), rep("SNP", 2),
                 rep("NUCLEOTIDE", 2), rep("SNP", 1))
 )
-.edist.model <- c("D_JC69", "D_K80", "D_HAMMING")
+.edist.model <- c("D_JC69", "D_K80", "D_HAMMING", "D_HAMMING_WOGAP")
 .identifier <- c("EE", "EV", "VE", "VV")
-.code.type <- c("NUCLEOTIDE", "SNP")
+.code.type <- c("NUCLEOTIDE", "SNP", "CODON", "AMINO_ACID")
 .em.method <- c("EM", "ECM", "AECM")
 .boundary.method <- c("ADJUST", "IGNORE")
 .label.method <- c("NONE", "SEMI", "GENERAL")

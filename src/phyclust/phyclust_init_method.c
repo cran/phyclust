@@ -183,6 +183,60 @@ void find_consensus_Mu(int N_X_org, int L, int ncode, int missing_index, int **X
 	}
 } /* End of find_consensus_Mu(). */
 
+void find_consensus_Mu_WIMISSING(int N_X_org, int L, int ncode_wimissing, int missing_index, int **X_org, int *consensus_Mu){
+	int i, n_X_org, l, flag, max_i;
+	int count_L_N[L][ncode_wimissing], count_N[ncode_wimissing], tmp_count;
+
+	/* Summarize overall. */
+	for(i = 0; i < ncode_wimissing; i++){
+		count_N[i] = 0;
+		for(l = 0; l < L; l++){
+			count_L_N[l][i] = 0;
+		}
+	}
+	for(l = 0; l < L; l++){
+		for(n_X_org = 0; n_X_org < N_X_org; n_X_org++){
+			count_L_N[l][X_org[n_X_org][l]]++;
+			count_N[X_org[n_X_org][l]]++;
+		}
+	}
+
+	max_i = 0;
+	tmp_count = count_N[0];
+	for(i = 1; i < ncode_wimissing; i++){
+		if(count_N[i] > tmp_count){
+			max_i = i;
+			tmp_count = count_N[i];
+		}
+	}
+
+	/* Find the consensus. */
+	for(l = 0; l < L; l++){
+		flag = 0;
+		for(i = 0; i < ncode_wimissing; i++){
+			if(count_L_N[l][i] > 0){
+				flag = 1;
+				break;
+			}
+		}
+
+		if(flag){
+			tmp_count = -1;
+			for(i = 0; i < ncode_wimissing; i++){
+				if(count_L_N[l][i] > tmp_count){
+					tmp_count = count_L_N[l][i];
+					consensus_Mu[l] = i;
+				} else if(count_L_N[l][i] == tmp_count && count_N[i] > count_N[consensus_Mu[l]]){
+					/* tie, compare the overall. */
+					consensus_Mu[l] = i;
+				}
+			}
+		} else{	/* All are missing, replace by the max. */
+			consensus_Mu[l] = max_i;
+		}
+	}
+} /* End of find_consensus_Mu_WIMISSING(). */
+
 
 
 

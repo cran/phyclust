@@ -27,7 +27,7 @@ print.phyclust <- function(x, digits = max(4, getOption("digits") - 3), ...){
   }
       
   my.cat("N.X.org: ", ret.phyclust$N.X.org,
-         ", N.X.unique: ", ret.phyclust$N.X.unique,
+         ", N.X: ", ret.phyclust$N.X,
          ", L: ", ret.phyclust$L,
          ", K: ", ret.phyclust$K,
          ", p: ", ret.phyclust$p,

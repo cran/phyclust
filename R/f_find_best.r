@@ -77,8 +77,7 @@ find.best <- function(X, K, EMC = .EMC, manual.id = NULL, byrow = TRUE,
       }
 
       if(class(new.ret) != "try-error"){
-        if(is.finite(new.ret$logL) && new.ret$logL > org.logL &&
-           new.ret$conv$flag < 2){
+        if(is.finite(new.ret$logL) && new.ret$logL > org.logL){
           org.logL <- new.ret$logL
           ret <- new.ret
         }

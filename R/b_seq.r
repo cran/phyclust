@@ -8,7 +8,7 @@ bootstrap.seq <- function(ret.phyclust, star.trees){
   } else if(ret.phyclust$code.type == "SNP"){
     seq.boot <- bootstrap.seq.snp(ret.phyclust, star.trees)
   } else{
-    stop("code.type is not found.")
+    stop("The code.type is not found.")
   }
   seq.boot
 } # End of bootstrap.seq()

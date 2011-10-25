@@ -15,13 +15,14 @@
  *   R_N_X_org: SEXP[1], number of sequences.
  *   R_L: SEXP[1], length of sequences.
  *   R_code_type: SEXP[1], code type.
+ *   R_WIMISSING: SEXP[1], with missing.
  *   R_X_org: SEXP[1], sequences.
  * Output:
  *   ret: SEXP[R_L], an array contains Mu. */
 SEXP R_phyclust_find_consensus(SEXP R_N_X_org, SEXP R_L, SEXP R_code_type,
-		SEXP R_X_org){
+		SEXP R_WIMISSING, SEXP R_X_org){
 	/* Declare variables for calling C. */
-	int *C_N_X_org, *C_L, *C_code_type, **C_X_org;
+	int *C_N_X_org, *C_L, *C_code_type, *C_WIMISSING, **C_X_org;
 
 	/* Declare variables for R's returning. */
 	SEXP ret;
@@ -34,6 +35,7 @@ SEXP R_phyclust_find_consensus(SEXP R_N_X_org, SEXP R_L, SEXP R_code_type,
 	C_N_X_org = INTEGER(R_N_X_org);
 	C_L = INTEGER(R_L);
 	C_code_type = INTEGER(R_code_type);
+	C_WIMISSING = INTEGER(R_WIMISSING);
 
 	/* Assign data. */
 	C_X_org = allocate_int_2D_AP(*C_N_X_org);
@@ -48,8 +50,15 @@ SEXP R_phyclust_find_consensus(SEXP R_N_X_org, SEXP R_L, SEXP R_code_type,
 	ret_ptr = INTEGER(ret);
 
 	/* Compute. */
-        find_consensus_Mu(*C_N_X_org, *C_L, NCODE[*C_code_type],
-		MISSING_INDEX[*C_code_type], C_X_org, ret_ptr);
+	if(*C_WIMISSING == 0){
+        	find_consensus_Mu(*C_N_X_org, *C_L,
+			NCODE[*C_code_type],
+			MISSING_INDEX[*C_code_type], C_X_org, ret_ptr);
+	} else{
+        	find_consensus_Mu_WIMISSING(*C_N_X_org, *C_L,
+			NCODE_WIMISSING[*C_code_type],
+			MISSING_INDEX[*C_code_type], C_X_org, ret_ptr);
+	}
 
 	/* Free memory and release protectation. */
 	UNPROTECT(1);

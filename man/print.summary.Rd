@@ -12,14 +12,13 @@
   to print and summary objects.
 }
 \usage{
-print.ms(x, ...)
-print.phyclust(x, digits = max(4, getOption("digits") - 3), ...)
-print.Pt(x, ...)
-print.RRand(x, digits = max(4, getOption("digits") - 3), ...)
-print.seq.data(x, ...)
-print.seqgen(x, ...)
-
-summary.phyclust(object, ...)
+\method{print}{ms}(x, ...)
+\method{print}{phyclust}(x, digits = max(4, getOption("digits") - 3), ...)
+\method{print}{Pt}(x, ...)
+\method{print}{RRand}(x, digits = max(4, getOption("digits") - 3), ...)
+\method{print}{seq.data}(x, ...)
+\method{print}{seqgen}(x, ...)
+\method{summary}{phyclust}(object, ...)
 }
 \arguments{
   \item{x}{an object with the class attributes.}
@@ -31,13 +30,13 @@ summary.phyclust(object, ...)
   These are useful functions for summarizing and debugging.
 
   For \code{ms} and \code{seqgen}, it will show the result as
-  standalone versions on the stdout out with line by line.
+  standalone versions on the STDOUT out with line by line.
 
   For other functions, they only show summaries of objects. Use
   \code{names} or \code{str} to explore the details.
 }
 \value{
-  The results will cat or print on the stdout by default.
+  The results will cat or print on the STDOUT by default.
 }
 \references{
   Phylogenetic Clustering Website:

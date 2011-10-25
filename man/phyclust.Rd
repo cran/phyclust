@@ -80,7 +80,7 @@ phyclust(X, K, EMC = .EMC, manual.id = NULL, label = NULL, byrow = TRUE)
   \item{'code.type'}{code type.}
   \item{'em.method'}{EM algorithm.}
   \item{'boundary.method'}{boundary method.}
-  \item{'label.method'}{labele method.}
+  \item{'label.method'}{label method.}
 }
 \section{ToDo(s)}{
   \itemize{

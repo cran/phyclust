@@ -4,7 +4,7 @@ plotstruct <- function(Z, X.class = NULL, sort.inside.class = TRUE,
     direction = "h", main = "Structure Plot", xlab = "Observations",
     ylab = "Posterior Probabilities", ...){
   if(direction != "h" && direction != "v"){
-    stop("direction is not found.")
+    stop("The direction is not found.")
   }
 
   N <- nrow(Z)

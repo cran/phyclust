@@ -14,15 +14,15 @@ phyclust <- function(X, K, EMC = .EMC, manual.id = NULL,
 
   if(! is.null(manual.id)){
     if(! is.null(label)){
-      stop("manual.id is only for unsupervised clustering.")
+      stop("The manual.id is only for unsupervised clustering.")
     }
     if(any(manual.id <= 0 | manual.id > K)){
-      stop("manual.id is not correct.")
+      stop("The manual.id is not correct.")
     }
     manual.id <- manual.id - 1
   } else{
     if(EMC$init.method == "manualMu"){
-      stop("manual.id is missing.")
+      stop("The manual.id is missing.")
     }
   }
 
@@ -41,7 +41,7 @@ phyclust <- function(X, K, EMC = .EMC, manual.id = NULL,
                PACKAGE = "phyclust")
 
   if(!is.finite(ret$logL)){
-    stop("logL is not finite.\n")
+    stop("The logL is not finite.\n")
   }
 
   ret$class.id <- ret$class.id + 1
@@ -69,7 +69,7 @@ check.EMC <- function(EMC){
   }
 
   if(EMC$substitution.model %in% c("SNP_JC69", "SNP_F81", "E_SNP_F81") &&
-     EMC$edist.model != "D_HAMMING"){
+     ! (EMC$edist.model %in% c("D_HAMMING", "D_HAMMING_WOGAP"))){
     my.cat("edist model: ", EMC$edist.model, " -> D_HAMMING",
            " (", EMC$substitution.model, ")\n")
     EMC$edist.model <- "D_HAMMING"
@@ -226,7 +226,7 @@ check.label <- function(label, N.X.org, K, byrow){
       if((length(label$semi) != N.X.org) ||
          (length(unique(label$semi)) != (max(label$semi) + 1)) ||
          any(label$semi < 0 | label$semi > K)){
-        stop("label$semi is not correct.")
+        stop("The label$semi is not correct.")
       }
 
       label$index <- which(label$semi != 0)
@@ -237,17 +237,17 @@ check.label <- function(label, N.X.org, K, byrow){
     } else{
       ### A data.frame of label is for semi-supervised clustering.
       if(! is.vector(label, mode = "list")){
-        stop("label should be a list.")
+        stop("The label should be a list.")
       }
 
       label$label.method <- as.integer(which(.label.method == "GENERAL") - 1)
 
       if(is.null(label$index) || is.null(label$prob)){
-        stop("label$index and label$prob are required.")
+        stop("The label$index and label$prob are required.")
       }
       if(length(label$index) > N.X.org ||
          any(label$index < 1 | label$index > N.X.org)){
-        stop("label$index is not correct.")
+        stop("The label$index is not correct.")
       }
 
       if(byrow){
@@ -259,7 +259,7 @@ check.label <- function(label, N.X.org, K, byrow){
          (ncol(label$prob) != length(label$index)) ||
          any(label$prob < 0 | label$prob > 1) ||
          any(colSums(label$prob) != 1)){
-        stop("label$prob is not correct.")
+        stop("The label$prob is not correct.")
       }
     }
 

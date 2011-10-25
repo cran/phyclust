@@ -10,7 +10,7 @@ phyclust.em.step <- function(X, ret.phyclust = NULL,
     if(is.null(K) || is.null(Eta) || is.null(Mu) || is.null(Tt) ||
        is.null(substitution.model) ||
        is.null(identifier) || is.null(code.type)){
-      stop("Parameters are not specified correctly.")
+      stop("The parameters are not specified correctly.")
     } else{
       ret.phyclust <- list(K = K, Eta = Eta, Mu = Mu,
                            QA = list(pi = pi, kappa = kappa, Tt = Tt,
@@ -20,7 +20,7 @@ phyclust.em.step <- function(X, ret.phyclust = NULL,
     }
   } else{
     if(class(ret.phyclust) != "phyclust"){
-      stop("ret.phyclust should be in a phyclust class.")
+      stop("The ret.phyclust should be in a phyclust class.")
     }
   }
 
@@ -65,7 +65,7 @@ phyclust.e.step <- function(X, ret.phyclust = NULL,
     if(is.null(K) || is.null(Eta) || is.null(Mu) || is.null(Tt) ||
        is.null(substitution.model) ||
        is.null(identifier) || is.null(code.type)){
-      stop("Parameters are not specified correctly.")
+      stop("The parameters are not specified correctly.")
     } else{
       ret.phyclust <- list(K = K, Eta = Eta, Mu = Mu,
                            QA = list(pi = pi, kappa = kappa, Tt = Tt,
@@ -75,7 +75,7 @@ phyclust.e.step <- function(X, ret.phyclust = NULL,
     }
   } else{
     if(class(ret.phyclust) != "phyclust"){
-      stop("ret.phyclust should be in a phyclust class.")
+      stop("The ret.phyclust should be in a phyclust class.")
     }
   }
 
@@ -112,7 +112,7 @@ phyclust.m.step <- function(X, ret.phyclust = NULL,
     if(is.null(K) || is.null(Tt) ||
        is.null(Z.normalized) || is.null(substitution.model) ||
        is.null(identifier) || is.null(code.type)){
-      stop("Parameters are not specified correctly.")
+      stop("The parameters are not specified correctly.")
     } else{
       ret.phyclust <- list(K = K,
                            QA = list(pi = pi, kappa = kappa, Tt = Tt,
@@ -123,7 +123,7 @@ phyclust.m.step <- function(X, ret.phyclust = NULL,
     }
   } else{
     if(class(ret.phyclust) != "phyclust"){
-      stop("ret.phyclust should be in a phyclust class.")
+      stop("The ret.phyclust should be in a phyclust class.")
     }
   }
 

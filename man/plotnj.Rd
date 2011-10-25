@@ -17,7 +17,7 @@ plotnj(unrooted.tree, X.class = NULL, type = "u", main = NULL,
   \item{type}{plot types, see \code{plot.phylo} in \pkg{ape} for details.}
   \item{main}{main label.}
   \item{show.tip.label}{show tip label if available.}
-  \item{show.node.label}{show node lable if available.}
+  \item{show.node.label}{show node label if available.}
   \item{edge.width}{edge width for all internal branches if \code{X.class} is set.}
   \item{edge.width.class}{edge width for tip branches if \code{X.class} is set.}
   \item{\dots}{other options passed to \code{plot.phylo}.}

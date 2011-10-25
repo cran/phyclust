@@ -65,7 +65,7 @@ SEXP initialize_emptr(EMPTR emptr, phyclust_struct *pcs){
 	     class_id, n_class, converge, label_method;
 	SEXP pi, kappa, Tt;
 	SEXP converge_eps, converge_error, converge_flag, converge_iter, converge_inner_iter, converge_cm_iter, check_param;
-	char *names_emobj[] = {"N.X.org", "N.X.unique", "L", "K", "Eta", "Z.normalized", "Mu", "QA", "logL", "p",
+	char *names_emobj[] = {"N.X.org", "N.X", "L", "K", "Eta", "Z.normalized", "Mu", "QA", "logL", "p",
 				"bic", "aic", "icl", "N.seg.site", "class.id", "n.class", "conv", "label.method"};
 	char *names_QA[] = {"pi", "kappa", "Tt"};
 	char *names_converge[] = {"eps", "error", "flag", "iter", "inner.iter", "cm.iter", "check.param"};

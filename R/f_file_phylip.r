@@ -5,17 +5,17 @@
 ###   seqname: Sequence's name.
 ###   org: Original sequence in nid. array[nseq, nsite]
 
-read.phylip.nucleotide <- function(filename, byrow = TRUE){
-  phylip <- list(code.type = "NUCLEOTIDe", info = NULL, nseq = NULL,
-                 seqlen = NULL, seqname = NULL, org.code = NULL, org = NULL,
-                 byrow = byrow)
+read.phylip.format <- function(filename, byrow = TRUE, sep = ""){
+  ret <- list(code.type = "UNKNOWN", info = NULL, nseq = NULL,
+              seqlen = NULL, seqname = NULL, org.code = NULL, org = NULL,
+              byrow = byrow, aligned = TRUE)
 
 ### Read header.
-  phylip$info <- readLines(filename, n = 1)
-  tmp <- unstrsplit(phylip$info, " ")
+  ret$info <- readLines(filename, n = 1)
+  tmp <- unstrsplit(ret$info, " ")
   tmp <- tmp[tmp != ""]
-  phylip$nseq <- as.numeric(tmp[1])
-  phylip$seqlen <- as.numeric(tmp[2])
+  ret$nseq <- as.numeric(tmp[1])
+  ret$seqlen <- as.numeric(tmp[2])
 
 ### Read data and transfer to nid.
   op <- options("stringsAsFactors")
@@ -24,29 +24,29 @@ read.phylip.nucleotide <- function(filename, byrow = TRUE){
   options(op)
 
 ### Split the data by reading blocks and rejoin them by sequences.
-  org <- split(tmp, gl(nrow(tmp) / phylip$nseq, phylip$nseq))
-  org <- do.call("cbind", org)
-  org <- as.matrix(org, nrow = phylip$nseq)
-  phylip$seqname <- org[, 1]
-  org <- apply(as.matrix(org[, -1], nrow = phylip$nseq), 1,
-               function(y){ unstrsplit(y, "") })
-  phylip$org.code <- matrix(org, nrow = phylip$seqlen, ncol = phylip$nseq)
-  phylip$org <- matrix(code2nid(org), nrow = phylip$seqlen, ncol = phylip$nseq)
-
+  ret$org.code <- split(tmp, gl(nrow(tmp) / ret$nseq, ret$nseq))
+  ret$org.code <- do.call("cbind", ret$org.code)
+  ret$org.code <- as.matrix(ret$org.code, nrow = ret$nseq)
+  ret$seqname <- ret$org.code[, 1]
+  ret$org.code <- apply(as.matrix(ret$org.code[, -1], nrow = ret$nseq), 1,
+                        function(y){ unstrsplit(y, sep) })
   if(byrow){
-    phylip$org.code <- t(phylip$org.code)
-    phylip$org <- t(phylip$org)
+    ret$org.code <- matrix(ret$org.code, nrow = ret$nseq,
+                           ncol = ret$seqlen, byrow = byrow)
+  } else{
+    ret$org.code <- matrix(ret$org.code, ncol = ret$nseq,
+                           nrow = ret$seqlen, byrow = byrow)
   }
+  ret$org <- ret$org.code
 
-  class(phylip) <- "seq.data"
-  phylip
-} # End of read.phylip.nucleotide().
+  class(ret) <- "seq.data"
+  ret
+} # End of read.phylip.format().
 
 
-write.phylip.nucleotide <- function(seqdata, filename, classid = NULL,
-    seqname = NULL, width.seqname = 10, width.line = 60, lower.case = FALSE){
-  seqdata <- apply(seqdata, 2, nid2code, lower.case = lower.case)
-  
+write.phylip.format <- function(seqdata, filename, classid = NULL,
+    seqname = NULL, width.seqname = 10, width.line = 60, sep = ""){
+#    add.space = 10){
   n.seq <- nrow(seqdata)
   tl.seq <- ncol(seqdata)
 
@@ -71,9 +71,23 @@ write.phylip.nucleotide <- function(seqdata, filename, classid = NULL,
     }
   }
   tmp.seqname <- do.call("c", tmp.seqname)
+  tmp.space <- rep(paste(rep(" ", width.seqname), collapse = ""),
+                   length(tmp.seqname))
 
   head <- paste(n.seq, tl.seq, collapse = " ")
   write(head, file = filename)
+
+#   my.paste <- function(x, collapse, add.space){
+#     tl.x <- length(x)
+#     x.new <- NULL
+#     tl.segment <- ceiling(tl.x / add.space)
+#     for(i in 1:tl.segment){
+#       get.range <- (i - 1) * add.space + 1:add.space
+#       x.new <- c(x.new,
+#                  paste(x[get.range[get.range <= tl.x]], collapse = collapse))
+#     }
+#     paste(x.new, collapse = " ")
+#   }
 
   tl.show <- ceiling(tl.seq / width.line)
   for(i in 1:tl.show){
@@ -82,16 +96,21 @@ write.phylip.nucleotide <- function(seqdata, filename, classid = NULL,
       show.range <- show.range[1:which(show.range == tl.seq)]
     }
 
-    tmp.seqdata <- apply(seqdata[, show.range], 1, paste, collapse = "")
+#     tmp.seqdata <- apply(matrix(seqdata[, show.range], nrow = n.seq), 1,
+#                          my.paste, collapse = sep, add.space = add.space)
+    tmp.seqdata <- apply(matrix(seqdata[, show.range], nrow = n.seq), 1,
+                         paste, collapse = sep)
 
     if(i == 1){
       tmp.seqdata <- cbind(tmp.seqname, tmp.seqdata)
-      tmp.seqdata <- apply(tmp.seqdata, 1, paste, collapse = "")
-    } 
+    } else{
+      tmp.seqdata <- cbind(tmp.space, tmp.seqdata)
+    }
+    tmp.seqdata <- apply(tmp.seqdata, 1, paste, collapse = "")
 
     write.table(tmp.seqdata, file = filename, append = TRUE, col.names = FALSE,
                 row.names = FALSE, sep = "", quote = FALSE)
     write("", file = filename, append = TRUE)
   }
-} # End of write.phylip.nucleotide().
+} # End of write.phylip.format().
 

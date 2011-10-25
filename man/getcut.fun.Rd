@@ -50,7 +50,7 @@ getcut.fun(pp.org, nn = 2 * nhap, plot = 0)
 \examples{
 \dontrun{
 data.path <- paste(.libPaths()[1], "/phyclust/data/crohn.phy", sep = "")
-my.snp <- read.phylip.snp(data.path)
+my.snp <- read.phylip(data.path, code.type = "SNP")
 ret <- haplo.post.prob(my.snp$org, ploidy = 1)
 getcut.fun(sort(ret$haplo$hap.prob, decreasing = TRUE),
            nn = my.snp$nseq, plot = 1)

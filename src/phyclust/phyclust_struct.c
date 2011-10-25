@@ -115,7 +115,7 @@ void update_phyclust_struct(phyclust_struct *pcs){
 	flag_missing = 0;
 	for(n_X = 0; n_X < pcs->N_X; n_X++){
 		for(l = 0; l < L; l++){
-			if(pcs->X_org[n_X][l] == pcs->missing_index){
+			if(pcs->X[n_X][l] == pcs->missing_index){
 				flag_missing = 1;
 				break;
 			}

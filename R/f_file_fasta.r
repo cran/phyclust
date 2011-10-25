@@ -5,62 +5,99 @@
 ###   seqname: Sequence's name.
 ###   org: Original sequence in nid. array[nsite, nseq]
 
-read.fasta.nucleotide <- function(filename, byrow = TRUE){
+read.fasta.format <- function(filename, byrow = TRUE, aligned = TRUE,
+    sep = ""){
+  ret <- list(code.type = "UNKNOWN", info = NULL, nseq = NULL,
+              seqlen = NULL, seqname = NULL, org.code = NULL, org = NULL,
+              byrow = byrow, aligned = aligned)
+
   tmp <- readLines(filename)
-  org <- NULL
   tmp.org <- NULL
   seqname <- NULL
 
+  ### parse data.
   i <- 1
   nseq <- 0
+  tmp.i <- NULL
   repeat{
     if(regexpr("^>", tmp[i]) == 1){
-      if(!is.null(tmp.org)){
-        org <- cbind(org, unlist(strsplit(tmp.org, "")))
-        tmp.org <- NULL
+      if(!is.null(tmp.i)){
+#        ret$org.code[[nseq]] <- unlist(strsplit(tmp.org, sep))
+        ret$org.code[[nseq]] <- unlist(strsplit(tmp[tmp.i], sep))
+        tmp.i <- NULL
       }
 
       if(regexpr("\\|", tmp[i]) == 1){
         tmp.seqname <- unlist(strsplit(tmp[i], "\\|"))[1]
+        seqname <- c(seqname, gsub(">(.*)", "\\1", tmp.seqname))
       } else{
-        tmp.seqname <- unlist(strsplit(tmp[i], " "))[1]
+        tmp.seqname <- unlist(strsplit(tmp[i], " "))
+        tmp.id <- which(nchar(tmp.seqname) > 1)[1]
+        if(tmp.id == 1){
+          seqname <- c(seqname, gsub(">(.*)", "\\1", tmp.seqname[tmp.id]))
+        } else{
+          seqname <- c(seqname, tmp.seqname[tmp.id])
+        }
       }
 
-      seqname <- c(seqname, gsub(">(.*)", "\\1", tmp.seqname))
       nseq <- nseq + 1
     } else if(tmp[i] %in% c("", " ")){
     } else{
-      tmp.org <- paste(tmp.org, tmp[i], sep = "")
+       tmp.i <- c(tmp.i, i)
+#      tmp.org <- paste(tmp.org, tmp[i], sep = "")
     }
 
     i <- i + 1
     if(i > length(tmp)){
-      org <- cbind(org, unlist(strsplit(tmp.org, "")))
+#      ret$org.code[[nseq]] <- unlist(strsplit(tmp.org, sep))
+      ret$org.code[[nseq]] <- unlist(strsplit(tmp[tmp.i], sep))
       break
     }
   }
-  
-  fasta <- list(code.type = "NUCLEOTIDE",
-              nseq = nseq, seqlen = nrow(org), seqname = seqname,
-              org.code = org, org = NULL, byrow = byrow)
-  fasta$org <- matrix(code2nid(org), nrow = fasta$seqlen, ncol = fasta$nseq)
 
-  if(byrow){
-    fasta$org.code <- t(fasta$org.code)
-    fasta$org <- t(fasta$org)
+  ### check if the inputs are aligned sequences.
+  flag.aligned <- aligned
+  tl.seq <- do.call("c", lapply(ret$org.code, length))
+  if(nseq > 1){
+    if(any(tl.seq != tl.seq[1])){
+      flag.aligned <- FALSE
+      ret$aligned <- FALSE
+    }
+    tl.seq <- max(tl.seq)
   }
 
-  class(fasta) <- "seq.data"
-  fasta
-} # End of read.fasta.nucleotide().
+  ### prepare for return.
+  ret$nseq <- nseq
+  ret$seqlen <- tl.seq
+  ret$seqname <- seqname
+  if(flag.aligned){
+    if(byrow){
+      ret$org.code <- do.call("rbind", ret$org.code)
+    } else{
+      ret$org.code <- do.call("cbind", ret$org.code)
+    }
+  }
+  ret$org <- ret$org.code
+
+  class(ret) <- "seq.data"
+  ret
+} # End of read.fasta.format().
 
 
-write.fasta.nucleotide <- function(seqdata, filename, classid = NULL,
-    seqname = NULL, width.line = 60, lower.case = FALSE){
-  seqdata <- apply(seqdata, 2, nid2code, lower.case = lower.case)
-  
-  n.seq <- nrow(seqdata)
-  tl.seq <- ncol(seqdata)
+write.fasta.format <- function(seqdata, filename, classid = NULL,
+    seqname = NULL, width.line = 60, sep = ""){
+  if(is.vector(seqdata) && (! is.list(seqdata))){
+    seqdata <- matrix(seqdata, nrow = 1)
+  }
+
+  ### matrix for aligned, list for unaligned.
+  if(is.matrix(seqdata)){
+    n.seq <- nrow(seqdata)
+  } else if(is.list(seqdata)){
+    n.seq <- length(seqdata)
+  } else{
+    stop("The seqdata should be a vector, matirx or list.")
+  }
 
   if(is.null(seqname)){
     seqname <- as.character(1:n.seq)
@@ -71,24 +108,45 @@ write.fasta.nucleotide <- function(seqdata, filename, classid = NULL,
     seqname <- apply(seqname, 1, paste, collapse = "")
   }
 
-  tl.show <- ceiling(tl.seq / width.line)
-  show.range <- list()
-  for(i in 1:tl.show){
-    show.range[[i]] <- (1:width.line) + (i - 1) * width.line
-    if(show.range[[i]][width.line] > tl.seq){
-      show.range[[i]] <- show.range[[i]][1:which(show.range[[i]] == tl.seq)]
+  if(is.matrix(seqdata)){
+    tl.seq <- ncol(seqdata)
+    tl.show <- ceiling(tl.seq / width.line)
+    show.range <- list()
+    for(i in 1:tl.show){
+      show.range[[i]] <- (1:width.line) + (i - 1) * width.line
+      if(show.range[[i]][width.line] > tl.seq){
+        show.range[[i]] <- show.range[[i]][1:which(show.range[[i]] == tl.seq)]
+      }
+    }
+
+    ret <- NULL
+    for(i in 1:n.seq){
+      ret <- c(ret, paste(">", seqname[i], sep = ""))
+      for(j in 1:tl.show){
+        ret <- c(ret, paste(seqdata[i, show.range[[j]]], collapse = sep))
+      }
+    }
+  } else{
+    ret <- NULL
+    for(i in 1:n.seq){
+      tl.seq <- length(seqdata[[i]])
+      tl.show <- ceiling(tl.seq / width.line)
+      show.range <- list()
+      for(j in 1:tl.show){
+        show.range[[j]] <- (1:width.line) + (j - 1) * width.line
+        if(show.range[[j]][width.line] > tl.seq){
+          show.range[[j]] <- show.range[[j]][1:which(show.range[[j]] == tl.seq)]
+        }
+      }
+
+      ret <- c(ret, paste(">", seqname[i], sep = ""))
+      for(j in 1:tl.show){
+        ret <- c(ret, paste(seqdata[[i]][show.range[[j]]], collapse = sep))
+      }
     }
   }
 
-  ret <- NULL
-  for(i in 1:n.seq){
-    ret <- c(ret, paste(">", seqname[i], sep = ""))
-    for(j in 1:tl.show){
-      ret <- c(ret, paste(seqdata[i, show.range[[j]]], collapse = ""))
-    }
-  }
-
-  write.table(ret, file = filename, quote = FALSE, sep = "", row.names = FALSE,
-              col.names = FALSE)
-} # End of write.fasta.nucleotide().
+  write.table(ret, file = filename, quote = FALSE, sep = "",
+              row.names = FALSE, col.names = FALSE)
+} # End of write.fasta.format().
 

@@ -32,7 +32,7 @@ rescale.rooted.tree <- function(rooted.tree, scale.height = 1){
     stop("A rooted tree is required")
   }
   if(scale.height <= 0){
-    stop("scale.height is not correct.")
+    stop("The scale.height is not correct.")
   }
 
   rooted.tree$edge.length <- rooted.tree$edge.length * scale.height
@@ -89,7 +89,7 @@ gen.unit.K <- function(K, N.K, rate.anc = 10, rate.dec = 10){
     stop("The length of N.K is not equal to K.")
   }
   if(rate.anc <= 0 || rate.dec <= 0){
-    stop("rate.anc or rate.dec <= 0.")
+    stop("The rate.anc or rate.dec <= 0.")
   }
 
   ms.anc <- ms(K, 1, opts = paste("-T -G", rate.anc, sep = " "))
@@ -148,10 +148,10 @@ gen.equal.star.anc.dec <- function(K, N.K, rate.f = 0.5){
     stop("The length of N.K is not equal to K.")
   }
   if(rate.f <= 0 || rate.f >= 1){
-    stop("rate.f <= 0 || >= 1.")
+    stop("The rate.f <= 0 or >= 1.")
   }
   if(K <= 0 || length(N.K) != K || any(N.K <= 0)){
-    stop("K or N.K is not consistant.")
+    stop("The K or N.K is not consistant.")
   }
 
   ms.anc <- ms(K, 1, opts = paste("-T -G", 1, sep = " "))

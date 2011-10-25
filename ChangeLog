@@ -1,3 +1,17 @@
+2011-10-24: Ver. 0.1-9
+  * modify for new release of R-2.14.x.
+
+2011-07-03: Ver. 0.1-9
+  * modify read.fasta.format().
+  * add some minor tools.
+
+2010-11-16: Ver. 0.1-9
+  * fix a bug in missing_flag.
+  * add .amino.acid, .codon, and .genetic.code, and translated functions.
+  * modified plotdots().
+  * Add a few arguments for reading, writing and translating unaligned
+    sequences.
+
 2010-09-15: Ver. 0.1-8
   * semi-supervised clustering.
   * remove any X_unique and replace by X.

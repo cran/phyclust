@@ -28,8 +28,8 @@ phyclust.Pt(Q, Tt, substitution.model = .substitution$model[1])
   Q matrix array.
 }
 \value{
-  A list with class \code{Pt} will be returned containin several
-  ememelts as the following:
+  A list with class \code{Pt} will be returned containing several
+  elements as the following:
 
   \item{'Pt'}{a transition probability matrix.}
   \item{'log.Pt'}{a log transition probability matrix.}

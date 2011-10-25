@@ -18,7 +18,7 @@ bootstrap.seq(ret.phyclust, star.trees)
   fitted by \code{phyclust}, or returned by \code{phyclust.m.step}.
 
   \code{star.trees} should be corresponding to the \code{ret.phyclust} which might
-  be directly bootstraped from the function \code{bootstrap.star.trees}.
+  be directly bootstrapped from the function \code{bootstrap.star.trees}.
 }
 \value{
   Return a list containing sequences in \eqn{K}{K} clusters.

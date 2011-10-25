@@ -1,6 +1,6 @@
 ### Read data set of Crohn's disease (Hugot et al. 2001, table 2).
 data.path <- paste("./data/crohn.phy", sep = "")
-my.snp <- read.phylip.snp(data.path)
+my.snp <- read.phylip(data.path, code.type = "SNP")
 X <- my.snp$org
 case.control <- gsub("hap.*-", "", my.snp$seqname)
 
