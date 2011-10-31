@@ -668,7 +668,6 @@ void ReadFileParams()
 /* Rewrite by WCC. */
 void ReadFileParams(){
 	char ch, st[256];
-	char *i;	//WCC
 	
 	hasAlignment=0;
 	
@@ -688,7 +687,10 @@ void ReadFileParams(){
 	ungetc(ch, tree_fv);
 
 	if (ch!='(' && isdigit(ch)) {
-		i = fgets(st, 255, tree_fv);
+		if(fgets(st, 255, tree_fv) == NULL){
+			fprintf(stderr, "Unable to read parameters from standard input\n");
+			exit(0);
+		}
 		if ( sscanf( st, " %d %d", &numSequences, &numAlignmentSites)!=2 ) {
 			fprintf(stderr, "Unable to read parameters from standard input\n");
 			exit(0);
@@ -868,7 +870,6 @@ int OpenTreeFile()
 {
 	char st[256];
 	int n;
-	char *i;	//WCC
 		
 	if (treeFile) {
 		if ( (tree_fv=fopen(treeFileName, "rt"))==NULL ) {
@@ -879,7 +880,10 @@ int OpenTreeFile()
 	} else {
 		tree_fv=stdin;
 		if (hasAlignment) {
-			i = fgets(st, 255, stdin);
+			if(fgets(st, 255, stdin) == NULL){
+				fprintf(stderr, "Tree is missing from end of sequence file\n");
+				exit(0);
+			}
 			if ( sscanf(st, " %d ", &n)!=1 ) {
 				fprintf(stderr, "Tree is missing from end of sequence file\n");
 				exit(0);

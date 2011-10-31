@@ -1,3 +1,6 @@
+2011-10-31: Ver. 0.1-10
+  * modify some warnings in C code due to the R CRAN's checking report.
+
 2011-10-24: Ver. 0.1-9
   * modify for new release of R-2.14.x.
 

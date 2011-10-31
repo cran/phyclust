@@ -87,7 +87,8 @@ segtre_mig(struct c_params *cp, int *pnsegs )
 {
 //WCC	int i, j, k, seg, dec, pop, pop2, c1, c2, ind, rchrom, intn  ;
 	int i, j, k, dec, pop, pop2, c1 = 0, c2 = 0, ind, rchrom;
-	int migrant, source_pop, *config, flagint ;
+	int migrant, source_pop, *config;
+//WCC	int flagint;
 //WCC	double  ran1(), sum, x, tcoal, ttemp, rft, clefta,  tmin, p  ;
 	double  sum, x, ttemp, rft, clefta,  tmin = 0.0, p;
 //WCC	double prec, cin,  prect, nnm1, nnm0, mig, ran, coal_prob, prob, rdum , arg ;
@@ -179,7 +180,7 @@ segtre_mig(struct c_params *cp, int *pnsegs )
 	if( r > 0.0 ) rf = r*f ;
 	else rf = f /(nsites-1) ;
 	rft = rf*track_len ;
-	flagint = 0 ;
+//WCC	flagint = 0 ;
 
 /* Main loop */
 

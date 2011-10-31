@@ -5,7 +5,8 @@ void RRand(int *N, int *TRUK,int *PREDK,int *trcl, int *prcl,
   double sumtr[(*TRUK)],sumpr[(*PREDK)],sumprsq,sumtrsq,sumsq,discordant,
     sumtrprsq;
   double term1, term2, term3;
-  double nij2sum, nidot2sum, ndotj2sum, Wallace;
+  double nij2sum, nidot2sum, ndotj2sum;
+//WCC  double Wallace;
 
   for (i=0;i<(*TRUK);i++)    {
     for (j=0;j<(*PREDK);j++)     {
@@ -68,7 +69,7 @@ void RRand(int *N, int *TRUK,int *PREDK,int *trcl, int *prcl,
     ndotj2sum+=(double)sumpr[i]*(sumpr[i]-1)/2.0;
   }
 
-  Wallace=nij2sum/nidot2sum;
+//WCC  Wallace=nij2sum/nidot2sum;
   discordant = 0.5*(sumtrsq + sumprsq) - sumsq ;
 
   (*Rand)=1.0-discordant/((double)(*N)*((double)(*N)-1.)/2.);

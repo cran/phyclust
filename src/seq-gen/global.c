@@ -186,10 +186,10 @@ int GetUnsignedLongParams(int argc, char **argv, int *argn, char *pos, int numPa
 /*************************************/
 int GetStrParam(int argc, char **argv, int *argn, char *pos, char *param, int len)
 {
-	int i;
+//WCC	int i;
 	char *st, *P, buf[256];
 	
-	i=0;
+//WCC	i=0;
 	strcpy(buf, pos);
 	st=strtok(buf, "\t,/");
 	if (st==NULL) {
