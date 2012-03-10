@@ -3,7 +3,7 @@
 \alias{snp2code}
 \alias{nid2sid}
 \alias{sid2nid}
-\title{Transfer nucleotide codes / nids and SNPs / sids}
+\title{Transfer Nucleotide Codes / nids and SNPs / sids}
 \description{
   Transfer nucleotide codes (A, G, C, T, -) and SNPs (1, 2, -).
   Transfer nucleotide ids (0, 1, 2, 3, 4) and SNP ids (0, 1, 2).

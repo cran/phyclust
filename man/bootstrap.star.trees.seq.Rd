@@ -1,6 +1,6 @@
 \name{bootstrap.star.trees.seq}
 \alias{bootstrap.star.trees.seq}
-\title{Bootstrap sequences from a fitted model.}
+\title{Bootstrap Sequences from a Fitted Model.}
 \description{
   This function bootstraps sequences from a model fitted by \code{phyclust}
   by combining two functions \code{bootstrap.star.trees} and
@@ -52,4 +52,4 @@ ret.1 <- phyclust(seq.data.toy$org, 2, EMC = EMC.1)
 ret.all <- bootstrap.star.trees.seq(ret.1)
 }
 }
-\keyword{programming}
+\keyword{bootstrap}

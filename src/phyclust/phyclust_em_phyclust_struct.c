@@ -7,6 +7,7 @@
 #include "phyclust_em.h"
 #include "phyclust_em_tool.h"
 #include "phyclust_tool.h"
+#include "phyclust_se_em.h"
 
 
 /* Initial a em_phyclust structure by a phyclust structure and a QA. */
@@ -63,10 +64,21 @@ em_phyclust_struct* initialize_em_phyclust_struct(phyclust_struct *pcs){
 	 * This can be an independent object, em_phyclust_label/empcl. */
 	initialize_em_phyclust_label(empcs, pcs);
 
+	/* For sequencing error model. */
+	empcs->se_type = pcs->se_type;
+	initialize_em_phyclust_struct_se(empcs, pcs);
+
 	return(empcs);
 } /* End of initialize_em_phyclust_struct(). */
 
 void free_em_phyclust_struct(em_phyclust_struct *empcs){
+	/* For sequencing error model. */
+	free_em_phyclust_struct_se(empcs);
+
+	/* For labels, only owned pointers memory and need to be freed.
+	 * This can be an independent object, em_phyclust_label/empcl. */
+	free_em_phyclust_label(empcs);
+
 	/* For EM. */
 	free(empcs->n_class);
 	free_int_RT(empcs->K, empcs->Mu);
@@ -78,10 +90,6 @@ void free_em_phyclust_struct(em_phyclust_struct *empcs){
 	if(empcs->missing_flag){
 		free_int_RT_3D(empcs->N_X, empcs->K, empcs->count_Mu_X_missing);
 	}
-
-	/* For labels, only owned pointers memory and need to be freed.
-	 * This can be an independent object, em_phyclust_label/empcl. */
-	free_em_phyclust_label(empcs);
 
 	free(empcs);
 } /* End of free_em_phyclust_struct(). */
@@ -123,7 +131,11 @@ em_phyclust_struct* duplicate_em_phyclust_struct(em_phyclust_struct *org_empcs){
 	/* For labels. */
 	duplicate_em_phyclust_label(org_empcs, new_empcs);
 
-	copy_empcs(org_empcs, new_empcs);
+	/* For sequencing error models. */
+	new_empcs->se_type = org_empcs->se_type;
+	duplicate_em_phyclust_struct_se(org_empcs, new_empcs);
+
+	Copy_empcs(org_empcs, new_empcs);
 	return(new_empcs);
 } /* End of duplicate_em_phyclust_struct(). */
 

@@ -5,7 +5,7 @@
 \alias{.amino.acid}
 \alias{.genetic.code}
 \docType{data}
-\title{Standard codes and ids for nucleotides, SNPs, codon, amino acid and genetic code}
+\title{Standard Codes and ids for Nucleotides, SNPs, Codon, Amino Acid and Genetic Code}
 \description{
   Standard codes and ids for nucleotides, SNPs, codon, amino acid and genetic
   code.

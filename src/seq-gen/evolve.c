@@ -133,11 +133,14 @@ void SetCategories()
 		}
 	} else if (rateHetero==GammaRates) {
 		for (i=0; i<numSites; i++)
-			gammaRates[i]=rndgamma(gammaShape) / gammaShape;
+//WCC			gammaRates[i]=rndgamma(gammaShape) / gammaShape;
+			gammaRates[i]=seq_gen_rndgamma(gammaShape) / gammaShape;
 	} else if (rateHetero==DiscreteGammaRates) {
-		DiscreteGamma(freqRate, catRate, gammaShape, gammaShape, numCats, 0);
+//WCC		DiscreteGamma(freqRate, catRate, gammaShape, gammaShape, numCats, 0);
+		seq_gen_DiscreteGamma(freqRate, catRate, gammaShape, gammaShape, numCats, 0);
 		for (i=0; i<numSites; i++)
-			categories[i]=(int)(rndu()*numCats);
+//WCC			categories[i]=(int)(rndu()*numCats);
+			categories[i]=(int)(seq_gen_rndu()*numCats);
 	}
 
 	if (invariableSites) {
@@ -152,7 +155,8 @@ char SetState(double *P)
 	char j;
 	double r;
 	
-	r=rndu();
+//WCC	r=rndu();
+	r=seq_gen_rndu();
 	for (j=0; r>(*P) && j<numStates; j++) P++;
 	return j;
 }
@@ -161,7 +165,8 @@ short IsInvariable()
 {
 	double r;
 
-	r=rndu();
+//WCC	r=rndu();
+	r=seq_gen_rndu();
 	if (r < proportionInvariable)
 		return 1;
 	else 

@@ -1,6 +1,6 @@
 \name{haplo.post.prob}
 \alias{haplo.post.prob}
-\title{Tzeng's method: haplotype grouping for SNP sequences}
+\title{Tzeng's Method: Haplotype Grouping for SNP Sequences}
 \description{
   For SNP sequences only, Tzeng's method (2005) uses an evolution approach
   to group haplotypes based on a deterministic transformation of haplotype
@@ -71,4 +71,4 @@ ret <- haplo.post.prob(my.snp$org, ploidy = 1)
 str(ret)
 }
 }
-\keyword{programming}
+\keyword{Haploclust}

@@ -1,6 +1,6 @@
 \name{gen.unit.K}
 \alias{gen.unit.K}
-\title{Generate comprehensive trees.}
+\title{Generate Comprehensive Trees.}
 \description{
   Generate comprehensive trees for simulation studies.
 }
@@ -81,4 +81,4 @@ plotnj(tree.K$star, X.class, type = "p",
 axis(1)
 }
 }
-\keyword{programming}
+\keyword{simulation}

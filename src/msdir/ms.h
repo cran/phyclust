@@ -1,3 +1,7 @@
+//WCC:add
+#include "R_ms.h"
+
+
 #ifndef __MS_
 #define __MS_
 
@@ -39,12 +43,10 @@ struct params {
 
 
 
-/* Add by Wei-Chen Chen. */
+//WCC:add
 #ifdef __HAVE_R_
-	#include <R.h>
-	#include <Rinternals.h>
-#endif
-#ifdef R_EXT_PRINT_H_
+#include <R.h>
+#include <Rinternals.h>
 #undef printf
 #define printf Rprintf
 #undef exit

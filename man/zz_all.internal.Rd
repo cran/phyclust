@@ -12,7 +12,9 @@
 \alias{plotfd}
 \alias{plothist.my}
 \alias{translate.EMC}
+\alias{translate.EMC.se}
 \alias{translate.ret}
+\alias{translate.ret.se}
 \alias{unstrsplit}
 \alias{code2nid.default}
 \alias{code2nid.list}
@@ -36,7 +38,7 @@
 \alias{aid2acode.list}
 \alias{acode2aid.default}
 \alias{acode2aid.list}
-\title{ All internal functions of phyclust }
+\title{ All Internal Functions of phyclust }
 \description{
   See \code{all.internal.tzeng} for Tzeng's methods (2005).
 

@@ -3,18 +3,18 @@
 \label{sec:introduction}
 \addcontentsline{toc}{section}{\thesection. Introduction}
 
-{\bf Warning.} This document is written to explain the major functions of \pkg{phyclust}, version 0.1-4.
-Every effort will be made to insure future versions are consistent with these instructions, but new features in later versions may not be explained in this document.
-
-This is a quick guide to the package \pkg{phyclust}.
+This is a quick guide to the package \pkg{phyclust}~\citep{snoweye2011}
+implementing model-based phylogenetic clustering aiming to cluster
+large amount of aligned DNA or SNP sequences.
 We will cover how to read and write sequence data,
 how to use the popular programs \code{ms}~\citep{Hudson2002} and \code{seq-gen}~\citep{Rambaut1997} for generating
 coalescent trees and molecular sequences from within \pkg{phyclust},
 the main function \code{phyclust()} for finding population structure,
+the tree finding program \code{baseml} of \code{PAML}~\citep{Yang1997,Yang2007},
 and Haplo-Clustering \citep{tzeng2005}.
 More information about the theory, other package functions,
 and any changes in future versions can be found on our website
-Phylogenetic Clustering at
+Phylogenetic Clustering (Phyloclustering) at
 \url{http://thirteen-01.stat.iastate.edu/snoweye/phyclust/}.
 
 Specifically, in Section~\ref{sec:dataio}, we introduce the basic data structures
@@ -25,9 +25,17 @@ In Section~\ref{sec:phyloclustering}, we briefly describe
 the phylogenetic clustering method, its implementation in \code{phyclust()}, the visualization functions,
 the auxiliary function \code{.EMControl()} for choosing the model, initialization method, optimization method,
 and the EM algorithm variant, and propose a ``ms+seqgen+phyclust'' approach.
+In Section~\ref{sec:paml}, we illustrate an extension of Phyloclustering, and
+propose a ``phyclust+paml.baseml'' approach.
 In Section~\ref{sec:haplo}, we demonstrate the function
 \code{haplo.post.prob()} for Hap-Clustering.
 
+\begin{color}{red}\bf Warning:\end{color}
+This document is written to explain the major functions of \pkg{phyclust}
+according to version \begin{color}{red}0.2-1\end{color}.
+Every effort will be made to insure future versions are consistent with these
+instructions, but new features in later versions may not be explained in this
+document.
 
 
 

@@ -4,7 +4,7 @@
 \alias{Class seq.data}
 \alias{Data Toy}
 \docType{data}
-\title{A toy dataset in class seq.data}
+\title{A Toy Dataset in Class seq.data}
 \description{
    A toy dataset, \code{seq.data.toy}, with 100 nucleotide sequences
    and 200 sites in 4 clusters.

@@ -1,7 +1,7 @@
 \name{data.phylip.crohn}
 \alias{Data Crohn's Disease}
 \docType{data}
-\title{Crohn's disease SNP dataset in the phylip format}
+\title{Crohn's Disease SNP Dataset in the phylip Format}
 \description{
   Crohn's disease dataset is published by Hugot, et al. (2001).
 }

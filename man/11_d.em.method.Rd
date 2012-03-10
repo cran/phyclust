@@ -1,7 +1,7 @@
 \name{.em.method}
 \alias{.em.method}
 \docType{data}
-\title{EM methods/algorithms}
+\title{EM Methods and Algorithms}
 \description{
   The varied EM algorithms are implemented in C.
   The first element is the default value.

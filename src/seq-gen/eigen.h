@@ -13,12 +13,23 @@
    email: andrew.rambaut@zoo.ox.ac.uk
 */
 
+
+//WCC:add
+#include "R_seq-gen.h"
+
+
 #ifndef _EIGEN_H_
 #define _EIGEN_H_
 
-int abyx (double a, double x[], int n);
-int xtoy (double x[], double y[], int n);
-int matinv( double x[], int n, int m, double space[]);
+//WCC int abyx (double a, double x[], int n);
+int seq_gen_abyx (double a, double x[], int n);
+
+//WCC int xtoy (double x[], double y[], int n);
+int seq_gen_xtoy (double x[], double y[], int n);
+
+//WCC int matinv( double x[], int n, int m, double space[]);
+int seq_gen_matinv( double x[], int n, int m, double space[]);
+
 int eigen(int job, double A[], int n, double rr[], double ri[],
           double vr[], double vi[], double w[]);
 

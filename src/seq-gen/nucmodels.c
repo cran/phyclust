@@ -426,14 +426,17 @@ void SetupGTR()
 		mr += nucFreq[i] * sum;
 	}
 	
-	abyx(1.0/mr, Qij, SQNUM_NUC);
+//WCC	abyx(1.0/mr, Qij, SQNUM_NUC);
+	seq_gen_abyx(1.0/mr, Qij, SQNUM_NUC);
 
 	if ((k=eigen(1, Qij, NUM_NUC, Root, T1, U, V, T2))!=0) {
 		fprintf(stderr, "\ncomplex roots in SetupGTR");
 		exit(0);
 	}
-	xtoy (U, V, SQNUM_NUC);
-	matinv (V, NUM_NUC, NUM_NUC, T1);
+//WCC	xtoy (U, V, SQNUM_NUC);
+	seq_gen_xtoy (U, V, SQNUM_NUC);
+//WCC	matinv (V, NUM_NUC, NUM_NUC, T1);
+	seq_gen_matinv (V, NUM_NUC, NUM_NUC, T1);
 	for (i=0; i<NUM_NUC; i++) {
    		for (j=0; j<NUM_NUC; j++) {
    			for (k=0; k<NUM_NUC; k++) {

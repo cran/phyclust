@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 
+#include "phyclust_constant.h"
 #include "phyclust_pam_ind_2.h"
 
 

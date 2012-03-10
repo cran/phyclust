@@ -2,7 +2,7 @@
 \alias{Data Pony 625}
 \alias{Format fasta}
 \docType{data}
-\title{Great pony 625 EIAV rev dataset in the fasta format}
+\title{Great Pony 625 EIAV rev Dataset in the Fasta Format}
 \description{
   Great pony 625 EIAV dataset is published by Baccam, P., et al. (2003),
   and they are also available on NCBI database.

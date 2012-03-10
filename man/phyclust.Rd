@@ -1,7 +1,7 @@
 \name{phyclust}
 \alias{phyclust}
 \alias{Class phyclust}
-\title{The main function of phyclust}
+\title{The Main Function of phyclust}
 \description{
   The main function of \pkg{phyclust} implements finite mixture
   models for sequence data that the mutation processes are modeled by
@@ -97,7 +97,9 @@ phyclust(X, K, EMC = .EMC, manual.id = NULL, label = NULL, byrow = TRUE)
 \seealso{
   \code{\link{.EMC}},
   \code{\link{.EMControl}},
-  \code{\link{find.best}}.
+  \code{\link{find.best}},
+  \code{\link{phyclust.se}}.
+  \code{\link{phyclust.se.update}}.
 }
 \examples{
 \dontrun{
@@ -118,4 +120,4 @@ semi.label[1:3] <- 1
 (ret.3 <- phyclust(X, 3, EMC = EMC.2, label = semi.label))
 }
 }
-\keyword{programming}
+\keyword{phyclust}

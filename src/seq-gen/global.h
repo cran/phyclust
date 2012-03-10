@@ -39,6 +39,11 @@
    email: andrew.rambaut@zoo.ox.ac.uk
 */
 
+
+//WCC:add
+#include "R_seq-gen.h"
+
+
 #ifndef _GLOBAL_H_
 #define _GLOBAL_H_
 

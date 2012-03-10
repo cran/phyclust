@@ -1,6 +1,6 @@
 \name{getcut.fun}
 \alias{getcut.fun}
-\title{Tzeng's method: finding the best number of clusters}
+\title{Tzeng's Method: Finding the Best Number of Clusters}
 \description{
   For SNP sequences only, Tzeng's method (2005) uses an evolution approach
   to group haplotypes based on a deterministic transformation of haplotype
@@ -56,4 +56,4 @@ getcut.fun(sort(ret$haplo$hap.prob, decreasing = TRUE),
            nn = my.snp$nseq, plot = 1)
 }
 }
-\keyword{programming}
+\keyword{Haploclust}

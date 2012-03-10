@@ -39,6 +39,11 @@
    email: andrew.rambaut@zoo.ox.ac.uk
 */
 
+
+//WCC:add
+#include "R_seq-gen.h"
+
+
 #ifndef _TREEFILE_H_
 #define _TREEFILE_H_
 

@@ -2,9 +2,13 @@ citHeader("To cite phyclust in a publication use:")
 
 citEntry(
   entry = "Manual",
-  title = "Phylogenetic Clustering with R package phyclust",
-  author = personList(as.person("W.-C. Chen")),
-  year = "2010",
+  title = "Overlapping Codon Model, Phylogenetic Clustering, and Alternative
+           Partial Expectation Conditional Maximization Algorithm",
+  author = personList(as.person("Chen, W.-C.")),
+  journal = "Ph.D. Diss., Iowa Stat University",
+  year = "2011",
   url = "http://thirteen-01.stat.iastate.edu/snoweye/phyclust/",
-  textVersion = "W.-C. Chen (2010). Phylogenetic Clustering with R package phyclust"
+  textVersion = "Chen, W.-C. (2011) Overlapping Codon model, Phylogenetic
+                 Clustering, and Alternative Partial Expectation Conditional
+                 Maximization Algorithm, Ph.D. Diss., Iowa Stat University."
 )

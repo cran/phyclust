@@ -3,7 +3,8 @@
 \docType{package}
 \title{Phyloclustering -- Phylogenetic Clustering}
 \description{
-  This package implements an novel approach combining model-based clusterings
+  This package \pkg{phyclust} (Chen 2011) implements an novel approach
+  combining model-based clusterings
   and phylogenetics to classify DNA sequences and SNP sequences.
   Based on evolution models, sequences are assumed to follow a mutation
   process/distribution clouding around an unknown center ancestor.
@@ -14,10 +15,13 @@
   EM algorithms are performed to find the maximum likelihood estimators.
   Initialization methods for EM algorithms are also established.
   Several evolution models are also developed.
-  \code{ms} and \code{seq-gen} are two useful programs to generate
-  coalescent trees and sequences, and both are merged into \pkg{phyclust}.
-  Tzeng's method for haplotype grouping are also incorporated into
-  \pkg{phyclust}.
+
+  \code{ms} (Hudson 2002) and \code{seq-gen} (Rambaut and Grassly 1997)
+  are two useful programs to generate coalescent trees and sequences, and
+  both are merged into \pkg{phyclust}. \code{baseml} of PAML (Yang 1997, 2007)
+  is also ported into \pkg{phyclust} and it is a program to find a phylogenetic
+  tree by maximizing likelihood. Hap-Clustering method (Tzeng 2005) for
+  haplotype grouping is also incorporated into \pkg{phyclust}.
 
   Type \code{help(package = phyclust)} to see a list of major
   functions for which further documentations are available. The on-line
@@ -44,6 +48,8 @@
   \code{ms} and \code{seqgen} can generate trees and sequences
   based on varied conditions, and they can jointly perform simulations.
 
+  \code{paml.baseml} can estimate trees based on sequences.
+
   \code{haplo.post.prob} is a modified version of Tzeng's method
   for haplotype grouping which uses a evolution approach to group SNP
   sequences.
@@ -54,6 +60,11 @@
 \references{
   Phylogenetic Clustering Website:
   \url{http://thirteen-01.stat.iastate.edu/snoweye/phyclust/}
+
+  Chen, W.-C. (2011)
+  \dQuote{Overlapping codon model, phylogenetic clustering, and alternative
+          partial expectation conditional maximization algorithm},
+  \emph{Ph.D. Diss., Iowa Stat University}.
 
   Hudson, R.R. (2002)
   \dQuote{Generating Samples under a Wright-Fisher Neutral Model of Genetic
@@ -66,6 +77,17 @@
           Sequence Evolution along Phylogenetic Trees},
   \emph{Computer Applications In The Biosciences}, \bold{13:3}, 235-238.
   \url{http://tree.bio.ed.ac.uk/software/seqgen/}
+
+  Yang, Z. (1997)
+  \dQuote{PAML: a program package for phylogenetic analysis by maximum
+          likelihood},
+  \emph{Computer Applications in BioSciences}, \bold{13}, 555-556.
+  \url{http://abacus.gene.ucl.ac.uk/software/paml.html}
+
+  Yang, Z. (2007)
+  \dQuote{PAML 4: a program package for phylogenetic analysis by maximum
+          likelihood},
+  \emph{Molecular Biology and Evolution}, \bold{24}, 1586-1591.
 
   Tzeng, J.Y. (2005)
   \dQuote{Evolutionary-Based Grouping of Haplotypes in Association Analysis},

@@ -1,6 +1,6 @@
 \name{plothist}
 \alias{plothist}
-\title{Plot histogram to compare number of mutations.}
+\title{Plot Histogram to Compare Number of Mutations.}
 \description{
   Plot histogram to compare number of mutations.
 }
@@ -57,4 +57,4 @@ X.class <- as.numeric(gsub(".*-(.*)", "\\\\1", seq.data.toy$seqname))
 plothist(X, X.class)
 }
 }
-\keyword{programming}
+\keyword{plot}

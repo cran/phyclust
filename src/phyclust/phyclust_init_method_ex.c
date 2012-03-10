@@ -23,6 +23,9 @@ void Update_init_k_medoids_by_X_org(em_phyclust_struct *empcs, Q_matrix_array *Q
 	while(init_iter < EMC->max_init_iter){
 		init_iter++;
 		reset_Q_matrix_array(QA);
+		if(EMC->se_type == SE_YES){
+			reset_SE_P_matrix(empcs->SE_P);
+		}
 
 		assign_class_by_k_medoids(N_X_org, K, eds->EDM, center_id, class_id);
 
@@ -81,6 +84,9 @@ void Update_init_k_medoids_by_X(em_phyclust_struct *empcs, Q_matrix_array *QA, e
 	while(init_iter < EMC->max_init_iter){
 		init_iter++;
 		reset_Q_matrix_array(QA);
+		if(EMC->se_type == SE_YES){
+			reset_SE_P_matrix(empcs->SE_P);
+		}
 
 		assign_class_by_k_medoids(N_X, K, eds->EDM, center_id, class_id);
 

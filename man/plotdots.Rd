@@ -1,6 +1,6 @@
 \name{plotdots}
 \alias{plotdots}
-\title{Dots plots of sequences for visual comparisons}
+\title{Dots Plots of Sequences for Visual Comparisons}
 \description{
   This function provides dots plots of data set given an idea how diverse
   the sequences are by drawing dots with different colors for all mutations.
@@ -76,4 +76,4 @@ X.SNP <- nid2sid(X)
 plotdots(X.SNP, X.class)
 }
 }
-\keyword{programming}
+\keyword{plot}

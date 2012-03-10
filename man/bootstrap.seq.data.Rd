@@ -1,6 +1,6 @@
 \name{bootstrap.seq.data}
 \alias{bootstrap.seq.data}
-\title{Bootstrap a seq.data from a fitted model.}
+\title{Bootstrap a seq.data from a Fitted Model.}
 \description{
   This function simplifies the bootstrap function
   \code{bootstrap.star.trees.seq()}, and only
@@ -48,4 +48,4 @@ ret.1 <- phyclust(seq.data.toy$org, 2, EMC = EMC.1)
 (ret.all <- bootstrap.seq.data(ret.1))
 }
 }
-\keyword{programming}
+\keyword{bootstrap}

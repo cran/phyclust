@@ -8,11 +8,15 @@
 #include "phyclust_em.h"
 #include "phyclust_tool.h"
 #include "phyclust_edist.h"
+#include "phyclust_se_struct.h"
 
 
 /* Initial a phyclust structure without assigning data X.
  * Assign X later by calling update_phyclust_struct() to update pcs.
- * Assign MISSING_CODE by code_type. */
+ * Assign MISSING_CODE by code_type.
+ * Assign labeled data if any by calling update_phyclust_label().
+ * Assign sequencing error if any by calling update_phyclust_struct_se().
+ */
 phyclust_struct* initialize_phyclust_struct(int code_type, int N_X_org, int L, int K){
 	phyclust_struct *pcs;
 
@@ -33,8 +37,6 @@ phyclust_struct* initialize_phyclust_struct(int code_type, int N_X_org, int L, i
 	pcs->map_X_to_X_org = NULL;			/* Assigned by update_phyclust_struct(). */
 	pcs->replication_X = NULL;			/* Assigned by update_phyclust_struct(). */
 	pcs->seg_site_id = NULL;			/* Assigned by update_phyclust_struct(). */
-	pcs->label = NULL;				/* Point to update_phyclust_label(). */
-
 	pcs->Mu = allocate_int_RT(K, L); 
 	pcs->Eta = allocate_double_1D(K); 
 	/* For report, so use original dimensions. */
@@ -48,17 +50,27 @@ phyclust_struct* initialize_phyclust_struct(int code_type, int N_X_org, int L, i
 	pcs->class_id = allocate_int_1D(N_X_org); 
 	pcs->n_class = allocate_int_1D(K); 
 
+	/* Labels. */
+	pcs->label = NULL;				/* Point to update_phyclust_label(). */
+
+	/* If code_type = NUCLEOTIDE & se_type == SE_YES, then this should be
+	 * updated by updat_phyclust_struct_se(). */
+	pcs->se_type = SE_NO;				/* Updated by outside function. */
+	pcs->SE_P = NULL;				/* Assigned by update_phyclust_se_struct(). */
+
 	return(pcs);
 } /* End of initialize_phyclust_struct(). */
 
 void free_phyclust_struct(phyclust_struct *pcs){
+	free_phyclust_se_struct(pcs);
+	free_phyclust_label(pcs->label);
+
 	free(pcs->X_org);
 	free(pcs->X);
 	free(pcs->map_X_org_to_X);
 	free(pcs->map_X_to_X_org);
 	free(pcs->replication_X);
 	free(pcs->seg_site_id);
-	free_phyclust_label(pcs->label);
 	free_int_RT(pcs->K, pcs->Mu);
 	free(pcs->Eta);
 	free_double_RT(pcs->N_X_org, pcs->Z_normalized);
@@ -66,7 +78,6 @@ void free_phyclust_struct(phyclust_struct *pcs){
 	free(pcs->n_class);
 	free(pcs);
 } /* End of free_phyclust_struct(). */
-
 
 /* After assigning the data X_org, this function will extract the information
  * and update the pcs including: N_X, X, map_X_to_X_org, replication_X,

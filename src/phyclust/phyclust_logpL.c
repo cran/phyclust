@@ -344,7 +344,7 @@ double negative_logpL_Mu_given_QA(int m, double *vect, void *ex){
 	if(in->QA->check_param){
 		in->QA->Update_log_Pt(in->QA);					/* Update log(P(t)). */
 		in->EMFP->Update_Mu_given_QA(in->empcs, in->QA, in->QA_H);	/* Update Mu. */
-		update_Z_modified(in->empcs, in->QA);				/* Update empcs->Z_modified (log and unnormalized). */
+		in->EMFP->Update_Z_modified(in->empcs, in->QA);			/* Update empcs->Z_modified (log and unnormalized). */
 		ret = -in->EMFP->Compute_R(in->empcs, in->QA, in->QA_H);	/* Compute R(Mu, QA, Tt). */
 	} else{
 		/* NM failed, restore to the original vect and return Inf to stop NM. */
@@ -378,7 +378,7 @@ double negative_logpL_QA_given_Mu(int m, double *vect, void *ex){
 	 * QA and Tt are updated by NM. Mu are updated given QA, Tt and empcs->Z_normalized. */
 	if(in->QA->check_param){
 		in->QA->Update_log_Pt(in->QA);					/* Update log(P(t)). */
-		update_Z_modified(in->empcs, in->QA);				/* Update empcs->Z_modified (log and unnormalized). */
+		in->EMFP->Update_Z_modified(in->empcs, in->QA);			/* Update empcs->Z_modified (log and unnormalized). */
 		ret = -in->EMFP->Compute_R(in->empcs, in->QA, in->QA_H);	/* Compute R(Mu, QA, Tt). */
 	} else{
 		/* NM failed, restore to the original vect and return Inf to stop NM. */
@@ -402,12 +402,12 @@ double negative_logpL_QA_given_Mu(int m, double *vect, void *ex){
 
 
 /* Maximize profile complete log-likelihood R(Mu, QA, Tt). */
-int maximize_logpL(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H, em_control *EMC, em_fp *EMFP){
+int Maximize_logpL(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H, em_control *EMC, em_fp *EMFP){
 	ex_struct exs;
 	nm_struct *nms;
+	int ret_stop;
 	double *vect = allocate_double_1D(QA->total_n_param);
 	double *org_vect = allocate_double_1D(QA->total_n_param);
-	int ret_stop;
 
 	QA->Convert_Q_matrix_array_to_vect(QA, vect);
 	exs.empcs = empcs;
@@ -502,7 +502,7 @@ int maximize_logpL(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array
 	free(org_vect);
 	free_nm_struct(nms);
 	return(ret_stop);
-} /* End of maximize_logpL(). */
+} /* End of Maximize_logpL(). */
 
 
 
@@ -512,7 +512,7 @@ void print_vect(int m, double *vect){
 	int i;
 
 	for(i = 0; i < m; i++){
-		printf(" %.4f", vect[i]);
+		printf(" %.8f", vect[i]);
 	}
 	printf("\n");
 } /* End of print_vect(). */

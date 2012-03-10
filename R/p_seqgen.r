@@ -10,6 +10,9 @@ seqgen <- function(opts = NULL, rooted.tree = NULL, newick.tree = NULL,
     if((! is.null(rooted.tree)) && (class(rooted.tree) == "phylo")){
       newick.tree <- write.tree(rooted.tree, digits = 12)
     }
+    if((!is.null(newick.tree)) && (!is.null(input))){
+      stop("rooted.tree/newick.tree and input can not work at the same time.")
+    }
     if(! is.null(newick.tree)){
       write(newick.tree, file = temp.file.ms, sep = "")
     } else if(! is.null(input)){
@@ -25,16 +28,16 @@ seqgen <- function(opts = NULL, rooted.tree = NULL, newick.tree = NULL,
                 what = "character", sep = "\n", quiet = TRUE)
     class(ret) <- "seqgen"
 
-    unlink(temp.file.ms)
     unlink(temp.file.seqgen)
+    unlink(temp.file.ms)
     return(ret)
   }
 
   argv <- c(argv, "-h")
   try(.Call("R_seq_gen_main", argv, temp.file.ms, PACKAGE = "phyclust"),
       silent = TRUE)
-  unlink(temp.file.ms)
   unlink(temp.file.seqgen)
+  unlink(temp.file.ms)
   invisible()
 } # End of seqgen().
 

@@ -1,6 +1,6 @@
 \name{find.consensus}
 \alias{find.consensus}
-\title{Find the consensus sequence}
+\title{Find the Consensus Sequence}
 \description{
   Based on the input data, this function will search all data along
   all sites to find a consensus sequence which may be or may not be

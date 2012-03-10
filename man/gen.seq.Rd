@@ -1,7 +1,7 @@
 \name{gen.seq}
 \alias{gen.seq.HKY}
 \alias{gen.seq.SNP}
-\title{Generate sequences given a rooted tree.}
+\title{Generate Sequences Given a Rooted Tree.}
 \description{
   These functions call \code{seqgen} to generate sequences by
   evolutions models based on a rooted tree. \code{gen.seq.HKY} is to
@@ -77,4 +77,4 @@ paste(sid2snp(anc.SNP), collapse = "")
                       anc.seq = anc.SNP))
 }
 }
-\keyword{programming}
+\keyword{simulation}

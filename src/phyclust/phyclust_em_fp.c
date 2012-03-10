@@ -7,6 +7,7 @@
 #include "phyclust_em_tool.h"
 #include "phyclust_init_method.h"
 #include "phyclust_logpL.h"
+#include "phyclust_se_em.h"
 
 /* Initial a em_fp. */
 em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
@@ -46,18 +47,24 @@ em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
 			EMFP->Check_convergence = &Check_convergence_em;
 			EMFP->Em_step = &Em_step;
 			EMFP->Short_em_step = &Short_em_step;
+			EMFP->Update_Z_modified = &Update_Z_modified;
+			EMFP->Maximize_logpL = &Maximize_logpL;
 			break;
 		case ECM:
 			EMFP->M_step = &M_step_CM;
 			EMFP->Check_convergence = &Check_convergence_org;
 			EMFP->Em_step = &Em_step;
 			EMFP->Short_em_step = &Short_em_step;
+			EMFP->Update_Z_modified = &Update_Z_modified;
+			EMFP->Maximize_logpL = &Maximize_logpL;
 			break;
 		case AECM:
 			EMFP->M_step = &M_step_ACM;
 			EMFP->Check_convergence = &Check_convergence_org;
 			EMFP->Em_step = &Em_step;
 			EMFP->Short_em_step = &Short_em_step;
+			EMFP->Update_Z_modified = &Update_Z_modified;
+			EMFP->Maximize_logpL = &Maximize_logpL;
 			break;
 		default:
 			fprintf(stderr, "PE: The EM method is not found.\n");
@@ -88,6 +95,7 @@ em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
 			exit(1);
 	}
 
+	/* For boundary methods. */
 	switch(EMC->boundary_method){
 		case IGNORE:
 			EMFP->Update_Eta_given_Z = &Update_Eta_given_Z_IGNORE;
@@ -100,6 +108,7 @@ em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
 			exit(1);
 	}
 
+	/* For GAPs. */
 	if(pcs->missing_flag){
 		EMFP->LogL_complete = &LogL_complete_missing;
 		EMFP->LogL_profile = &LogL_profile_missing;
@@ -119,10 +128,15 @@ em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
 			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_skip_non_seg;
 		}
 	}
+
+	EMFP->Copy_empcs = &Copy_empcs;
 	EMFP->Copy_empcs_to_pcs = &Copy_empcs_to_pcs;
+
+	/* For sequencing error model. */
+	update_em_fp_se(EMFP, EMC, pcs);
 	
 	return(EMFP);
-} /* End of initialize_em_control(). */
+} /* End of initialize_em_fp(). */
 
 
 void free_em_fp(em_fp *EMFP){

@@ -2,7 +2,7 @@
 \alias{Data Pony 524}
 \alias{Format phylip}
 \docType{data}
-\title{Great pony 524 EIAV rev dataset in the phylip format}
+\title{Great Pony 524 EIAV rev Dataset in the phylip Format}
 \description{
   Great pony 524 EIAV dataset is published by Baccam, P., et al. (2003),
   and they are also available on NCBI database.

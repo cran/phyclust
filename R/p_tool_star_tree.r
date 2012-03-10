@@ -3,8 +3,10 @@ get.rooted.tree.height <- function(rooted.tree, tol = .Machine$double.eps^0.5){
   if(!is.rooted(rooted.tree)){
     stop("A rooted tree is required")
   }
-  if(!is.ultrametric(rooted.tree, tol = tol)){
-    stop("A rooted tree is not ultrametric")
+  if(rooted.tree$Nnode > 1){
+    if(!is.ultrametric(rooted.tree, tol = tol)){
+      stop("A rooted tree is not ultrametric")
+    }
   }
 
   edge.from <- rooted.tree$edge[, 1]
@@ -37,7 +39,7 @@ rescale.rooted.tree <- function(rooted.tree, scale.height = 1){
 
   rooted.tree$edge.length <- rooted.tree$edge.length * scale.height
   rooted.tree
-} # End of rescale.tree().
+} # End of rescale.rooted.tree().
 
 
 ### Reshap a rooted tree to a star shape.

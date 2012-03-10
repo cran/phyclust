@@ -54,16 +54,21 @@ double LogL_observed(em_phyclust_struct *empcs, Q_matrix_array *QA){
 			}
 		}
 
+		/* This function takes log of component densities "a_z_normalized",
+		 * stores a total density in "total_sum",
+		 * stores a scale for exponent in "scal_exp", and
+		 * turn on "flag_out_range" if exponent is unstable. */
 		e_step_with_stable_exp(&K, a_Z_normalized, &total_sum, &scale_exp, &flag_out_range);
 
 		/* Update logL_observed. */
-		if(empcs->replication_X[n_X] == 1){
-			logL_observed += log(total_sum);
-		} else{
-			logL_observed += log(total_sum) * empcs->replication_X[n_X];
-		}
+		total_sum = log(total_sum);
 		if(flag_out_range){
-			logL_observed += scale_exp;
+			total_sum += scale_exp;
+		}
+		if(empcs->replication_X[n_X] == 1){
+			logL_observed += total_sum;
+		} else{
+			logL_observed += total_sum * empcs->replication_X[n_X];
 		}
 	}
 	
@@ -90,13 +95,14 @@ double LogL_observed_label_semi(em_phyclust_struct *empcs, Q_matrix_array *QA){
 		e_step_with_stable_exp(&K, a_Z_normalized, &total_sum, &scale_exp, &flag_out_range);
 
 		/* Update logL_observed. */
-		if(empcs->replication_X[n_X] == 1){
-			logL_observed += log(total_sum);
-		} else{
-			logL_observed += log(total_sum) * empcs->replication_X[n_X];
-		}
+		total_sum = log(total_sum);
 		if(flag_out_range){
-			logL_observed += scale_exp;
+			total_sum += scale_exp;
+		}
+		if(empcs->replication_X[n_X] == 1){
+			logL_observed += total_sum;
+		} else{
+			logL_observed += total_sum * empcs->replication_X[n_X];
 		}
 	}
 
@@ -341,7 +347,7 @@ void reassign_label_pointer(em_phyclust_struct *empcs){
 	}
 } /* End of reassign_label_pointer(). */
 
-void copy_empcs(em_phyclust_struct *empcs_from, em_phyclust_struct *empcs_to){
+void Copy_empcs(em_phyclust_struct *empcs_from, em_phyclust_struct *empcs_to){
 	int N_X = empcs_from->N_X, L = empcs_from->L, K = empcs_from->K;
 
 	/* For Em. */
@@ -358,7 +364,8 @@ void copy_empcs(em_phyclust_struct *empcs_from, em_phyclust_struct *empcs_to){
 		copy_int_RT_3D(empcs_from->N_X, empcs_from->K, empcs_from->ncode, empcs_from->count_Mu_X_missing,
 				empcs_to->count_Mu_X_missing);
 	}
-} /* End of copy_empcs(). */
+} /* End of Copy_empcs(). */
+
 
 void Copy_empcs_to_pcs(em_phyclust_struct *empcs, phyclust_struct *pcs){
 	int n_X_org, n_X, k, L = empcs->L, K = empcs->K;
@@ -380,6 +387,7 @@ void Copy_empcs_to_pcs(em_phyclust_struct *empcs, phyclust_struct *pcs){
 	}
 	pcs->logL_observed = empcs->logL_observed;
 } /* End of Copy_empcs_to_pcs(). */
+
 
 /* For M-step lonely, or semi-supervised. */
 void Copy_pcs_to_empcs(phyclust_struct *pcs, em_phyclust_struct *empcs){
@@ -514,6 +522,10 @@ void print_result(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC){
 	}
 	printf(".\n");
 	print_QA(QA);
+
+	if(pcs->se_type == SE_YES){
+		pcs->SE_P->Print_f_err(pcs->SE_P);
+	}
 } /* End of print_result(). */
 
 void print_Z_modified(em_phyclust_struct *empcs){

@@ -1,7 +1,7 @@
 \name{.EMC}
 \alias{.EMC}
 \docType{data}
-\title{EM control}
+\title{EM Control}
 \description{
   An default template object stores controlling options for \code{phyclust}
   to perform EM algorithms. This object combines all other read-only

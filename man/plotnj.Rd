@@ -1,6 +1,6 @@
 \name{plotnj}
 \alias{plotnj}
-\title{Plot an unrooted trees.}
+\title{Plot an Unrooted Trees.}
 \description{
   This is a enhanced version of \code{plot.phylo} in \pkg{ape} which
   can plot trees in \code{Class phylo} including neighbor-joining trees,
@@ -68,4 +68,4 @@ plotnj(tree.new, X.class, type = "r", edge.width.class = 2,
        main = "star tree in radial")
 }
 }
-\keyword{programming}
+\keyword{plot}

@@ -24,7 +24,7 @@
 \alias{I33Inv.fun}
 \alias{index.k.fun}
 \alias{zero.mat.fun}
-\title{ All internal functions of Tzeng's methods }
+\title{ All Internal Functions of Tzeng's Methods }
 \description{
   See \code{all.internal} for phyclust.
 
@@ -69,3 +69,4 @@
   Maintain: Wei-Chen Chen \email{phyclust@gmail.com}
 }
 \keyword{internal}
+\keyword{Haploclust}

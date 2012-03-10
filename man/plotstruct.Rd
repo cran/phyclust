@@ -1,6 +1,6 @@
 \name{plotstruct}
 \alias{plotstruct}
-\title{Struct plots of observations based on posterior probabilities}
+\title{Struct Plots of Observations Based on Posterior Probabilities}
 \description{
   This function provides structure plots of data set given based on posterior
   probabilities, the \code{Z.normalized} matrix.
@@ -56,4 +56,4 @@ windows()
 plotstruct(ret.1$Z.normalized, X.class = X.class)
 }
 }
-\keyword{programming}
+\keyword{plot}

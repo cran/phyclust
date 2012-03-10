@@ -5,6 +5,7 @@
 
 #include "phyclust_qmatrix_array.h"
 #include "phyclust_label.h"
+#include "phyclust_se_pmatrix.h"
 
 typedef struct _phyclust_struct		phyclust_struct;
 
@@ -31,8 +32,6 @@ struct _phyclust_struct{
 	int		*replication_X;		/* Count replications of each unique sequence, dim = N_X. */
 	/* Summarizd information for X. */
 	int		*seg_site_id;		/* Segregating site id, dim = N_seg_site. */
-	/* Label. */
-	phyclust_label	*label;			/* For labels. */
 
 /* Dynamical variables, used in copy functions only. */
 	/* Parameters. */
@@ -47,6 +46,14 @@ struct _phyclust_struct{
 	double		icl;			/* icl. */
 	int		*class_id;		/* Class id of each sequence, dim = N_X. */
 	int		*n_class;		/* Number of sequences for each class, dim = K. */
+
+/* Extension applications. */
+	/* Label. */
+	phyclust_label	*label;			/* For labels. */
+
+	/* For sequencing error if assumed. */
+	int		se_type;		/* For sequencing error. */
+	SE_P_matrix	*SE_P;			/* Parameters of sequencing error models. */
 };
 
 phyclust_struct* initialize_phyclust_struct(int code_type, int N_X_org, int L, int K);

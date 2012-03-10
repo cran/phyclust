@@ -32,4 +32,10 @@
 /* Define input file format: phylip, fasta. */
 #include "phyclust_file_input.h"
 
+/* Define sequencing error models. */
+#include "phyclust_se_struct.h"
+#include "phyclust_se_pmatrix.h"
+#include "phyclust_se_em.h"
+#include "phyclust_se_convolution_logpL.h"
+
 #endif	/* End of __PHYCLUST_. */

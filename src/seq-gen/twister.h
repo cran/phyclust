@@ -40,9 +40,10 @@
 #ifndef _TWISTER_H_
 #define _TWISTER_H_
 
-void SetSeed (unsigned long seed);
+//WCC void SetSeed (unsigned long seed);
 unsigned long CreateSeed(void);
-double rndu (void);
+//WCC double rndu (void);
+double seq_gen_rndu (void);
 
 #endif /* _TWISTER_H_ */
 

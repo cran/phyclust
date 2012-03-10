@@ -1,7 +1,7 @@
 \name{as.star.tree}
 \alias{as.star.tree}
 \alias{Class phylo}
-\title{Coerce a rooted tree to a star tree in Class phylo}
+\title{Coerce a Rooted Tree to a Star Tree in Class phylo}
 \description{
   Coerce a rooted tree generating by \code{ms} to a star tree and
   maintain a bifurcation structure.

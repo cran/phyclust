@@ -1,4 +1,5 @@
 \name{print.object}
+\alias{print.baseml}
 \alias{print.ms}
 \alias{print.phyclust}
 \alias{print.Pt}
@@ -6,12 +7,13 @@
 \alias{print.seq.data}
 \alias{print.seqgen}
 \alias{summary.phyclust}
-\title{Functions for printing or summarizing objects according to classes}
+\title{Functions for Printing or Summarizing Objects According to Classes}
 \description{
   Several classes are declared in \pkg{phyclust}, and these are functions
   to print and summary objects.
 }
 \usage{
+\method{print}{baseml}(x, ...)
 \method{print}{ms}(x, ...)
 \method{print}{phyclust}(x, digits = max(4, getOption("digits") - 3), ...)
 \method{print}{Pt}(x, ...)
@@ -29,8 +31,8 @@
 \details{
   These are useful functions for summarizing and debugging.
 
-  For \code{ms} and \code{seqgen}, it will show the result as
-  standalone versions on the STDOUT out with line by line.
+  For \code{ms}, \code{seqgen}, and \code{paml.baseml}, it will show the
+  result as standalone versions on the STDOUT out with line by line.
 
   For other functions, they only show summaries of objects. Use
   \code{names} or \code{str} to explore the details.
@@ -47,6 +49,7 @@
 }
 \seealso{
   \code{\link{ms}},
+  \code{\link{paml.baseml}},
   \code{\link{phyclust}},
   \code{\link{phyclust.Pt}},
   \code{\link{RRand}},

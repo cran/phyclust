@@ -16,8 +16,12 @@
 #include "twister.h"
 #include "gamma.h"
 
-double LnGamma (double alpha);
-double IncompleteGamma (double x, double alpha, double ln_gamma_alpha);
+//WCC double LnGamma (double alpha);
+double seq_gen_LnGamma (double alpha);
+
+//WCC double IncompleteGamma (double x, double alpha, double ln_gamma_alpha);
+double seq_gen_IncompleteGamma (double x, double alpha, double ln_gamma_alpha);
+
 double PointNormal (double prob);
 double PointChi2 (double prob, double v);
 
@@ -25,7 +29,8 @@ double PointChi2 (double prob, double v);
 double rndgamma1 (double s);
 double rndgamma2 (double s);
 
-double rndgamma (double s)
+//WCC double rndgamma (double s)
+double seq_gen_rndgamma (double s)
 {
 	double	r=0.0;
 	
@@ -36,7 +41,8 @@ double rndgamma (double s)
 	else if (s > 1.0)  
 		r = rndgamma2 (s);
 	else           
-		r =- log(rndu());
+//WCC		r =- log(rndu());
+		r =- log(seq_gen_rndu());
 	return (r);
 }
 
@@ -57,14 +63,16 @@ double rndgamma1 (double s)
 		}
 	for (;;) 
 		{
-		r = rndu();
+//WCC		r = rndu();
+		r = seq_gen_rndu();
 		if (r > p)        
 			x = a-log((1.0-r)/(1.0-p)), w=a*log(x)-d;
 		else if (r>uf)  
 			x = a*pow(r/p,1/s), w=x;
 		else            
 			return (0.0);
-		r = rndu();
+//WCC		r = rndu();
+		r = seq_gen_rndu();
 		if (1.0-r <= w && r > 0.0)
 			if (r*(w+1.0) >= 1.0 || -log(r) <= w)  
 				continue;
@@ -88,13 +96,15 @@ double rndgamma2 (double s)
 		}
 	for (;;) 
 		{
-		r = rndu();
+//WCC		r = rndu();
+		r = seq_gen_rndu();
 		g = r-r*r;
 		f = (r-0.5)*h/sqrt(g);
 		x = b+f;
 		if (x <= 0.0) 
 			continue;
-		r = rndu();
+//WCC		r = rndu();
+		r = seq_gen_rndu();
 		d = 64*r*r*g*g*g;
 		if (d*x < x-2.0*f*f || log(d) < 2*(b*log(x/b)-f))  
 			break;
@@ -103,7 +113,8 @@ double rndgamma2 (double s)
 }
 
 
-double LnGamma (double alpha)
+//WCC double LnGamma (double alpha)
+double seq_gen_LnGamma (double alpha)
 {
 /* returns ln(gamma(alpha)) for alpha>0, accurate to 10 decimal places.  
    Stirling's formula is used for the central polynomial part of the procedure.
@@ -123,7 +134,8 @@ double LnGamma (double alpha)
 	       +.083333333333333)/x;  
 }
 
-double IncompleteGamma (double x, double alpha, double ln_gamma_alpha)
+//WCC double IncompleteGamma (double x, double alpha, double ln_gamma_alpha)
+double seq_gen_IncompleteGamma (double x, double alpha, double ln_gamma_alpha)
 {
 /* returns the incomplete gamma ratio I(x,alpha) where x is the upper 
 	   limit of the integration and alpha is the shape parameter.
@@ -226,7 +238,8 @@ double PointChi2 (double prob, double v)
 
    if (p<.000002 || p>.999998 || v<=0) return (-1);
 
-   g = LnGamma (v/2);
+//WCC   g = LnGamma (v/2);
+   g = seq_gen_LnGamma (v/2);
    xx=v/2;   c=xx-1;
    if (v >= -1.24*log(p)) goto l1;
 
@@ -249,7 +262,8 @@ l3:
    if (ch>2.2*v+6)  ch=-2*(log(1-p)-c*log(.5*ch)+g);
 l4:
    q=ch;   p1=.5*ch;
-   if ((t=IncompleteGamma (p1, xx, g))<0) {
+//WCC   if ((t=IncompleteGamma (p1, xx, g))<0) {
+   if ((t=seq_gen_IncompleteGamma (p1, xx, g))<0) {
       return (-1);
    }
    p2=p-t;
@@ -271,7 +285,8 @@ l4:
 
 #define PointGamma(prob,alpha,beta) PointChi2(prob,2.0*(alpha))/(2.0*(beta))
 
-int DiscreteGamma (double freqK[], double rK[], 
+//WCC int DiscreteGamma (double freqK[], double rK[], 
+int seq_gen_DiscreteGamma (double freqK[], double rK[], 
     double alfa, double beta, int K, int median)
 {
 /* discretization of gamma distribution with equal proportions in each 
@@ -286,11 +301,13 @@ int DiscreteGamma (double freqK[], double rK[],
       for (i=0; i<K; i++)     rK[i]*=factor/t;
    }
    else {
-      lnga1=LnGamma(alfa+1);
+//WCC      lnga1=LnGamma(alfa+1);
+      lnga1=seq_gen_LnGamma(alfa+1);
       for (i=0; i<K-1; i++)
 	 freqK[i]=PointGamma((i+1.0)/K, alfa, beta);
       for (i=0; i<K-1; i++)
-	 freqK[i]=IncompleteGamma(freqK[i]*beta, alfa+1, lnga1);
+//WCC	 freqK[i]=IncompleteGamma(freqK[i]*beta, alfa+1, lnga1);
+	 freqK[i]=seq_gen_IncompleteGamma(freqK[i]*beta, alfa+1, lnga1);
       rK[0] = freqK[0]*factor;
       rK[K-1] = (1-freqK[K-2])*factor;
       for (i=1; i<K-1; i++)  rK[i] = (freqK[i]-freqK[i-1])*factor;

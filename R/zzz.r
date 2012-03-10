@@ -1,6 +1,6 @@
 .First.lib <- function(lib, pkg)
 {
-  library(ape)
+#  library(ape)
   library.dynam("phyclust", pkg, lib)
 } # End of .First.lib()
 

@@ -1,7 +1,7 @@
 \name{.label.method}
 \alias{.label.method}
 \docType{data}
-\title{Label method}
+\title{Label Method}
 \description{
   An object stores label method for un-, semi-, and general semi-
   supervised clustering..

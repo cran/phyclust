@@ -60,7 +60,7 @@ SEXP R_phyclust_em_step(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
 
 	/* Assign data, read only. */
 	pcs = R_initialize_phyclust_struct(EMC->code_type, *C_N_X_org, *C_L, *C_K);
-	emobj = initialize_emptr(emptr, pcs);
+	emobj = initialize_emptr(emptr, pcs);			/* !! Don't move this. */
 	tmp_ptr = INTEGER(R_X);
 	for(i = 0; i < *C_N_X_org; i++){
 		pcs->X_org[i] = tmp_ptr;			/* Assign poiners. */
@@ -98,7 +98,7 @@ SEXP R_phyclust_em_step(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
 	new_QA = duplicate_Q_matrix_array(org_QA);
 
 	/* Compute. */
-	E_step_simple(empcs, new_QA);
+	E_step_simple(empcs, new_QA, EMFP);
 	M_step_simple(empcs, new_QA, org_QA, EMC, EMFP, tmp_empcs, tmp_QA);
 	empcs->logL_observed = EMFP->LogL_observed(empcs, new_QA);
 	EMFP->Copy_empcs_to_pcs(empcs, pcs);
@@ -214,9 +214,9 @@ SEXP R_phyclust_e_step(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
 
 	/* Compute. */
 	if(*C_Z_state == 1){
-		E_step_simple(empcs, QA);
+		E_step_simple(empcs, QA, EMFP);
 	} else{
-		update_Z_modified(empcs, QA);
+		EMFP->Update_Z_modified(empcs, QA);
 	}
 	EMFP->Copy_empcs_to_pcs(empcs, pcs);
 

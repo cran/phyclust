@@ -1,6 +1,6 @@
 \name{get.rooted.tree.height}
 \alias{get.rooted.tree.height}
-\title{Get a rooted tree height}
+\title{Get a Rooted Tree Height}
 \description{
   This function gets a rooted tree height, and only meaningful for
   a \strong{ultrametric} tree which has the equal height from the root to

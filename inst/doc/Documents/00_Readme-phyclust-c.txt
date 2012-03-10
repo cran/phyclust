@@ -15,4 +15,4 @@ type the following,
 > test_toy Tt.009.anc.015.phy 4 0 0 3 2 0 2 3 10 0
 > test_toy Tt.009.anc.015.missing.phy 4 0 0 3 2 0 2 3 10 0
 
-:Wei-Chen Chen
+Wei-Chen Chen

@@ -1,6 +1,6 @@
 \name{find.best}
 \alias{find.best}
-\title{Find the best solution of phyclust}
+\title{Find the Best Solution of phyclust}
 \description{
   Based on input initialization procedures and methods,
   this function tries to find the best solution in terms of the highest

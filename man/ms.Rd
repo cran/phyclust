@@ -13,7 +13,7 @@ ms(nsam = NULL, nreps = 1, opts = NULL)
 \arguments{
   \item{nsam}{number of samples/coalescent trees, usually greater than 2.}
   \item{nreps}{number of replications.}
-  \item{opts}{options as the standalone version}
+  \item{opts}{options as the standalone version.}
 }
 \details{
   This function directly reuses the C code of \code{ms} by arguments
@@ -31,9 +31,13 @@ ms(nsam = NULL, nreps = 1, opts = NULL)
 }
 \value{
   This function returns a vector, and each element stores one line of STDOUT
-  of \code{ms} separated by newline, and store as a class \code{ms}.
+  of \code{ms} separated by newline. The vector stores in a class \code{ms}.
   The details of output format can found on the website
   \url{http://home.uchicago.edu/~rhudson1/source.html} and its manual.
+}
+\section{Warning(s)}{
+  Carefully read the \code{ms}'s original document before using the \code{ms}
+  function.
 }
 \references{
   Phylogenetic Clustering Website:
@@ -95,4 +99,4 @@ plot(tree.joint, main = paste("joint (", N, ")", sep = ""))
 axis(1)
 }
 }
-\keyword{programming}
+\keyword{ms}

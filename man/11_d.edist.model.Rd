@@ -1,7 +1,7 @@
 \name{.edist.model}
 \alias{.edist.model}
 \docType{data}
-\title{Evolution distance model}
+\title{Evolution Distance Model}
 \description{
   Evolution distances based on certain evolution models as in \pkg{ape}. 
   The implemented model is used in \code{phyclust.edist} and initializations

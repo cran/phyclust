@@ -187,10 +187,10 @@ double genrand_res53(void)
 } 
 /* These real versions are due to Isaku Wada, 2002/01/09 added */
 
-void SetSeed(unsigned long seed)
-{
-	init_genrand(seed);
-}
+//WCC void SetSeed(unsigned long seed)
+//WCC {
+//WCC 	init_genrand(seed);
+//WCC }
 
 unsigned long CreateSeed( )
 {
@@ -234,11 +234,11 @@ unsigned long CreateSeed( )
 #else
 	#include <stdlib.h>
 #endif
-double rndu(){
+double seq_gen_rndu(){
 	#ifdef __HAVE_R_ 
 		return(runif(0, 1));	/* Generate a uniform(0, 1). */
 	#else
 		return((double) rand() / ((double) RAND_MAX + 1.0));
 	#endif
-} /* End of rndu(). */
+} /* End of seq_gen_rndu(). */
 

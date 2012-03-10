@@ -88,11 +88,11 @@ void e_step_with_stable_exp(int *K, double *a_Z_normalized, double *total_sum, d
 
 
 /* This is a original version of E-step, and has some numerical problems such as overflow or underflow. */
-void E_step_original(em_phyclust_struct *empcs, Q_matrix_array *QA){
+void E_step_original(em_phyclust_struct *empcs, Q_matrix_array *QA, em_fp *EMFP){
 	int n_X, k, K = empcs->K;
 	double total_sum;
 
-	update_Z_modified(empcs, QA);	/* Update empcs->Z_modified (log and unnormalized). */
+	EMFP->Update_Z_modified(empcs, QA);	/* Update empcs->Z_modified (log and unnormalized). */
 	for(n_X = 0; n_X < empcs->N_X; n_X++){	/* Update Z_normalized. */
 		total_sum = 0.0;
 		for(k = 0; k < K; k++){
@@ -107,11 +107,11 @@ void E_step_original(em_phyclust_struct *empcs, Q_matrix_array *QA){
 } /* End of E_step_original(). */
 
 /* E-steps simple verion. */
-void E_step_simple(em_phyclust_struct *empcs, Q_matrix_array *QA){
+void E_step_simple(em_phyclust_struct *empcs, Q_matrix_array *QA, em_fp *EMFP){
 	int n_X, k, K = empcs->K, flag_out_range;
 	double total_sum, scale_exp;
 
-	update_Z_modified(empcs, QA);	/* Update empcs->Z_modified (log and unnormalized). */
+	EMFP->Update_Z_modified(empcs, QA);	/* Update empcs->Z_modified (log and unnormalized). */
 	for(n_X = 0; n_X < empcs->N_X; n_X++){	/* Update Z_normalized. */
 		for(k = 0; k < K; k++){
 			empcs->Z_normalized[n_X][k] = empcs->Z_modified[n_X][k] + empcs->log_Eta[k];
@@ -122,11 +122,11 @@ void E_step_simple(em_phyclust_struct *empcs, Q_matrix_array *QA){
 } /* End of E_step_simple(). */
 
 /* E-steps with none labels. */
-void E_step_logL_observed(em_phyclust_struct *empcs, Q_matrix_array *QA){
+void E_step_logL_observed(em_phyclust_struct *empcs, Q_matrix_array *QA, em_fp *EMFP){
 	int n_X, k, K = empcs->K, flag_out_range;
 	double total_sum, scale_exp;
 
-	update_Z_modified(empcs, QA);	/* Update empcs->Z_modified (log and unnormalized). */
+	EMFP->Update_Z_modified(empcs, QA);	/* Update empcs->Z_modified (log and unnormalized). */
 	empcs->logL_observed = 0.0;
 	for(n_X = 0; n_X < empcs->N_X; n_X++){	/* Update Z_normalized and logL_observed. */
 		for(k = 0; k < K; k++){
@@ -136,23 +136,24 @@ void E_step_logL_observed(em_phyclust_struct *empcs, Q_matrix_array *QA){
 		e_step_with_stable_exp(&K, empcs->Z_normalized[n_X], &total_sum, &scale_exp, &flag_out_range);
 
 		/* Update logL_observed. */
-		if(empcs->replication_X[n_X] == 1){
-			empcs->logL_observed += log(total_sum);
-		} else{
-			empcs->logL_observed += log(total_sum) * empcs->replication_X[n_X];
-		}
+		total_sum = log(total_sum);
 		if(flag_out_range){
-			empcs->logL_observed += scale_exp;
+			total_sum += scale_exp;
+		}
+		if(empcs->replication_X[n_X] == 1){
+			empcs->logL_observed += total_sum;
+		} else{
+			empcs->logL_observed += total_sum * empcs->replication_X[n_X];
 		}
 	}
 } /* End of E_step_logL_observed(). */
 
 /* E-steps with simple labels. */
-void E_step_logL_observed_label_semi(em_phyclust_struct *empcs, Q_matrix_array *QA){
+void E_step_logL_observed_label_semi(em_phyclust_struct *empcs, Q_matrix_array *QA, em_fp *EMFP){
 	int n_X, k, K = empcs->K, flag_out_range;
 	double total_sum, scale_exp;
 
-	update_Z_modified(empcs, QA);	/* Update empcs->Z_modified (log and unnormalized). */
+	EMFP->Update_Z_modified(empcs, QA);	/* Update empcs->Z_modified (log and unnormalized). */
 	empcs->logL_observed = 0.0;
 
 	/* For unlabeled part. */
@@ -164,13 +165,14 @@ void E_step_logL_observed_label_semi(em_phyclust_struct *empcs, Q_matrix_array *
 		e_step_with_stable_exp(&K, empcs->Z_normalized_unlabeled[n_X], &total_sum, &scale_exp, &flag_out_range);
 
 		/* Update logL_observed. */
-		if(empcs->replication_X[n_X] == 1){
-			empcs->logL_observed += log(total_sum);
-		} else{
-			empcs->logL_observed += log(total_sum) * empcs->replication_X[n_X];
-		}
+		total_sum = log(total_sum);
 		if(flag_out_range){
-			empcs->logL_observed += scale_exp;
+			total_sum += scale_exp;
+		}
+		if(empcs->replication_X[n_X] == 1){
+			empcs->logL_observed += total_sum;
+		} else{
+			empcs->logL_observed += total_sum * empcs->replication_X[n_X];
 		}
 	}
 
@@ -190,7 +192,7 @@ void E_step_logL_observed_label_semi(em_phyclust_struct *empcs, Q_matrix_array *
 } /* End of E_step_logL_observed_label_semi(). */
 
 /* E-steps with general labels. */
-void E_step_logL_observed_label_general(em_phyclust_struct *empcs, Q_matrix_array *QA){
+void E_step_logL_observed_label_general(em_phyclust_struct *empcs, Q_matrix_array *QA, em_fp *EMFP){
 } /* End of E_step_logL_observed_label_general(). */
 
 
@@ -210,7 +212,7 @@ int M_step_simple(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array 
 	if(ret_stop > 0){
 		return(ret_stop);
 	}
-	maximize_logpL(empcs, QA, QA_H, EMC, EMFP);	/* Find QA, Tt, and Mu. */
+	EMFP->Maximize_logpL(empcs, QA, QA_H, EMC, EMFP);	/* Find QA, Tt, and Mu. */
 	return(ret_stop);
 } /* End of M_step_simple(). */
 
@@ -227,7 +229,7 @@ int M_step_CM(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_
 	int ret_stop = 0, cm_iter = 1, flag = 1;
 	double cm_reltol = 0.0, R = 0.0, tmp_R = 0.0;
 
-	copy_empcs(empcs, tmp_empcs);
+	EMFP->Copy_empcs(empcs, tmp_empcs);
 	tmp_QA->Copy_Q_matrix_array(QA, tmp_QA);
 
 	ret_stop = EMFP->Update_Eta_given_Z(tmp_empcs, EMC);	/* Update Eta given Z_normalized. */
@@ -236,22 +238,22 @@ int M_step_CM(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_
 	}
 
 	EMFP->Update_Mu_given_QA(tmp_empcs, tmp_QA, QA_H);	/* Update Mu given Eta and QA. */ 
-	update_Z_modified(tmp_empcs, tmp_QA);			/* Update empcs->Z_modified (log and unnormalized). */
-	maximize_logpL(tmp_empcs, QA, QA_H, EMC, EMFP);		/* Update QA given Eta and Mu. */ 
+	EMFP->Update_Z_modified(tmp_empcs, tmp_QA);		/* Update empcs->Z_modified (log and unnormalized). */
+	EMFP->Maximize_logpL(tmp_empcs, QA, QA_H, EMC, EMFP);	/* Update QA given Eta and Mu. */ 
 	tmp_QA->Update_log_Pt(tmp_QA);
-	update_Z_modified(tmp_empcs, tmp_QA);			/* Update empcs->Z_modified (log and unnormalized). */
+	EMFP->Update_Z_modified(tmp_empcs, tmp_QA);		/* Update empcs->Z_modified (log and unnormalized). */
 	tmp_R = EMFP->Compute_R(tmp_empcs, tmp_QA, QA_H);	/* Compute R(Mu, QA, Tt). */
 	do{
-		copy_empcs(tmp_empcs, empcs);
+		EMFP->Copy_empcs(tmp_empcs, empcs);
 		tmp_QA->Copy_Q_matrix_array(tmp_QA, QA);
 		R = tmp_R;
 
-		EMFP->Update_Mu_given_QA(tmp_empcs, tmp_QA, QA_H);	/* Update Mu given Eta and QA. */ 
-		update_Z_modified(tmp_empcs, tmp_QA);			/* Update empcs->Z_modified (log and unnormalized). */
-		maximize_logpL(tmp_empcs, tmp_QA, QA_H, EMC, EMFP);	/* Update QA given Eta and Mu. */ 
+		EMFP->Update_Mu_given_QA(tmp_empcs, tmp_QA, QA_H);		/* Update Mu given Eta and QA. */ 
+		EMFP->Update_Z_modified(tmp_empcs, tmp_QA);			/* Update empcs->Z_modified (log and unnormalized). */
+		EMFP->Maximize_logpL(tmp_empcs, tmp_QA, QA_H, EMC, EMFP);	/* Update QA given Eta and Mu. */ 
 		tmp_QA->Update_log_Pt(tmp_QA);
-		update_Z_modified(tmp_empcs, tmp_QA);			/* Update empcs->Z_modified (log and unnormalized). */
-		tmp_R = EMFP->Compute_R(tmp_empcs, tmp_QA, QA_H);	/* Compute R(Mu, QA, Tt). */
+		EMFP->Update_Z_modified(tmp_empcs, tmp_QA);			/* Update empcs->Z_modified (log and unnormalized). */
+		tmp_R = EMFP->Compute_R(tmp_empcs, tmp_QA, QA_H);		/* Compute R(Mu, QA, Tt). */
 
 		if(tmp_R < R){
 			flag = 0;
@@ -263,7 +265,7 @@ int M_step_CM(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_
 	} while((cm_reltol > EMC->cm_reltol) && (cm_iter < EMC->cm_maxit));
 
 	if(flag){
-		copy_empcs(tmp_empcs, empcs);
+		EMFP->Copy_empcs(tmp_empcs, empcs);
 		tmp_QA->Copy_Q_matrix_array(tmp_QA, QA);
 	}
 	EMC->converge_cm_iter += cm_iter;
@@ -286,10 +288,10 @@ int M_step_ACM(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA
 	if(ret_stop){
 		return(ret_stop);
 	}
-	E_step_simple(empcs, QA);
-	EMFP->Update_Mu_given_QA(empcs, QA, QA_H);	/* Update Mu given Eta and QA. */ 
-	E_step_simple(empcs, QA);
-	maximize_logpL(empcs, QA, QA_H, EMC, EMFP);	/* Update QA given Eta and Mu. */ 
+	E_step_simple(empcs, QA, EMFP);
+	EMFP->Update_Mu_given_QA(empcs, QA, QA_H);		/* Update Mu given Eta and QA. */ 
+	E_step_simple(empcs, QA, EMFP);
+	EMFP->Maximize_logpL(empcs, QA, QA_H, EMC, EMFP);	/* Update QA given Eta and Mu. */ 
 	QA->Update_log_Pt(QA);
 	EMC->converge_cm_iter++;
 	return(ret_stop);
@@ -377,7 +379,7 @@ int Update_Eta_given_Z_IGNORE(em_phyclust_struct *empcs, em_control *EMC){
 
 
 /* For each sequence, compute log_Pt for all (n, k) cells and save in empcs->Z_modified (log and unnormalized). */
-void update_Z_modified(em_phyclust_struct *empcs, Q_matrix_array *QA){
+void Update_Z_modified(em_phyclust_struct *empcs, Q_matrix_array *QA){
 	int s_from, s_to, n_X, k;
 
 	for(n_X = 0; n_X < empcs->N_X; n_X++){
@@ -394,7 +396,7 @@ void update_Z_modified(em_phyclust_struct *empcs, Q_matrix_array *QA){
 			}
 		}
 	}
-} /* End of update_Z_modified(). */
+} /* End of Update_Z_modified(). */
 
 
 void print_status(em_phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, int verbosity){
@@ -428,7 +430,7 @@ void print_status(em_phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, 
  * update_flag = 0 for update Mu given QA. (for profile logL)
  *             = 1 for update QA given Mu. (for profile logL and ECM/AECM) */
 int Check_convergence_em(em_phyclust_struct *new_empcs, em_phyclust_struct *org_empcs, Q_matrix_array *new_QA,
-		Q_matrix_array *org_QA, Q_matrix_array *QA_H, em_control *EMC){
+		Q_matrix_array *org_QA, Q_matrix_array *QA_H, em_control *EMC, em_fp *EMFP){
 	int ret_stop = 0;
 	if(new_empcs->logL_observed < org_empcs->logL_observed){	/* logL decreasing. */
 		if(EMC->update_flag == 0){				/* change to update Q, Tt given Mu. */
@@ -440,7 +442,7 @@ int Check_convergence_em(em_phyclust_struct *new_empcs, em_phyclust_struct *org_
 		}
 
 		/* Restore to orginal setting with heigher logL. */
-		copy_empcs(org_empcs, new_empcs);			/* Repalce object with higher logL. */
+		EMFP->Copy_empcs(org_empcs, new_empcs);			/* Repalce object with higher logL. */
 		org_QA->Copy_Q_matrix_array(org_QA, new_QA);
 		QA_H->Copy_Q_matrix_array(QA_H, org_QA);
 	} else{
@@ -452,7 +454,7 @@ int Check_convergence_em(em_phyclust_struct *new_empcs, em_phyclust_struct *org_
 } /* End of Check_convergence_em(). */
 
 int Check_convergence_org(em_phyclust_struct *new_empcs, em_phyclust_struct *org_empcs, Q_matrix_array *new_QA,
-		Q_matrix_array *org_QA, Q_matrix_array *QA_H, em_control *EMC){
+		Q_matrix_array *org_QA, Q_matrix_array *QA_H, em_control *EMC, em_fp *EMFP){
 	int ret_stop = 0;
 	if(new_empcs->logL_observed < org_empcs->logL_observed){	/* logL decreasing. */
 		EMC->converge_flag = 9;
@@ -460,7 +462,7 @@ int Check_convergence_org(em_phyclust_struct *new_empcs, em_phyclust_struct *org
 		ret_stop = 1;
 
 		/* Restore to orginal setting with heigher logL. */
-		copy_empcs(org_empcs, new_empcs);			/* Repalce object with higher logL. */
+		EMFP->Copy_empcs(org_empcs, new_empcs);			/* Repalce object with higher logL. */
 		org_QA->Copy_Q_matrix_array(org_QA, new_QA);
 		QA_H->Copy_Q_matrix_array(QA_H, org_QA);
 	}
@@ -498,10 +500,14 @@ void Em_step(em_phyclust_struct *org_empcs, Q_matrix_array *org_QA, em_control *
 		}
 		printf("\n");
 		print_QA(new_QA);
+		printf("\n");
+		if(EMC->se_type == SE_YES){
+			new_empcs->SE_P->Print_f_err(new_empcs->SE_P);
+		}
 	#endif
 
 	EMC->update_flag = (EMC->em_method == EM) ? 0 : 1;
-	EMFP->E_step_logL_observed(new_empcs, new_QA);
+	EMFP->E_step_logL_observed(new_empcs, new_QA, EMFP);
 	#if (EMDEBUG & 1) == 1
 		double tmp_logL;
 		printf("iter: %d, update_flag: %d\n", EMC->converge_iter - 1, EMC->update_flag);
@@ -518,7 +524,7 @@ void Em_step(em_phyclust_struct *org_empcs, Q_matrix_array *org_QA, em_control *
 			print_status(new_empcs, new_QA, EMC, verbosity_em_step);
 		#endif
 
-		copy_empcs(new_empcs, org_empcs);
+		EMFP->Copy_empcs(new_empcs, org_empcs);
 		org_QA->Copy_Q_matrix_array(org_QA, QA_H);
 		new_QA->Copy_Q_matrix_array(new_QA, org_QA);
 
@@ -542,7 +548,7 @@ void Em_step(em_phyclust_struct *org_empcs, Q_matrix_array *org_QA, em_control *
 			printf("    conv.: R = %.6f, Q = %.6f, Obs = %.6f. [indep fcn]\n", tmp_R, tmp_Q, tmp_obs);
 		#endif
 
-		EMFP->E_step_logL_observed(new_empcs, new_QA);
+		EMFP->E_step_logL_observed(new_empcs, new_QA, EMFP);
 
 		EMC->converge_eps = fabs(new_empcs->logL_observed / org_empcs->logL_observed - 1.0);
 		EMC->converge_iter++;
@@ -556,7 +562,7 @@ void Em_step(em_phyclust_struct *org_empcs, Q_matrix_array *org_QA, em_control *
 			printf("iter: %d, update_flag: %d\n", EMC->converge_iter, EMC->update_flag);
 		#endif
 
-		ret_stop = EMFP->Check_convergence(new_empcs, org_empcs, new_QA, org_QA, QA_H, EMC);
+		ret_stop = EMFP->Check_convergence(new_empcs, org_empcs, new_QA, org_QA, QA_H, EMC, EMFP);
 		if(ret_stop){
 			break;	/* logL is decreasing and fails after switch. */
 		}
@@ -571,7 +577,7 @@ void Em_step(em_phyclust_struct *org_empcs, Q_matrix_array *org_QA, em_control *
 	}
 
 	if(EMC->converge_flag < 2){
-		copy_empcs(new_empcs, org_empcs);
+		EMFP->Copy_empcs(new_empcs, org_empcs);
 		org_QA->Copy_Q_matrix_array(new_QA, org_QA);
 	}
 
@@ -619,11 +625,11 @@ void Short_em_step(em_phyclust_struct *org_empcs, Q_matrix_array *org_QA, em_con
 	#endif
 
 	EMC->update_flag = (EMC->em_method == EM) ? 0 : 1;
-	EMFP->E_step_logL_observed(new_empcs, new_QA);
+	EMFP->E_step_logL_observed(new_empcs, new_QA, EMFP);
 	logL_0 = new_empcs->logL_observed;
 	#if (EMDEBUG & 1) == 1
 		printf("iter: %d, update_flag: %d\n", EMC->converge_iter - 1, EMC->update_flag);
-		update_Z_modified(org_empcs, org_QA);
+		EMFP->Update_Z_modified(org_empcs, org_QA);
 		tmp_logL = EMFP->LogL_observed(org_empcs, org_QA);
 		if(is_finite(org_empcs->logL_observed)){
 			printf("  logL: %.8f, %.8f [indep fcn]\n", org_empcs->logL_observed, tmp_logL);
@@ -633,7 +639,7 @@ void Short_em_step(em_phyclust_struct *org_empcs, Q_matrix_array *org_QA, em_con
 		printf("iter: %d, update_flag: %d\n", EMC->converge_iter, EMC->update_flag);
 	#endif
 	do{
-		copy_empcs(new_empcs, org_empcs);
+		EMFP->Copy_empcs(new_empcs, org_empcs);
 		org_QA->Copy_Q_matrix_array(org_QA, QA_H);
 		new_QA->Copy_Q_matrix_array(new_QA, org_QA);
 
@@ -657,7 +663,7 @@ void Short_em_step(em_phyclust_struct *org_empcs, Q_matrix_array *org_QA, em_con
 			printf("    conv.: R = %.6f, Q = %.6f, Obs = %.6f. [indep fcn]\n", tmp_R, tmp_Q, tmp_obs);
 		#endif
 
-		EMFP->E_step_logL_observed(new_empcs, new_QA);
+		EMFP->E_step_logL_observed(new_empcs, new_QA, EMFP);
 
 		EMC->converge_eps = (org_empcs->logL_observed - new_empcs->logL_observed) /
 			(logL_0 - new_empcs->logL_observed);
@@ -672,7 +678,7 @@ void Short_em_step(em_phyclust_struct *org_empcs, Q_matrix_array *org_QA, em_con
 			printf("iter: %d, update_flag: %d\n", EMC->converge_iter, EMC->update_flag);
 		#endif
 
-		ret_stop = EMFP->Check_convergence(new_empcs, org_empcs, new_QA, org_QA, QA_H, EMC);
+		ret_stop = EMFP->Check_convergence(new_empcs, org_empcs, new_QA, org_QA, QA_H, EMC, EMFP);
 		if(ret_stop){
 			break;	/* logL is decreasing and fails after switch. */
 		}
@@ -683,7 +689,7 @@ void Short_em_step(em_phyclust_struct *org_empcs, Q_matrix_array *org_QA, em_con
 	}
 
 	if(EMC->converge_flag < 2){
-		copy_empcs(new_empcs, org_empcs);
+		EMFP->Copy_empcs(new_empcs, org_empcs);
 		org_QA->Copy_Q_matrix_array(new_QA, org_QA);
 	}
 

@@ -1,6 +1,6 @@
 \name{.show.option}
 \alias{.show.option}
-\title{Show available options}
+\title{Show Available Options}
 \description{
   This function show available options for functions in \pkg{phyclust}.
 }

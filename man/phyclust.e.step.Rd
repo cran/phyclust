@@ -1,6 +1,6 @@
 \name{phyclust.e.step}
 \alias{phyclust.e.step}
-\title{One E-step of phyclust}
+\title{One E-Step of phyclust}
 \description{
   This is a single E-step of \code{phyclust}, usually following or followed
   by the other M-step.
@@ -79,4 +79,4 @@ semi.label[1:3] <- 1
 ret.3 <- phyclust.e.step(X, ret.phyclust = ret.1, label = semi.label)
 }
 }
-\keyword{programming}
+\keyword{phyclust stepwised}

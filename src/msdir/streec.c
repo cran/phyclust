@@ -31,7 +31,13 @@
 #include <stdlib.h>
 #include <math.h>
 #include "ms.h"
+
+//WCC #define NL putchar('\n')
+//WCC:add
+#ifndef __HAVE_R_
 #define NL putchar('\n')
+#endif
+
 #define size_t unsigned
 
 #define MIN(x, y) ( (x)<(y) ? (x) : (y) )
@@ -39,7 +45,14 @@
 #ifdef ERROR
 #undef ERROR
 #endif
+
+//WCC #define ERROR(message) fprintf(stderr,message),NL,exit(1)
+//WCC:add
+#ifndef __HAVE_R_
 #define ERROR(message) fprintf(stderr,message),NL,exit(1)
+#else
+#define ERROR(message) REprintf(message),error("%d\n",1)
+#endif
 
 //WCC #define SEGINC 80 
 
@@ -153,7 +166,8 @@ segtre_mig(struct c_params *cp, int *pnsegs )
 			
 			chrom[ind].nseg = 1;
 			if( !(chrom[ind].pseg = (struct seg*)malloc((unsigned)sizeof(struct seg)) ))
-			  ERROR("calloc error. se1");
+//WCC			  ERROR("calloc error. se1");
+			  ERROR("calloc error. se1\n");
 
 			(chrom[ind].pseg)->beg = 0;
 			(chrom[ind].pseg)->end = nsites-1;
@@ -540,7 +554,8 @@ xover(int nsam,int ic, int is)
 	    if( chrom == NULL ) perror( "malloc error. segtre2");
 	    }
 	if( !( pseg2 = chrom[nchrom-1].pseg = (struct seg *)calloc((unsigned)newsg,sizeof(struct seg)) ) )
-		ERROR(" alloc error. re1");
+//WCC		ERROR(" alloc error. re1");
+		ERROR(" alloc error. re1\n");
 	chrom[nchrom-1].nseg = newsg;
 	chrom[nchrom-1].pop = chrom[ic].pop ;
 	pseg2->end = (pseg+jseg)->end ;

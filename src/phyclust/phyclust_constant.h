@@ -75,6 +75,7 @@ enum {randomMu, NJ, randomNJ, PAM, kMedoids, manualMu};			/* Initialization meth
 static char VARIABLE_IS_NOT_USED *INIT_METHOD[N_INIT_METHOD] =
 	{"randomMu", "NJ", "randomNJ", "PAM", "K-Medoids", "manualMu"};
 
+
 /* Substitution models. */
 #define N_SUB_MODEL 9							/* Number of evolution models. */
 enum {JC69, K80, F81, HKY85, SNP_JC69, SNP_F81,
@@ -85,9 +86,25 @@ static char VARIABLE_IS_NOT_USED *SUBSTITUTION_MODEL[N_SUB_MODEL] =
 
 /* Distance models. */
 #define N_EDIST 4
-enum {D_JC69, D_K80, D_HAMMING, D_HAMMING_WOGAP};					/* Distance models. */
+enum {D_JC69, D_K80, D_HAMMING, D_HAMMING_WOGAP};			/* Distance models. */
 static char VARIABLE_IS_NOT_USED *EDISTANCE_MODEL[N_EDIST] =
 	{"D_JC69", "D_K80", "D_HAMMING", "D_HAMMING_WOGAP"};
+
+/* Sequencing error models for nucleotide only. */
+#define N_SE_TYPE 2
+enum {SE_NO, SE_YES};							/* Sequencing error types. */
+static char VARIABLE_IS_NOT_USED *SE_TYPE[N_SE_TYPE] =
+	{"SE_NO", "SE_YES"};
+#define N_SE_MODEL 1
+enum {SE_CONVOLUTION};							/* Seaquencing error models. */
+static char VARIABLE_IS_NOT_USED *SE_MODEL[N_SE_MODEL] =
+	{"SE_CONVOLUTION"};
+#define SE_CONSTANT 1e-2
+
+//#define N_SE_P_MODEL 2
+//enum {SE_P_NONE, SE_CONVOLUTION, SE_P_UNSTRUCT, SE_P_SYMMETRIC};			/* Seaquencing error models. */
+//static char VARIABLE_IS_NOT_USED *SE_P_MODEL[N_SE_P_MODEL] =
+//	{"SE_P_NONE", "SE_P_CONVOLUTION", "SE_P_UNSTRUCT", "SE_P_SYMMETRIC"};
 
 
 /* Identifier for constraints. */
@@ -98,10 +115,10 @@ static char VARIABLE_IS_NOT_USED *IDENTIFIER[N_IDENTIFIER] =
 
 
 /* EM methods. */
-#define N_EM_METHOD 3
-enum {EM, ECM, AECM};
+#define N_EM_METHOD 4
+enum {EM, ECM, AECM, APECM};
 static char VARIABLE_IS_NOT_USED *EM_METHOD[N_EM_METHOD] =
-	{"EM", "ECM", "AECM"};
+	{"EM", "ECM", "AECM", "APECM"};
 
 
 /* Boundary methods. */
@@ -119,21 +136,26 @@ static char VARIABLE_IS_NOT_USED *LABEL_METHOD[N_LABEL_METHOD] =
 
 
 /* Rprintf: print message to R console. */
-#ifdef R_EXT_PRINT_H_
-	#undef printf
-	#define printf Rprintf
-	#undef exit
-	#define exit(a) error("%d\n", a)
+#ifdef __HAVE_R_
+
+#undef printf
+#define printf Rprintf
+#undef exit
+#define exit(a) error("%d\n", a)
+#define fprintf(stderr, ...) REprintf(__VA_ARGS__)
+
 #endif
 
 
 /* EM Debugging only. */
-#define EMDEBUG 0		/* 0 for no output, 1 for em steps, >1 for m step, >2 for nm, >3 for -logpL.
-				 * 0 = 0000 for no output,
-				 * 1 = 0001 for em steps,
-				 * 2 = 0010 for m step,
-				 * 4 = 0100 for nm step,
-				 * 8 = 1000 for -logpL. */
+/* Ex: 1 for em steps, 2 for m steps, 3 for em and m steps. */
+#define EMDEBUG 0		/* 0  = 000000 for no output,
+				 * 1  = 000001 for em steps,
+				 * 2  = 000010 for m step,
+				 * 4  = 000100 for nm step,
+				 * 8  = 001000 for -logpL.
+				 * 16 = 010000 for log_conv in se_convolution.
+				 * 32 = 100000 for f_err in se_convolution. */
 #define INITDEBUG 0		/* 1 */		/* 0 for no output, >0 for tracing initialization. */
 #define verbosity_em_step 0	/* 3 */		/* 0 for no output, >0 for print information. */
 #define verbosity_exhaust_EM 0	/* 1 */		/* 0 for no output, >0 for print information. */

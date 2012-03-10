@@ -1,3 +1,16 @@
+2012-03-01: Ver. 0.1-11
+  * add sequencing error models in C and R, phyclust.se(), phyclust.se.update().
+  * fix stdout, stderr, fprintf, printf, puts, ...etc for CRAN.
+
+2012-01-03: Ver. 0.1-11
+  * add PAML C function baseml to find tree using maximum likelihood.
+  * modify PAML functions for baseml and fix bugs.
+  * fix the fclose() problem in baseml.
+  * generate the R function paml.baseml() to call PAML baseml.
+  * generate utility functions such write.paml(), write.paml.format(), ... etc.
+  * rename some C functions of seq-gen borrowed from PAML with conflicts.
+  * fix the fclose() problem in seq-gen.
+
 2011-10-31: Ver. 0.1-10
   * modify some warnings in C code due to the R CRAN's checking report.
 

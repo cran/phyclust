@@ -238,7 +238,7 @@ void Update_log_Pt_split(Q_matrix_array *QA){		/* For EV, VE, VV. */
 /* These functions update log(P(t)). */
 void Check_param_common(Q_matrix_array *QA){		/* For EE. */
 	QA->check_param = *QA->Q[0]->check_param;
-} /* Update_log_Pt_common(). */
+} /* Chark_param_common(). */
 
 void Check_param_split(Q_matrix_array *QA){		/* For EV, VE, VV. */
 	int k;
@@ -247,7 +247,7 @@ void Check_param_split(Q_matrix_array *QA){		/* For EV, VE, VV. */
 	for(k = 0; k < QA->K; k++){
 		QA->check_param &= *QA->Q[k]->check_param;
 	}
-} /* Update_log_Pt_split(). */
+} /* Check_param_split(). */
 
 
 

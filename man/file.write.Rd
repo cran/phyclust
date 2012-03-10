@@ -3,7 +3,9 @@
 \alias{write.fasta.format}
 \alias{write.phylip}
 \alias{write.phylip.format}
-\title{Write data to files by formats}
+\alias{write.paml}
+\alias{write.paml.format}
+\title{Write Data to Files by Formats}
 \description{
   Two major file formats are supported in \pkg{phyclust},
   \code{Format phylip} and \code{Format fasta}.
@@ -23,6 +25,12 @@ write.phylip(seqdata, filename, classid = NULL, seqname = NULL,
 write.phylip.format(seqdata, filename, classid = NULL, seqname = NULL,
     width.seqname = 10, width.line = 60, sep = "")
 %    width.seqname = 10, width.line = 60, sep = "", add.space = 10)
+
+write.paml(seqdata, filename, classid = NULL, seqname = NULL,
+    width.seqname = 10, width.line = 60, lower.case = FALSE,
+    code.type = .code.type[1], sep = "")
+write.paml.format(seqdata, filename, classid = NULL, seqname = NULL,
+    width.seqname = 10, width.line = 60, sep = "")
 }
 \arguments{
   \item{seqdata}{a matrix contains sequence ids as \code{X} in \code{phyclust}.}
@@ -37,16 +45,23 @@ write.phylip.format(seqdata, filename, classid = NULL, seqname = NULL,
 %  \item{add.space}{add a space for every few sites.}
 }
 \details{
-  \code{write.fasta} and \code{write.phylip} are general functions call
-  \code{write.fasta.format} and \code{write.phylip.format}.
+  \code{write.fasta}, \code{write.phylip}, and \code{write.paml} are general
+  functions call \code{write.fasta.format}, \code{write.phylip.format} and
+  \code{write.paml.format}.
 
-  \code{write.fasta.format} and \code{write.phylip.format} will not do any
-  transformation for input sequences, but directly write them into the file
-  as \code{code.type = NULL} in \code{write.fasta} and \code{write.phylip}.
+  \code{write.fasta.format}, \code{write.phylip.format}, and
+  \code{wirte.paml.format} will not do any transformation for input sequences,
+  but directly write them into the file as \code{code.type = NULL} in
+  \code{write.fasta}, \code{write.phylip} and \code{write.paml}.
+
+  Note that PAML uses one of PHYLIP format to deal with sequence files, so
+  \code{write.paml.format} is to write files in a different format of
+  \code{write.phylip.format}. The main purpose of \code{write.paml} and
+  \code{write.paml.format} is to generate files for \code{pamle.baseml}.
 
   \code{sep} can specify a character which is used to split sites in file.
   By default, "" denote no character between sites. Only "CODON" id requires
-  a character to avoid ambiguity
+  a character to avoid ambiguity.
 }
 \value{
   Save a text file.
@@ -74,6 +89,9 @@ data.path <- paste(.libPaths()[1], "/phyclust/data/pony625.fas", sep = "")
 (my.pony <- read.fasta(data.path))
 write.fasta(my.pony$org, "new.pony.fas")
 
+# PAML
+write.paml(my.pony$org, "new.pony.pam")
+
 # Amino acid in PHYLIP
 aa.aid <- nid2aid(my.pony$org)
 aa.acode <- aid2acode(aa.aid)
@@ -85,6 +103,11 @@ write.phylip.format(aa.acode, "new.pony.aa.acode.phy")
 write.fasta(aa.aid, "new.pony.aa.phy", code.type = "AMINO_ACID")
 write.fasta.format(aa.aid, "new.pony.aa.aid.phy", sep = ",")
 write.fasta.format(aa.acode, "new.pony.aa.acode.fas")
+
+# Amino acid in PAML
+write.paml(aa.aid, "new.pony.aa.pam", code.type = "AMINO_ACID")
+write.paml.format(aa.aid, "new.pony.aa.aid.pam", sep = ",")
+write.paml.format(aa.acode, "new.pony.aa.acode.pam")
 }
 }
-\keyword{programming}
+\keyword{file I/O}

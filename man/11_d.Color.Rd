@@ -1,7 +1,7 @@
 \name{.Color}
 \alias{.Color}
 \docType{data}
-\title{Colors for identifying clusters in plots}
+\title{Colors for Identifying Clusters in Plots}
 \description{
   Color themes as used in the package \pkg{lattice}.
 }

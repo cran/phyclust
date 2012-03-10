@@ -1,7 +1,7 @@
 \name{.substitution}
 \alias{.substitution}
 \docType{data}
-\title{Substitution models for mutation processes}
+\title{Substitution Models for Mutation Processes}
 \description{
   An object stores substitution models for mutation processes
   for Continuous Time Markov Chain theory.

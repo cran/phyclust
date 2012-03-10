@@ -1,6 +1,6 @@
 \name{.EMControl}
 \alias{.EMControl}
-\title{EM control generator}
+\title{EM Control Generator}
 \description{
   Generate an EM control (\code{.EMC}) controlling the options,
   methods, conditions and models of EM algorithms.
@@ -23,7 +23,8 @@
     substitution.model = .substitution$model[1],
     edist.model = .edist.model[1], identifier = .identifier[1],
     code.type = .code.type[1], em.method = .em.method[1],
-    boundary.method = .boundary.method[1], min.n.class = 1)
+    boundary.method = .boundary.method[1], min.n.class = 1,
+    se.type = FALSE, se.model = .se.model[1], se.constant = 1e-2)
 }
 \arguments{
   \item{exhaust.iter}{number of iterations for "exhaustEM", default = 1.}
@@ -54,6 +55,10 @@
   \item{em.method}{EM method, default = "EM".}
   \item{boundary.method}{boundary method, default = \code{ADJUST}.}
   \item{min.n.class}{minimum number of sequences in a cluster, default = 1.}
+
+  \item{se.type}{sequencing error type, default = FALSE.}
+  \item{se.model}{sequencing error model, default = "CONVOLUTION".}
+  \item{se.constant}{constrained constant, default = 1e-2.}
 }
 \details{
   \code{exhaust.iter}, \code{fixed.iter}, \code{short.iter}, and
@@ -86,9 +91,17 @@
 
   \code{min.n.class} is the minimum number of sequences in a cluster to
   avoid bad initialization state and degenerated clusters.
+
+  \code{se.type}, \code{se.model}, and \code{se.constant} which are used only
+  for sequencing error models and only for nucleotide data without labels.
 }
 \value{
   This function returns a list as \code{.EMC}. 
+
+  The sequencing error controls are stored in
+  \code{se.type}, \code{se.model}, and \code{se.constant}, for
+  sequencing error type, model, and constrained constant of errors,
+  respectively.
 }
 \references{
   Phylogenetic Clustering Website:
@@ -109,7 +122,8 @@
   \code{\link{.init.procedure}},
   \code{\link{.substitution}},
   \code{\link[stats]{optim}},
-  \code{\link{phyclust}}.
+  \code{\link{phyclust}},
+  \code{\link{phyclust.se}}.
 }
 \examples{
 \dontrun{

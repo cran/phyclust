@@ -1,7 +1,7 @@
 \name{.boundary.method}
 \alias{.boundary.method}
 \docType{data}
-\title{Boundary methods for population proportions}
+\title{Boundary Methods for Population Proportions}
 \description{
   Methods used in EM Algorithms to deal with boundary problems of
   population proportions, \eqn{\eta_k}{eta_k}.

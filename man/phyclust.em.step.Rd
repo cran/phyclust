@@ -70,4 +70,4 @@ ret.3 <- phyclust.em.step(X, ret.phyclust = ret.1, label = semi.label)
 str(ret.3)
 }
 }
-\keyword{programming}
+\keyword{phyclust stepwise}

@@ -206,7 +206,7 @@ SEXP initialize_emptr(EMPTR emptr, phyclust_struct *pcs){
 	emptr->C_protect_length = 4 + emobj_length + QA_length + converge_length;
 
 	return(emobj);
-} /* End of initialize_emobj_emptr(). */
+} /* End of initialize_emptr(). */
 
 void copy_all_to_emptr(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, EMPTR emptr){
 	int i, k, i2;
@@ -261,8 +261,8 @@ SEXP R_phyclust(SEXP R_N_X_org, SEXP R_L, SEXP R_K, SEXP R_X, SEXP R_EMC, SEXP R
 	int *C_N_X_org, *C_L, *C_K, *C_manual_id;
 	em_control *EMC;
 	phyclust_struct *pcs;
-	em_fp *EMFP;
 	Q_matrix_array *QA;
+	em_fp *EMFP;
 
 	/* Declare variables for R's returning. */
 	EMPTR emptr = allocate_emptr();
@@ -285,7 +285,7 @@ SEXP R_phyclust(SEXP R_N_X_org, SEXP R_L, SEXP R_K, SEXP R_X, SEXP R_EMC, SEXP R
 
 	/* Assign data. */
 	pcs = R_initialize_phyclust_struct(EMC->code_type, *C_N_X_org, *C_L, *C_K);
-	emobj = initialize_emptr(emptr, pcs);
+	emobj = initialize_emptr(emptr, pcs);		 /* !! Don't move this. */
 	tmp_ptr = INTEGER(R_X);
 	for(i = 0; i < *C_N_X_org; i++){
 		pcs->X_org[i] = tmp_ptr;

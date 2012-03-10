@@ -488,3 +488,47 @@ void copy_int_RT_3D(int N_X, int K, int ncode, int ***from, int ***to){
 	}
 } /* End of copy_int_RT_3D(). */
 
+double*** allocate_double_RT_3D(int K, int L, int ncode){
+	int k, l;
+	double ***pointerarray = (double ***) malloc(K * sizeof(double **));
+
+	if(pointerarray == NULL){
+		fprintf(stderr, "PE: Memory allocation fails!\n");
+		exit(1);
+	}
+	for(k = 0; k < K; k++){
+		pointerarray[k] = (double **) malloc(L * sizeof(double *));
+		if(pointerarray[k] == NULL){
+			fprintf(stderr, "PE: Memory allocation fails!\n");
+			exit(1);
+		}
+		for(l = 0; l < L; l++){
+			pointerarray[k][l] = allocate_double_1D(ncode);
+		}
+	}
+
+	return(pointerarray);
+} /* End of allocate_double_RT_3D(). */
+
+void free_double_RT_3D(int K, int L, double ***RT3D){
+	int k, l;
+
+	for(k = 0; k < K; k++){
+		for(l = 0; l < L; l++){
+			free(RT3D[k][l]);
+		}
+		free(RT3D[k]);
+	}
+	free(RT3D);
+} /* End of free_double_RT_3D(). */
+
+void copy_double_RT_3D(int K, int L, int ncode, double ***from, double ***to){
+	int k, l;
+
+	for(k = 0; k < K; k++){
+		for(l = 0; l < L; l++){
+			copy_double_1D(ncode, from[k][l], to[k][l]);
+		}
+	}
+} /* End of copy_double_RT_3D(). */
+

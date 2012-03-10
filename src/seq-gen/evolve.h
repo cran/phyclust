@@ -40,6 +40,10 @@
 */
 
 
+//WCC:add
+#include "R_seq-gen.h"
+
+
 #ifndef _EVOLVE_H_
 #define _EVOLVE_H_
 

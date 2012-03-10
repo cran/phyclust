@@ -1,6 +1,6 @@
 \name{rescale.rooted.tree}
 \alias{rescale.rooted.tree}
-\title{Rescale a rooted tree's height}
+\title{Rescale a Rooted Tree's Height}
 \description{
   This function rescaled the input rooted tree height by a scale.height.
 }
@@ -45,4 +45,4 @@ tree.scaled <- rescale.rooted.tree(tree.ms, scale.height = 2)
 get.rooted.tree.height(tree.scaled)
 }
 }
-\keyword{programming}
+\keyword{simulation}

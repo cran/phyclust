@@ -1,6 +1,6 @@
 \name{phyclust.logL}
 \alias{phyclust.logL}
-\title{Log-likelihood of phyclust}
+\title{Log-Likelihood of phyclust}
 \description{
   This computes a log-likelihood value of \code{phyclust}.
 }
@@ -34,7 +34,7 @@ phyclust.logL(X, ret.phyclust = NULL, K = NULL, Eta = NULL,
 
   If \code{label} is inputted, the label information will be used to
   calculate log likelihood (complete-data), even the \code{ret.phyclust}
-  is the result of unsuprvised clustering.
+  is the result of unsupervised clustering.
 }
 \value{
   This function return a log-likelihood value of \code{phyclust}.
@@ -66,4 +66,4 @@ semi.label[1:3] <- 1
 phyclust.logL(X, ret.phyclust = ret.1, label = semi.label)
 }
 }
-\keyword{programming}
+\keyword{phyclust stepwised}

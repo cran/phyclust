@@ -30,7 +30,7 @@ void init_em_step(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, em_
 	double lower_bound_org, lower_bound;
 
 	if(pcs->K * EMC->min_n_class >= pcs->N_X){
-		fprintf(stderr, "PE: K is too huge.");
+		fprintf(stderr, "PE: K is too huge.\n");
 		exit(1);
 	}
 	lower_bound_org = (double) EMC->min_n_class / (double) pcs->N_X_org;
@@ -158,7 +158,7 @@ void exhaust_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EM
 	}
 
 	EMFP->Em_step(new_empcs, new_QA, new_EMC, EMFP);
-	copy_empcs(new_empcs, org_empcs);
+	EMFP->Copy_empcs(new_empcs, org_empcs);
 	org_QA->Copy_Q_matrix_array(new_QA, org_QA);
 
 	copy_EMC(new_EMC, org_EMC);
@@ -193,7 +193,7 @@ void exhaust_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EM
 
 		if(new_empcs->logL_observed > org_empcs->logL_observed &&
 		   new_EMC->converge_flag < 2){
-			copy_empcs(new_empcs, org_empcs);
+			EMFP->Copy_empcs(new_empcs, org_empcs);
 			org_QA->Copy_Q_matrix_array(new_QA, org_QA);
 			copy_EMC(new_EMC, org_EMC);
 		}
@@ -262,7 +262,7 @@ void Rnd_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, e
 		converge_cm_iter += new_EMC->converge_cm_iter;
 
 		if(new_empcs->logL_observed > org_empcs->logL_observed){
-			copy_empcs(new_empcs, org_empcs);
+			EMFP->Copy_empcs(new_empcs, org_empcs);
 			org_QA->Copy_Q_matrix_array(new_QA, org_QA);
 			copy_EMC(new_EMC, org_EMC);
 		}
@@ -331,7 +331,7 @@ void Rndp_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, 
 		converge_cm_iter += new_EMC->converge_cm_iter;
 
 		if(new_empcs->logL_observed > org_empcs->logL_observed){
-			copy_empcs(new_empcs, org_empcs);
+			EMFP->Copy_empcs(new_empcs, org_empcs);
 			org_QA->Copy_Q_matrix_array(new_QA, org_QA);
 			copy_EMC(new_EMC, org_EMC);
 		}
@@ -398,7 +398,7 @@ void em_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, em
 		converge_cm_iter += new_EMC->converge_cm_iter;
 
 		if(new_empcs->logL_observed > org_empcs->logL_observed){
-			copy_empcs(new_empcs, org_empcs);
+			EMFP->Copy_empcs(new_empcs, org_empcs);
 			org_QA->Copy_Q_matrix_array(new_QA, org_QA);
 			copy_EMC(new_EMC, org_EMC);
 		}

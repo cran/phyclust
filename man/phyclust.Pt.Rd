@@ -1,6 +1,6 @@
 \name{phyclust.Pt}
 \alias{phyclust.Pt}
-\title{Transition probabilities of phyclust given time}
+\title{Transition Probabilities of phyclust Given Time}
 \description{
   This computes transition probabilities of \code{phyclust} given time.
 }
@@ -63,4 +63,4 @@ Q <- list(pi = c(0.5, 0.5), kappa = 0.5)
 phyclust.Pt(Q, Tt, "SNP_JC69")
 }
 }
-\keyword{programming}
+\keyword{phyclust stepwised}

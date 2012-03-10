@@ -1,6 +1,6 @@
 \name{RRand}
 \alias{RRand}
-\title{Rand index and adjusted Rand index}
+\title{Rand Index and Adjusted Rand Index}
 \description{
   This function returns the Rand index and the adjusted Rand index for
   given true class ids and predicted class ids.

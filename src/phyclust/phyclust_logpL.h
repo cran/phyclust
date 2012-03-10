@@ -22,7 +22,7 @@ struct _ex_struct{
 
 double negative_logpL_Mu_given_QA(int m, double *vect, void *ex);
 double negative_logpL_QA_given_Mu(int m, double *vect, void *ex);
-int maximize_logpL(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H, em_control *EMC, em_fp *EMFP);
+int Maximize_logpL(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H, em_control *EMC, em_fp *EMFP);
 
 /* For update Mu given QA. */
 /* QA_H unused */

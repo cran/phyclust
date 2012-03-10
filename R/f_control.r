@@ -30,7 +30,11 @@
     em.method = .em.method[1],
     boundary.method = .boundary.method[1],
 
-    min.n.class = 1
+    min.n.class = 1,
+
+    se.type = FALSE,
+    se.model = .se.model[1],
+    se.constant = 1e-2
 ){
   list(exhaust.iter = as.integer(exhaust.iter),
        fixed.iter = as.integer(fixed.iter),
@@ -60,6 +64,11 @@
        em.method = em.method[1],
        boundary.method = boundary.method[1],
 
-       min.n.class = as.integer(min.n.class)
+       min.n.class = as.integer(min.n.class),
+
+       se.type = as.logical(se.type),
+       se.model = se.model[1],
+       se.constant = as.double(se.constant)
       )
 } # End of .EMControl().
+

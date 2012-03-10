@@ -1,6 +1,6 @@
 \name{phyclust.edist}
 \alias{phyclust.edist}
-\title{Evolution distance of sequences}
+\title{Evolution Distance of Sequences}
 \description{
   This computes pair wised evolution distance of sequences.
 }

@@ -1,6 +1,6 @@
 \name{gen.star.tree}
 \alias{gen.star.tree}
-\title{Generate a rooted tree with a star shape}
+\title{Generate a Rooted Tree with a Star Shape}
 \description{
   Generate a rooted tree with a star shape based on a sequence calls
   of several functions.
@@ -43,4 +43,4 @@ ret.star <- gen.star.tree(5)
 plot(ret.star, type = "u")
 }
 }
-\keyword{programming}
+\keyword{simulation}

@@ -1,7 +1,7 @@
 \name{.code.type}
 \alias{.code.type}
 \docType{data}
-\title{Code types of dataset and substitution models}
+\title{Code Types of Dataset and Substitution Models}
 \description{
   Indicate the types of codes for datasets and functions.
   The first element is the default value.

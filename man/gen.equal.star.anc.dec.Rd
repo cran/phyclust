@@ -1,6 +1,6 @@
 \name{gen.equal.star.anc.dec}
 \alias{gen.equal.star.anc.dec}
-\title{Generate comprehensive trees.}
+\title{Generate Comprehensive Trees.}
 \description{
   Generate comprehensive trees for simulation studies.
 }
@@ -54,4 +54,4 @@ plotnj(tree.K$equal.star, X.class, type = "p",
 axis(1)
 }
 }
-\keyword{programming}
+\keyword{simulation}

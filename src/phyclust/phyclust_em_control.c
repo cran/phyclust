@@ -55,6 +55,11 @@ em_control* initialize_em_control(){
 	EMC->converge_cm_iter = 0;
 	EMC->update_flag = 0;		/* 0 to apply optimization on QA, Tt and update Mu given QA and Tt;
 					   1 to apply optimization on QA and Tt given Mu. */
+
+	EMC->se_type = SE_NO;
+	EMC->se_model = SE_CONVOLUTION;
+	EMC->se_constant = SE_CONSTANT;
+
 	update_em_control(EMC);
 	return(EMC);
 } /* End of initialize_em_control(). */
@@ -98,6 +103,10 @@ em_control* duplicate_em_control(em_control *org_EMC){
 
 	new_EMC->Eta_lower_bound = org_EMC->Eta_lower_bound;
 	new_EMC->Eta_upper_bound = org_EMC->Eta_upper_bound;
+
+	new_EMC->se_type = org_EMC->se_type;
+	new_EMC->se_model = org_EMC->se_model;
+	new_EMC->se_constant = org_EMC->se_constant;
 
 	copy_EMC(org_EMC, new_EMC);
 	return(new_EMC);

@@ -46,6 +46,11 @@ print.phyclust <- function(x, digits = max(4, getOption("digits") - 3), ...){
   if(!is.null(ret.phyclust$Q$kappa)) cat("  kappa:", ret.phyclust$Q$kappa, "\n")
   cat("  Tt:", ret.phyclust$Q$Tt, "\n")
   if(!is.null(ret.phyclust$n.class)) cat("  n.class:", ret.phyclust$n.class, "\n")
+  if(!is.null(ret.phyclust$SE)){
+    my.cat("SE_model: ", ret.phyclust$SE$model,
+           ", SE_constant: ", ret.phyclust$SE$constant, "\n")
+    my.print(ret.phyclust$SE$f.err)
+  }
 } # End of print.phyclust().
 
 summary.phyclust <- function(object, ...){

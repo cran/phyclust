@@ -42,11 +42,16 @@ int cmatby (complex a[], complex b[], complex c[], int n,int m,int k);
 int cmatout (FILE * fout, complex x[], int n, int m);
 int cmatinv( complex x[], int n, int m, double space[]);
 
-int abyx (double a, double x[], int n)
+//WCC int abyx (double a, double x[], int n)
+int seq_gen_abyx (double a, double x[], int n)
 { int i; for (i=0; i<n; x[i]*=a,i++) ;  return(0); }
-int xtoy (double x[], double y[], int n)
+
+//WCC int xtoy (double x[], double y[], int n)
+int seq_gen_xtoy (double x[], double y[], int n)
 { int i; for (i=0; i<n; y[i]=x[i],i++) ;  return(0); }
-int matinv( double x[], int n, int m, double space[])
+
+//WCC int matinv( double x[], int n, int m, double space[])
+int seq_gen_matinv( double x[], int n, int m, double space[])
 {
 /* x[n*m]  ... m>=n
 */

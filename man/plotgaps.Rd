@@ -1,6 +1,6 @@
 \name{plotgaps}
 \alias{plotgaps}
-\title{Gaps plots of sequences for visual comparisons}
+\title{Gaps Plots of Sequences for Visual Comparisons}
 \description{
   This function provides gaps plots of data set to identify regions where
   gaps enriched. The plot show the proportions of context by sites and the
@@ -45,4 +45,4 @@ X[sample(c(T, F), length(X), replace = TRUE, prob = c(0.05, 0.95))] <-
 plotgaps(X)
 }
 }
-\keyword{programming}
+\keyword{plot}

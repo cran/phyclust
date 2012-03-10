@@ -15,3 +15,4 @@
 .em.method <- c("EM", "ECM", "AECM")
 .boundary.method <- c("ADJUST", "IGNORE")
 .label.method <- c("NONE", "SEMI", "GENERAL")
+.se.model <- c("CONVOLUTION")

@@ -39,6 +39,11 @@
    email: andrew.rambaut@zoo.ox.ac.uk
 */
 
+
+//WCC:add
+#include "R_seq-gen.h"
+
+
 #ifndef _NUC_MODELS_H_
 #define _NUC_MODELS_H_
 

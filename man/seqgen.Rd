@@ -7,8 +7,7 @@
   developed by Rambaut, A. and Grassly, N.C. (1997).
 }
 \usage{
-seqgen(opts = NULL, rooted.tree = NULL, newick.tree = NULL,
-       input = NULL)
+seqgen(opts = NULL, rooted.tree = NULL, newick.tree = NULL, input = NULL)
 }
 \arguments{
   \item{opts}{options as the standalone version.}
@@ -18,7 +17,7 @@ seqgen(opts = NULL, rooted.tree = NULL, newick.tree = NULL,
 }
 \details{
   This function directly reuses the C code of \code{seq-gen} by arguments
-  as input from the stdin. The options \code{opts} is followed from the
+  as input from the STDIN. The options \code{opts} is followed from the
   original \code{seq-gen} except an input tree.
 
   Input either a \code{rooted.tree} or a \code{newick.tree}, and
@@ -39,20 +38,22 @@ seqgen(opts = NULL, rooted.tree = NULL, newick.tree = NULL,
 
   \strong{Note}:
   \itemize{
+    \item \code{input} and \code{rooted.tree}/\code{newick.tree} can not be
+          submitted at the same time.
     \item \code{seq-gen} use the order A, C, G, T.
     \item \code{-t} is ts/tv ratio which is not equal to \eqn{\kappa}{kappa}.
     \item See more examples in \code{gen.seq.HKY} and \code{gen.seq.SNP}.
   }
 }
 \value{
-  This function returns a vector, and each element stores one line of stdout
-  of \code{seq-gen} separated by newline, and store as a class \code{seqgen}.
-  The details of output format can found on the website
+  This function returns a vector, and each element stores one line of STDOUT
+  of \code{seq-gen} separated by newline. The vector stores in a class
+  \code{seqgen}. The details of output format can found on the website
   \url{http://tree.bio.ed.ac.uk/software/seqgen/} and its manual.
 }
-\section{Bug(s)}{
-  An unsolved minor bug is that memory unreleased thoroughly caused by
-  reopen a file pointer to the same file without calling a function, fclose.
+\section{Warning(s)}{
+  Carefully read the \code{seq-gen}'s original document before using the
+  \code{seqgen} function.
 }
 \references{
   Phylogenetic Clustering Website:
@@ -81,6 +82,7 @@ seqgen(opts = NULL, rooted.tree = NULL, newick.tree = NULL,
 set.seed(123)
 ret.ms <- ms(nsam = 5, nreps = 1, opts = "-T")
 seqgen(opts = "-mHKY -l40 -s0.2", newick.tree = ret.ms[3])
+
 }
 }
-\keyword{programming}
+\keyword{Seq-Gen}

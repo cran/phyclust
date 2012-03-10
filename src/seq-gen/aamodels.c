@@ -320,14 +320,17 @@ void SetupAAMatrix()
 		mr += aaFreq[i] * sum;
 	}
 	
-	abyx(1.0/mr, Qij, SQNUM_AA);
+//WCC	abyx(1.0/mr, Qij, SQNUM_AA);
+	seq_gen_abyx(1.0/mr, Qij, SQNUM_AA);
 
 	if ((k=eigen(1, Qij, NUM_AA, Root, T1, U, V, T2))!=0) {
 		fprintf(stderr, "\ncomplex roots in SetupAAMatrix");
 		exit(0);
 	}
-	xtoy (U, V, SQNUM_AA);
-	matinv (V, NUM_AA, NUM_AA, T1);
+//WCC	xtoy (U, V, SQNUM_AA);
+	seq_gen_xtoy (U, V, SQNUM_AA);
+//WCC	matinv (V, NUM_AA, NUM_AA, T1);
+	seq_gen_matinv (V, NUM_AA, NUM_AA, T1);
 	for (i=0; i<NUM_AA; i++) {
    		for (j=0; j<NUM_AA; j++) {
    			for (k=0; k<NUM_AA; k++) {

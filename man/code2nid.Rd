@@ -1,7 +1,7 @@
 \name{code2nid}
 \alias{code2nid}
 \alias{nid2code}
-\title{Transfer codes (A, G, C, T, -) and nids (0, 1, 2, 3, 4)}
+\title{Transfer Codes (A, G, C, T, -) and nids (0, 1, 2, 3, 4)}
 \description{
   Transfer nucleotide codes (A, G, C, T, -) and nucleotide ids (0, 1, 2, 3, 4).
 }

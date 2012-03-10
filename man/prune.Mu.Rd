@@ -1,6 +1,6 @@
 \name{prune.Mu}
 \alias{prune.Mu}
-\title{Prune the center sequences Mu}
+\title{Prune the Center Sequences Mu}
 \description{
   This function prune the center sequences Mu where the sites will be reset
   as GAPs if all members within the same cluster are all GAPs.

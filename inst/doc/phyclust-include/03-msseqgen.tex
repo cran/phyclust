@@ -5,16 +5,8 @@
 \pkg{Phyclust} incorporates two popular open source \proglang{C} programs:
 \pkg{ms} \citep{Hudson2002} and \pkg{seq-gen} \citep{Rambaut1997}.
 The original source code and documentation are available on the authors'
-websites.
-For \pkg{ms},
-the pdf file (downloaded from the author's website) is in the install directory
-\url{phyclust/doc/Documents/msdoc.pdf} or in the source code directory
-\url{phyclust/inst/doc/Documents/msdoc.pdf}.
-For \pkg{seq-gen},
-the html file (downloaded from the author's website) is in the install directory
-\url{phyclust/doc/Documents/Seq-Gen.v.1.3.2/Seq-Gen.Manual.html}
-or in the source code directory
-\url{phyclust/inst/doc/Documents/Seq-Gen.v.1.3.2/Seq-Gen.Manual.html}.
+original websites, or the mirror on phyloclustering website at
+\url{http://thirteen-01.stat.iastate.edu/snoweye/phyclust/}.
 
 The \pkg{ms} documentation demonstrates how to use \pkg{ms}
 to generate coalescent trees, followed by sequence generation using \pkg{seq-gen},
@@ -56,13 +48,13 @@ of the \pkg{ape} package.
 > (ret.ms <- ms(nsam = 3, opts = "-T -G 0.1"))
 ms 3 1 -T -G 0.1 
 //
-(1: 0.568774938583,(2: 0.355949461460,3: 0.355949461460): 0.212825477123);
+(s1: 0.568774938583,(s2: 0.355949461460,s3: 0.355949461460): 0.212825477123);
 > (tree.anc <- read.tree(text = ret.ms[3]))
 
 Phylogenetic tree with 3 tips and 2 internal nodes.
 
 Tip labels:
-[1] "1" "2" "3"
+[1] "s1" "s2" "s3"
 
 Rooted; includes branch lengths.
 > tree.anc$tip.label <- paste("a", 1:3, sep = "")
@@ -70,6 +62,10 @@ Rooted; includes branch lengths.
 > axisPhylo()
 \end{Code}
 \begin{figure}[h]
+%pdf("f-ms.pdf", width = 5, height = 4)
+%plot(tree.anc, type = "c")
+%axisPhylo()
+%dev.off()
 \begin{center}
 \includegraphics[width=5.0in]{./phyclust-include/f-ms}
 \caption{A diagram of a simple coalescent tree.}
@@ -106,21 +102,21 @@ Without further options, HKY85 is equivalent to the JC69 model \citep{Jukes1969}
 > set.seed(123)
 > seqgen(opts = "-mHKY -l40", newick.tree = ret.ms[3])
  5 40
-1         CTCTCATTGGACGCACACTTTAGGGGGGGATTGCACTGCA
-5         CTCTCTCTGGACGCACACTTTAAGGGGGGATTGAACTACA
-2         CTCTTCGGGCTCGGATAAGTTTGGAGGGTTGTTCTCTACA
-3         CTCTGAGTGCTCGGATTAGTTAGGGGGAATGACGTCTACA
-4         CTCTTATCTCTCGGATAAGTTGGGGGTGATGGCTTTTACA
+s1        CTCTCATTGGACGCACACTTTAGGGGGGGATTGCACTGCA
+s5        CTCTCTCTGGACGCACACTTTAAGGGGGGATTGAACTACA
+s2        CTCTTCGGGCTCGGATAAGTTTGGAGGGTTGTTCTCTACA
+s3        CTCTGAGTGCTCGGATTAGTTAGGGGGAATGACGTCTACA
+s4        CTCTTATCTCTCGGATAAGTTGGGGGTGATGGCTTTTACA
 > set.seed(123)
 > (ret.seq <- seqgen(opts = "-mHKY -l40", rooted.tree = tree.anc))
  5 40
-1         CTCTCATTGGACGCACACTTTAGGGGGGGATTGCACTGCA
-5         CTCTCTCTGGACGCACACTTTAAGGGGGGATTGAACTACA
-2         CTCTTCGGGCTCGGATAAGTTTGGAGGGTTGTTCTCTACA
-3         CTCTGAGTGCTCGGATTAGTTAGGGGGAATGACGTCTACA
-4         CTCTTATCTCTCGGATAAGTTGGGGGTGATGGCTTTTACA
+s1        CTCTCATTGGACGCACACTTTAGGGGGGGATTGCACTGCA
+s5        CTCTCTCTGGACGCACACTTTAAGGGGGGATTGAACTACA
+s2        CTCTTCGGGCTCGGATAAGTTTGGAGGGTTGTTCTCTACA
+s3        CTCTGAGTGCTCGGATTAGTTAGGGGGAATGACGTCTACA
+s4        CTCTTATCTCTCGGATAAGTTGGGGGTGATGGCTTTTACA
 > str(ret.seq)
-Class 'seqgen'  chr [1:6] " 5 40" "1         CTCTCATTGGACGCACACTTTAGGGGGG ...
+Class 'seqgen'  chr [1:6] " 5 40" "s1        CTCTCATTGGACGCACACTTTAGGGGGG ...
 \end{Code}
 
 The \code{seqgen()} function need not take in a tree from \code{ms()},
@@ -165,11 +161,11 @@ for use by the function \code{phyclust()} (see Section~\ref{sec:phyclust}).
 > set.seed(1234)
 > (HKY.1 <- gen.seq.HKY(tree.ms, pi.HKY, kappa, L, anc.seq = anc.HKY))
  5 12
-1         AGCTTGACCGGC
-3         AGCTTCACCGGT
-2         ACCTCGCTAGCT
-4         ACGACGCTCGCT
-5         CCTACGCTAGCT
+s1        AGCTTGACCGGC
+s3        AGCTTCACCGGT
+s2        ACCTCGCTAGCT
+s4        ACGACGCTCGCT
+s5        CCTACGCTAGCT
 > (ret <- read.seqgen(HKY.1))
 code.type: NUCLEOTIDE, n.seq: 5, seq.len: 12.
 \end{Code}

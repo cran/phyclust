@@ -1,7 +1,7 @@
 \name{.init.procedure}
 \alias{.init.procedure}
 \docType{data}
-\title{Initialization procedures for EM algorithms}
+\title{Initialization Procedures for EM Algorithms}
 \description{
   The varied initialization procedures are implemented in C.
   The first element is the default value.

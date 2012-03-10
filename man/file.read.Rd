@@ -3,7 +3,7 @@
 \alias{read.fasta.format}
 \alias{read.phylip}
 \alias{read.phylip.format}
-\title{Read data from files by formats and return a seq.data object}
+\title{Read Data from Files by Formats and Return a seq.data Object}
 \description{
   Two major file formats are supported in \pkg{phyclust},
   \code{Format phylip} and \code{Format fasta}.
@@ -69,4 +69,4 @@ data.path <- paste(.libPaths()[1], "/phyclust/data/pony625.fas", sep = "")
 (my.pony <- read.fasta(data.path))
 }
 }
-\keyword{programming}
+\keyword{file I/O}

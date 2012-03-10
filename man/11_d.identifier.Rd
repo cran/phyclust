@@ -1,7 +1,7 @@
 \name{.identifier}
 \alias{.identifier}
 \docType{data}
-\title{Identifiers for evolution models}
+\title{Identifiers for Evolution Models}
 \description{
   Identifiers for evolution models identify the \eqn{Q_k}{Q_k} matrix and
   evolution time \eqn{t_k}{t_k} for subpopulations.

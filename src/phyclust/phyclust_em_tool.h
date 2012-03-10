@@ -29,7 +29,7 @@ int is_finite(double x);
 /* ----- For copy. ----- */
 void copy_EMC(em_control *EMC_from, em_control *EMC_to);
 void reassign_label_pointer(em_phyclust_struct *empcs);
-void copy_empcs(em_phyclust_struct *empcs_from, em_phyclust_struct *empcs_to);
+void Copy_empcs(em_phyclust_struct *empcs_from, em_phyclust_struct *empcs_to);
 void Copy_empcs_to_pcs(em_phyclust_struct *empcs, phyclust_struct *pcs);
 /* For M-step lonely, or semi-supervised. */
 void Copy_pcs_to_empcs(phyclust_struct *pcs, em_phyclust_struct *empcs);

@@ -935,7 +935,7 @@ parens( struct node *ptree, int *descl, int *descr,  int noden)
 
    if( descl[noden] == -1 ) {
 //WCC	printf("%d:%5.3lf", noden+1, (ptree+ ((ptree+noden)->abv))->time );
-	fprintf(temp_file_pointer, "%d:%15.12lf", noden+1, (ptree+ ((ptree+noden)->abv))->time );
+	fprintf(temp_file_pointer, "s%d:%15.12lf", noden+1, (ptree+ ((ptree+noden)->abv))->time );
 	}
    else{
 //WCC	printf("(");

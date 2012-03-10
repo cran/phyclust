@@ -73,7 +73,7 @@ int init_m_step(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, 
 	/* Find QA. */
 	EMC->update_flag = 1;		/* For update QA, given Mu. */
 	QA_H = duplicate_Q_matrix_array(QA);
-	ret_stop = maximize_logpL(empcs, QA, QA_H, EMC, EMFP);
+	ret_stop = EMFP->Maximize_logpL(empcs, QA, QA_H, EMC, EMFP);
 	QA->Update_log_Pt(QA);
 	EMC->update_flag = 0;		/* Reset to 0 for update Mu, given QA. */
 
@@ -251,6 +251,9 @@ int Update_init_manually(em_phyclust_struct *empcs, Q_matrix_array *QA, em_contr
 	}
 
 	reset_Q_matrix_array(QA);
+	if(EMC->se_type == SE_YES){
+		reset_SE_P_matrix(empcs->SE_P);
+	}
 	assign_Mu_by_class(empcs->N_X_org, empcs->K, empcs->L, empcs->ncode, empcs->missing_index,
 				empcs->class_id, empcs->X_org, empcs->Mu);
 	ret_stop = init_m_step(empcs, QA, EMC, EMFP);
@@ -291,6 +294,9 @@ int Update_init_random_Mu_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 	while(init_iter < EMC->max_init_iter){
 		init_iter++;
 		reset_Q_matrix_array(QA);
+		if(EMC->se_type == SE_YES){
+			reset_SE_P_matrix(empcs->SE_P);
+		}
 
 		srswor(N_X, K, center_id);
 		
@@ -382,6 +388,7 @@ int Update_init_random_Mu_unique_label(em_phyclust_struct *empcs, Q_matrix_array
 	while(init_iter < EMC->max_init_iter){
 		init_iter++;
 		reset_Q_matrix_array(QA);
+		// reset_SE_P_matrix(empcs->SE_P);
 
 		/* Randomly pick centers from X. */
 		for(k = 0; k < K_labeled; k++){
@@ -627,6 +634,9 @@ int Update_init_random_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 	while(init_iter < EMC->max_init_iter){
 		init_iter++;
 		reset_Q_matrix_array(QA);
+		if(EMC->se_type == SE_YES){
+			reset_SE_P_matrix(empcs->SE_P);
+		}
 
 		/* Randomly pick mu from X. */
 		random_branch(njs, random_branch_id);
@@ -713,6 +723,9 @@ int Update_init_k_medoids(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 	while(init_iter < EMC->max_init_iter){
 		init_iter++;
 		reset_Q_matrix_array(QA);
+		if(EMC->se_type == SE_YES){
+			reset_SE_P_matrix(empcs->SE_P);
+		}
 
 		assign_class_unique_by_k_medoids(N_X_org, K, eds->EDM, N_X, empcs->map_X_to_X_org,
 							center_id, class_id);

@@ -28,7 +28,6 @@ phyclust_struct* R_initialize_phyclust_struct(int code_type, int N_X_org, int L,
 	pcs->map_X_to_X_org = NULL;
 	pcs->replication_X = NULL;
 	pcs->seg_site_id = NULL;
-	pcs->label = NULL;					/* Assigned by R_update_phyclust_label(pcs, R_label) */
 
 	pcs->Mu = allocate_int_2D_AP(K);			/* Assigned by R. */
 	pcs->Eta = NULL;					/* Assigned by R. */
@@ -42,9 +41,20 @@ phyclust_struct* R_initialize_phyclust_struct(int code_type, int N_X_org, int L,
 	pcs->class_id = NULL; 
 	pcs->n_class = NULL; 
 
+	/* Labels. */
+	pcs->label = NULL;					/* Assigned by R_update_phyclust_label(pcs, R_label) */
+
+	/* If code_type = NUCLEOTIDE & se_type == SE_YES, then this should be
+	 * updated by updat_phyclust_struct_se(). */
+	pcs->se_type = SE_NO;					/* Updated by outside function. */
+	pcs->SE_P = NULL;					/* Assigned by update_phyclust_se_struct(). */
+
 	return(pcs);
 } /* End of R_initialize_phyclust_struct(). */
 
+
+/* This function only frees pointers. The memory pointed by the pointer is
+ * allocated in R and should not be free by R. */
 void R_free_phyclust_struct(phyclust_struct *pcs){
 	free(pcs->X_org);
 	free(pcs->seg_site_id);

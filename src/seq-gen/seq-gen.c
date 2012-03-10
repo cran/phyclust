@@ -1,14 +1,3 @@
-#ifdef __HAVE_R_ 
-	#include <R.h>
-	#include <Rinternals.h>
-	#ifdef R_EXT_PRINT_H_
-	#undef printf
-	#define printf Rprintf
-	#undef exit
-	#define exit(a) error("%d\n", a)
-	#endif
-#endif
-
 /*  
    Sequence Generator - seq-gen, version 1.3.2
    Copyright (c)1996-2004, Andrew Rambaut & Nick Grassly
@@ -48,6 +37,11 @@
    email: andrew.rambaut@zoo.ox.ac.uk
 */
 
+
+//WCC:add
+#include "R_seq-gen.h"
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -68,11 +62,11 @@
 #define VERSION_NUMBER "Version 1.3.2"
 
 
-FILE *R_temp_file_pointer;	//WCC
-TNode *avail;			//WCC
-long usedAvail;			//WCC
-long usedMalloc;		//WCC
-int MAX_TIPS;			//WCC for -u
+extern FILE *R_seq_gen_file_pointer;	//WCC:add
+TNode *avail;							//WCC:add
+long usedAvail;							//WCC:add
+long usedMalloc;						//WCC:add
+int MAX_TIPS;							//WCC:add for -u
 
 
 int treeFile, textFile, numDatasets, numTrees;
@@ -80,8 +74,10 @@ int scaleTrees, scaleBranches, ancestorSeq, writeAncestors, writeRates;
 int *partitionLengths;
 double *partitionRates;
 double treeScale, branchScale;
-char treeFileName[256];
-char textFileName[256];
+//WCC char treeFileName[256];
+char treeFileName[1024];
+//WCC char textFileName[256];
+char textFileName[1024];
 
 int hasAlignment, numSequences, numAlignmentSites;
 char **names;
@@ -165,7 +161,7 @@ static void PrintUsage()
 //WCC	fprintf(stderr, "Usage: seq-gen [-m MODEL] [-l #] [-n #] [-p #] [-s # | -d #] [-k #]\n");
 //WCC	fprintf(stderr, "               [-c #1 #2 #3 | -a # [-g #]] [-f e | #] [-t # | -r #]\n");
 //WCC	fprintf(stderr, "               [-z #] [-o[p][r][n]] [-w[a][r]] [-x NAME] [-q] [-h] [treefile]\n");
-	printf("Usage: seq-gen [-m MODEL] [-u #] [-l #] [-n #] [-p #] [-s # | -d #] [-k #]\n");	//add by WCC
+	printf("Usage: seq-gen [-m MODEL] [-u #] [-l #] [-n #] [-p #] [-s # | -d #] [-k #]\n");		//WCC:add
 	printf("               [-c #1 #2 #3 | -a # [-g #]] [-f e | #] [-t # | -r #]\n");
 	printf("               [-o[p][r][n]] [-w[a][r]] [-q] [-h]\n");
 	printf("  -u: # = maximum number of tips of trees [default = 2000]. Add by WCC\n");
@@ -264,12 +260,12 @@ void ReadParams(int argc, char **argv)
 	treeFile=0;
 	textFile=0;
 
-	numSequences = 0;	//WCC
-	numAlignmentSites = 0;	//WCC
-	avail = NULL;		//WCC
-	usedAvail = 0;		//WCC
-	usedMalloc = 0;		//WCC
-	MAX_TIPS = 2000;	//WCC for -u
+	numSequences = 0;		//WCC:add
+	numAlignmentSites = 0;	//WCC:add
+	avail = NULL;			//WCC:add
+	usedAvail = 0;			//WCC:add
+	usedMalloc = 0;			//WCC:add
+	MAX_TIPS = 2000;		//WCC:add for -u
 		
 	for (i=1; i<argc; i++) {
 		P=argv[i];
@@ -281,12 +277,12 @@ void ReadParams(int argc, char **argv)
 				case 'H':
 					PrintTitle();
 					PrintUsage();
-					exit(0);
+					exit(1);	//WCC:change
 				break;
 				case 'M':
 					if (GetStrParam(argc, argv, &i, P, st, 3)) {
 						fprintf(stderr, "Bad (or missing) Model Code: %s\n\n", argv[i]);
-						exit(0);
+						exit(2);	//WCC:change
 					}
 					
 					P=st;
@@ -316,7 +312,7 @@ void ReadParams(int argc, char **argv)
 					}
 					if (model==-1) {
 						fprintf(stderr, "Unknown Model: %s\n\n", argv[i]);
-						exit(0);
+						exit(3);	//WCC:change
 					}
 
 				break;
@@ -327,7 +323,7 @@ void ReadParams(int argc, char **argv)
 	if (model==NONE) {
 		fprintf(stderr, "No model has been specified (use the -m option)\n\n");
 		PrintUsage();
-		exit(0);
+		exit(4);	//WCC:change
 	}
 
 	for (i=1; i<argc; i++) {
@@ -336,7 +332,7 @@ void ReadParams(int argc, char **argv)
 			if (treeFile) {
 				fprintf(stderr, "Illegal command parameter: %s\n\n", argv[i]);
 				PrintUsage();
-				exit(0);
+				exit(5);	//WCC:change
 			}
 			treeFile=1;
 			strcpy(treeFileName, argv[i]);
@@ -362,75 +358,75 @@ void ReadParams(int argc, char **argv)
 				case 'L':
 					if (GetIntParams(argc, argv, &i, P, 1, &numSites) || numSites<1) {
 						fprintf(stderr, "Bad (or missing) sequence length: %s\n\n", argv[i]);
-						exit(0);
+						exit(6);	//WCC:change
 					}
 				break;
-				case 'U':	//Add by WCC
+				case 'U':	//WCC:add
 					if (GetIntParams(argc, argv, &i, P, 1, &MAX_TIPS) || MAX_TIPS<1) {
 						fprintf(stderr, "Bad (or missing) maximum number of tips: %s\n\n", argv[i]);
-						exit(0);
+						exit(7);	//WCC:change
 					}
 				break;
 				case 'N':
 					if (GetIntParams(argc, argv, &i, P, 1, &numDatasets) || numDatasets<1) {
 						fprintf(stderr, "Bad (or missing) number of datasets: %s\n\n", argv[i]);
-						exit(0);
+						exit(8);	//WCC:change
 					}
 				break;
 				case 'P':
 					if (GetIntParams(argc, argv, &i, P, 1, &maxPartitions) || maxPartitions < 1) {
 						fprintf(stderr, "Bad number of partitions: %s\n\n", argv[i]);
-						exit(0);
+						exit(9);	//WCC:change
 					}
 				break;
 				case 'C':
 					if (!isNucModel) {
 						fprintf(stderr, "You can only have codon rates when using nucleotide models\n\n");
-						exit(0);
+						exit(10);	//WCC:change
 					}
 					if (rateHetero==GammaRates) {
 						fprintf(stderr, "You can only have codon rates or gamma rates not both\n\n");
-						exit(0);
+						exit(11);	//WCC:change
 					}
 					numCats=3;
 					rateHetero=CodonRates;
 					if (GetDoubleParams(argc, argv, &i, P, 3, catRate) ||
 						catRate[0] <= 0.0 || catRate[1] <= 0.0 || catRate[2] <= 0.0 ) {
 						fprintf(stderr, "Bad Category Rates: %s\n\n", argv[i]);
-						exit(0);
+						exit(12);	//WCC:change
 					}
 				break;
 				case 'I':
 					if (GetDoubleParams(argc, argv, &i, P, 1, &proportionInvariable) || 
 							proportionInvariable < 0.0 || proportionInvariable >= 1.0) {
 						fprintf(stderr, "Bad Proportion of Invariable Sites: %s\n\n", argv[i]);
-						exit(0);
+						exit(13);	//WCC:change
 					}
 					invariableSites = 1;
 				break;
 				case 'A':
 					if (rateHetero==CodonRates) {
 						fprintf(stderr, "You can only have codon rates or gamma rates not both\n\n");
-						exit(0);
+						exit(14);	//WCC:change
 					}
 					
 					if (rateHetero==NoRates)
 						rateHetero=GammaRates;
 					if (GetDoubleParams(argc, argv, &i, P, 1, &gammaShape) || gammaShape<=0.0) {
 						fprintf(stderr, "Bad Gamma Shape: %s\n\n", argv[i]);
-						exit(0);
+						exit(15);	//WCC:change
 					}
 				break;
 				case 'G':
 					if (rateHetero==CodonRates) {
 						fprintf(stderr, "You can only have codon rates or gamma rates not both\n\n");
-						exit(0);
+						exit(16);	//WCC:change
 					}
 					
 					rateHetero=DiscreteGammaRates;
 					if (GetIntParams(argc, argv, &i, P, 1, &numCats) || numCats<2 || numCats>MAX_RATE_CATS) {
 						fprintf(stderr, "Bad number of Gamma Categories: %s\n\n", argv[i]);
-						exit(0);
+						exit(17);	//WCC:change
 					}
 				break;
 				case 'F':
@@ -441,7 +437,7 @@ void ReadParams(int argc, char **argv)
 							equalFreqs = 0;
 							if (GetDoubleParams(argc, argv, &i, P, NUM_NUC, nucFreq)) {
 								fprintf(stderr, "Bad Nucleotide Frequencies: %s\n\n", argv[i]);
-								exit(0);
+								exit(18);	//WCC:change
 							}
 						}
 					} else {
@@ -455,7 +451,7 @@ void ReadParams(int argc, char **argv)
 							equalFreqs = 0;
 							if (GetDoubleParams(argc, argv, &i, P, NUM_AA, aaFreq)) {
 								fprintf(stderr, "Bad Amino Acid Frequencies: %s\n\n", argv[i]);
-								exit(0);
+								exit(19);	//WCC:change
 							}
 						}
 					}
@@ -463,19 +459,19 @@ void ReadParams(int argc, char **argv)
 				case 'T':
 					if (model != HKY && model != F84) {
 						fprintf(stderr, "You can only have a transition/transversion ratio when using HKY or F84 models\n\n");
-						exit(0);
+						exit(20);	//WCC:change
 					}
 					equalTstv = 0;
 					if (GetDoubleParams(argc, argv, &i, P, 1, &tstv)) {
 						fprintf(stderr, "Bad Transition-Transversion Ratio: %s\n\n", argv[i]);
-						exit(0);
+						exit(21);	//WCC:change
 					}
 				break;
 				case 'R':
 					if (model == GTR) {
 						if (GetDoubleParams(argc, argv, &i, P, NUM_NUC_REL_RATES, nucRelativeRates)) {
 							fprintf(stderr, "Bad General Nucleotide Rate Matrix: %s\n\n", argv[i]);
-							exit(0);
+							exit(22);	//WCC:change
 						}
 						if (nucRelativeRates[NUM_NUC_REL_RATES - 1]!=1.0) {
 							for (j=0; j < NUM_NUC_REL_RATES - 1; j++) 
@@ -485,47 +481,47 @@ void ReadParams(int argc, char **argv)
 					} else if ( model == GENERAL) {
 						if (GetDoubleParams(argc, argv, &i, P, NUM_AA_REL_RATES, aaRelativeRate)) {
 							fprintf(stderr, "Bad General Amino Acid Rate Matrix: %s\n\n", argv[i]);
-							exit(0);
+							exit(23);	//WCC:change
 						}
 					} else {
 						fprintf(stderr, "You can only have a general rate matrix when using GTR or GENERAL models\n\n");
-						exit(0);
+						exit(24);	//WCC:change
 					}
 				break;
 				case 'D':
 					scaleTrees=1;
 					if (GetDoubleParams(argc, argv, &i, P, 1, &treeScale) || treeScale<=0.0) {
 						fprintf(stderr, "Bad Total Tree Scale: %s\n\n", argv[i]);
-						exit(0);
+						exit(25);	//WCC:change
 					}
 					if (scaleBranches) {
 						fprintf(stderr, "You can't specify both the -d and -s options\n\n");
-						exit(0);
+						exit(26);	//WCC:change
 					}
 				break;
 				case 'S':
 					scaleBranches=1;
 					if (GetDoubleParams(argc, argv, &i, P, 1, &branchScale) || branchScale<=0.0) {
 						fprintf(stderr, "Bad Branch Length Scale: %s\n\n", argv[i]);
-						exit(0);
+						exit(27);	//WCC:change
 					}
 					if (scaleTrees) {
 						fprintf(stderr, "You can't specify both the -d and -s options\n\n");
-						exit(0);
+						exit(28);	//WCC:change
 					}
 				break;
 				case 'K':
 					if (GetIntParams(argc, argv, &i, P, 1, &ancestorSeq) || ancestorSeq<1) {
 						fprintf(stderr, "Bad ancestral sequence number: %s\n\n", argv[i]);
-						exit(0);
+						exit(29);	//WCC:change
 					}
 				break;
-				case 'Z':
-					userSeed = 1;
-					if (GetUnsignedLongParams(argc, argv, &i, P, 1, &randomSeed)) {
-						fprintf(stderr, "Bad random number generator seed: %s\n\n", argv[i]);
-						exit(0);
-					}
+//WCC				case 'Z':
+//WCC					userSeed = 1;
+//WCC					if (GetUnsignedLongParams(argc, argv, &i, P, 1, &randomSeed)) {
+//WCC						fprintf(stderr, "Bad random number generator seed: %s\n\n", argv[i]);
+//WCC						exit(30);	//WCC:change
+//WCC					}
 				break;
 				case 'O':
 					switch (toupper(*P)) {
@@ -535,7 +531,7 @@ void ReadParams(int argc, char **argv)
 						default:					
 							fprintf(stderr, "Unknown output format: %s\n\n", argv[i]);
 							PrintUsage();
-							exit(0);
+							exit(31);	//WCC:change
 					}
 				break;
 				case 'W':
@@ -545,7 +541,7 @@ void ReadParams(int argc, char **argv)
 						default:					
 							fprintf(stderr, "Unknown write mode: %s\n\n", argv[i]);
 							PrintUsage();
-							exit(0);
+							exit(32);	//WCC:change
 					}
 				break;
 				case 'Q':
@@ -554,7 +550,7 @@ void ReadParams(int argc, char **argv)
 				default:
 					fprintf(stderr, "Illegal command parameter: %s\n\n", argv[i]);
 					PrintUsage();
-					exit(0);
+					exit(33);	//WCC:change
 				break;
 			}
 		}
@@ -657,7 +653,7 @@ void ReadFileParams()
 		i = fgets(st, 255, stdin);
 		if ( sscanf( st, " %d %d", &numSequences, &numAlignmentSites)!=2 ) {
 			fprintf(stderr, "Unable to read parameters from standard input\n");
-			exit(0);
+			exit(34);	//WCC:change
 		}
 		hasAlignment=1;
 	}
@@ -668,16 +664,13 @@ void ReadFileParams()
 /* Rewrite by WCC. */
 void ReadFileParams(){
 	char ch, st[256];
+	char *i;	//WCC:add
 	
 	hasAlignment=0;
 	
-	if(treeFile){
-		if((tree_fv = fopen(treeFileName, "rt")) == NULL){
-			fprintf(stderr, "Error opening tree file: '%s'\n", treeFileName);
-			exit(0);
-		}
-	} else{
-		tree_fv = stdin;
+	if((tree_fv = fopen(treeFileName, "rt")) == NULL){
+		fprintf(stderr, "Error opening tree file: '%s'\n", treeFileName);
+		exit(35);	//WCC:change
 	}
 
 	ch=fgetc(tree_fv);
@@ -687,13 +680,10 @@ void ReadFileParams(){
 	ungetc(ch, tree_fv);
 
 	if (ch!='(' && isdigit(ch)) {
-		if(fgets(st, 255, tree_fv) == NULL){
-			fprintf(stderr, "Unable to read parameters from standard input\n");
-			exit(0);
-		}
+		i = fgets(st, 255, tree_fv);
 		if ( sscanf( st, " %d %d", &numSequences, &numAlignmentSites)!=2 ) {
 			fprintf(stderr, "Unable to read parameters from standard input\n");
-			exit(0);
+			exit(36);	//WCC:change
 		}
 		hasAlignment=1;
 	}
@@ -726,7 +716,7 @@ void ReadFile()
 			
 		if ( feof(stdin) ) {
 			fprintf(stderr, "Unexpected end of file on standard input\n"); 
-			exit(0);
+			exit(37);	//WCC:change
 		}
 	
 		i=0;
@@ -738,14 +728,14 @@ void ReadFile()
 		names[n][i]='\0';
 		if (i==0) {
 			fprintf(stderr, "Name missing for species %d\n", n+1);
-			exit(0);
+			exit(38);	//WCC:change
 		}
 		while (!feof(stdin) && isspace(ch))
 			ch=fgetc(stdin);
 		
 		if ( feof(stdin) ) {
 			fprintf(stderr, "Unexpected end of file on standard input\n");
-			exit(0);
+			exit(39);	//WCC:change
 		}
 		
 		b=0;
@@ -759,7 +749,7 @@ void ReadFile()
 		
 		if ( b<numAlignmentSites ) {
 			fprintf(stderr, "Unexpected end of file on standard input\n");
-			exit(0);
+			exit(40);	//WCC:change
 		}
 		
 		//fprintf(stderr, "%d: %s, bases read: %d\n", n+1, names[n], b);
@@ -767,7 +757,7 @@ void ReadFile()
 		
 		if ( n<numSequences && feof(stdin) ) {
 			fprintf(stderr, "Too few sequences in input file\n");
-			exit(0);
+			exit(41);	//WCC:change
 		}
 	} while ( n<numSequences );
 }
@@ -786,8 +776,8 @@ void ReadFile()
 			ch=fgetc(tree_fv);
 			
 		if ( feof(tree_fv) ) {
-			fprintf(stderr, "Unexpected end of file on standard input\n"); 
-			exit(0);
+			fprintf(stderr, "Unexpected end of file\n"); 
+			exit(42);	//WCC:change
 		}
 	
 		i=0;
@@ -799,14 +789,14 @@ void ReadFile()
 		names[n][i]='\0';
 		if (i==0) {
 			fprintf(stderr, "Name missing for species %d\n", n+1);
-			exit(0);
+			exit(43);	//WCC:change
 		}
 		while (!feof(tree_fv) && isspace(ch))
 			ch=fgetc(tree_fv);
 		
 		if ( feof(tree_fv) ) {
-			fprintf(stderr, "Unexpected end of file on standard input\n");
-			exit(0);
+			fprintf(stderr, "Unexpected end of file\n");
+			exit(44);	//WCC:change
 		}
 		
 		b=0;
@@ -819,8 +809,8 @@ void ReadFile()
 		}
 		
 		if ( b<numAlignmentSites ) {
-			fprintf(stderr, "Unexpected end of file on standard input\n");
-			exit(0);
+			fprintf(stderr, "Unexpected end of file\n");
+			exit(45);	//WCC:change
 		}
 		
 		//fprintf(stderr, "%d: %s, bases read: %d\n", n+1, names[n], b);
@@ -828,13 +818,9 @@ void ReadFile()
 		
 		if ( n<numSequences && feof(tree_fv) ) {
 			fprintf(stderr, "Too few sequences in input file\n");
-			exit(0);
+			exit(46);	//WCC:change
 		}
 	} while ( n<numSequences );
-
-	if(treeFile){
-		fclose(tree_fv);
-	}
 }
 
 /*
@@ -846,7 +832,7 @@ int OpenTreeFile()
 	if (treeFile) {
 		if ( (tree_fv=fopen(treeFileName, "rt"))==NULL ) {
 			fprintf(stderr, "Error opening tree file: '%s'\n", treeFileName);
-			exit(0);
+			exit(47);	//WCC:change
 		}
 		n=CountTrees(tree_fv);
 	} else {
@@ -855,7 +841,7 @@ int OpenTreeFile()
 			i = fgets(st, 255, stdin);
 			if ( sscanf(st, " %d ", &n)!=1 ) {
 				fprintf(stderr, "Tree is missing from end of sequence file\n");
-				exit(0);
+				exit(48);	//WCC:change
 			}
 		} else
 			n=CountTrees(stdin);
@@ -868,31 +854,10 @@ int OpenTreeFile()
 /* Rewrite by WCC. */
 int OpenTreeFile()
 {
-	char st[256];
 	int n;
-		
-	if (treeFile) {
-		if ( (tree_fv=fopen(treeFileName, "rt"))==NULL ) {
-			fprintf(stderr, "Error opening tree file: '%s'\n", treeFileName);
-			exit(0);
-		}
-		n=CountTrees(tree_fv);
-	} else {
-		tree_fv=stdin;
-		if (hasAlignment) {
-			if(fgets(st, 255, stdin) == NULL){
-				fprintf(stderr, "Tree is missing from end of sequence file\n");
-				exit(0);
-			}
-			if ( sscanf(st, " %d ", &n)!=1 ) {
-				fprintf(stderr, "Tree is missing from end of sequence file\n");
-				exit(0);
-			}
-		} else
-			n=CountTrees(stdin);
-	}
-	
-	n = CountTrees(tree_fv);
+
+	n=CountTrees(tree_fv);
+
 	return n;
 }
 
@@ -916,7 +881,7 @@ int seq_gen_main(int argc, char **argv)
 
 	if (rateHetero == CodonRates && invariableSites) {
 		fprintf(stderr, "Invariable sites model cannot be used with codon rate heterogeneity.\n");
-		exit(0);
+		exit(51);	//WCC:change
 	}
 
 	if (writeAncestors && fileFormat == NEXUSFormat) {
@@ -925,7 +890,7 @@ int seq_gen_main(int argc, char **argv)
 
 	if (writeAncestors && maxPartitions > 1) {
 		fprintf(stderr, "Writing ancestral sequences can only be used for a single partition.\n");
-		exit(0);
+		exit(52);	//WCC:change
 	}
 			
 //WCC	if (!userSeed)
@@ -942,13 +907,13 @@ int seq_gen_main(int argc, char **argv)
 	
 	if ((ancestorSeq>0 && !hasAlignment) || ancestorSeq>numSequences) {
 		fprintf(stderr, "Bad ancestral sequence number\n");
-		exit(0);
+		exit(53);	//WCC:change
 	}
 	
 	if (textFile) {
 		if ( (text_fv=fopen(textFileName, "rt"))==NULL ) {
 			fprintf(stderr, "Error opening text file for insertion into output: '%s'\n", textFileName);
-			exit(0);
+			exit(54);	//WCC:change
 		}
 	}
 
@@ -963,7 +928,7 @@ int seq_gen_main(int argc, char **argv)
 		if (ancestorSeq>0) {
 			if (numSites!=numAlignmentSites) {
 				fprintf(stderr, "Ancestral sequence is of a different length to the simulated sequences\n");
-				exit(0);
+				exit(55);	//WCC:change
 			}
 			ancestor=sequences[ancestorSeq-1];
 		}
@@ -979,26 +944,26 @@ int seq_gen_main(int argc, char **argv)
 	treeSet = (TTree **)malloc(sizeof(TTree *) * maxPartitions);
 	if (treeSet==NULL) {
 		fprintf(stderr, "Out of memory\n");
-		exit(0);
+		exit(56);	//WCC:change
 	}
 	
 	partitionLengths = (int *)malloc(sizeof(int) * maxPartitions);
 	if (partitionLengths==NULL) {
 		fprintf(stderr, "Out of memory\n");
-		exit(0);
+		exit(57);	//WCC:change
 	}
 	
 	partitionRates = (double *)malloc(sizeof(double) * maxPartitions);
 	if (partitionRates==NULL) {
 		fprintf(stderr, "Out of memory\n");
-		exit(0);
+		exit(58);	//WCC:change
 	}
 	
 	for (i = 0; i < maxPartitions; i++) {
 //WCC		if ((treeSet[i]=NewTree())==NULL) {
 		if ((treeSet[i]=NewTree(MAX_TIPS))==NULL) {
 			fprintf(stderr, "Out of memory\n");
-			exit(0);
+			exit(59);	//WCC:change
 		}
 	}
 			
@@ -1014,22 +979,22 @@ int seq_gen_main(int argc, char **argv)
 		if (treeNo==0) {
 			numTaxa=treeSet[0]->numTips;
 			
-			if (!quiet)
-				fprintf(stderr, "Random number generator seed: %ld\n\n", randomSeed);
+//WCC			if (!quiet)
+//WCC				fprintf(stderr, "Random number generator seed: %ld\n\n", randomSeed);
 				
 			if (fileFormat == NEXUSFormat) {
 //WCC				fprintf(stdout, "#NEXUS\n");
 //WCC				fprintf(stdout, "[\nGenerated by %s %s\n\n", PROGRAM_NAME, VERSION_NUMBER);
 //WCC				PrintVerbose(stdout);
 //WCC				fprintf(stdout, "]\n\n");
-				fprintf(R_temp_file_pointer, "#NEXUS\n");
-				fprintf(R_temp_file_pointer, "[\nGenerated by %s %s\n\n", PROGRAM_NAME, VERSION_NUMBER);
-				PrintVerbose(R_temp_file_pointer);
-				fprintf(R_temp_file_pointer, "]\n\n");
+				fprintf(R_seq_gen_file_pointer, "#NEXUS\n");
+				fprintf(R_seq_gen_file_pointer, "[\nGenerated by %s %s\n\n", PROGRAM_NAME, VERSION_NUMBER);
+				PrintVerbose(R_seq_gen_file_pointer);
+				fprintf(R_seq_gen_file_pointer, "]\n\n");
 			}
 		} else if (treeSet[0]->numTips != numTaxa) {
 			fprintf(stderr, "All trees must have the same number of tips.\n");
-			exit(0);
+			exit(60);	//WCC:change
 		}
 		
 		if (maxPartitions == 1) {
@@ -1046,7 +1011,7 @@ int seq_gen_main(int argc, char **argv)
 			if (!IsTreeAvail(tree_fv)) {
 				fprintf(stderr, "\nA set of trees number %d had less partition length (%d) than\n", treeNo + 1, sumLength);
 				fprintf(stderr, "was required to make a sequence of length %d.\n", numSites);
-				exit(0);
+				exit(61);	//WCC:change
 			}
 				
 			ReadTree(tree_fv, treeSet[i], treeNo+1, treeSet[0]->numTips, treeSet[0]->names, 
@@ -1054,7 +1019,7 @@ int seq_gen_main(int argc, char **argv)
 						
 			if (treeSet[i]->numTips != numTaxa) {
 				fprintf(stderr, "All trees must have the same number of tips.\n");
-				exit(0);
+				exit(62);	//WCC:change
 			}
 			
 			sumLength += partitionLengths[i];
@@ -1069,7 +1034,7 @@ int seq_gen_main(int argc, char **argv)
 		if (sumLength != numSites) {
 			fprintf(stderr, "The sum of the partition lengths in the treefile does not equal\n");
 			fprintf(stderr, "the specified number of sites.\n");
-			exit(0);
+			exit(63);	//WCC:change
 		}
 			
 		for (i = 0; i < numPartitions; i++)
@@ -1100,7 +1065,7 @@ int seq_gen_main(int argc, char **argv)
 				if (scaleTrees) { 
 					if (!treeSet[j]->rooted) {
 						fprintf(stderr, "To scale tree length, they must be rooted and ultrametric.\n");
-						exit(0);
+						exit(64);	//WCC:change
 					}
 					scale *= treeScale/treeSet[j]->totalLength;
 				} else if (scaleBranches)
@@ -1112,10 +1077,10 @@ int seq_gen_main(int argc, char **argv)
 			
 			if (writeAncestors)
 //WCC				WriteAncestralSequences(stdout, treeSet[0]);
-				WriteAncestralSequences(R_temp_file_pointer, treeSet[0]);
+				WriteAncestralSequences(R_seq_gen_file_pointer, treeSet[0]);
 			else
 //WCC				WriteSequences(stdout, (numTrees > 1 ? treeNo+1 : -1), (numDatasets > 1 ? i+1 : -1), treeSet, partitionLengths);
-				WriteSequences(R_temp_file_pointer, (numTrees > 1 ? treeNo+1 : -1), (numDatasets > 1 ? i+1 : -1), treeSet, partitionLengths);
+				WriteSequences(R_seq_gen_file_pointer, (numTrees > 1 ? treeNo+1 : -1), (numDatasets > 1 ? i+1 : -1), treeSet, partitionLengths);
 
 			if (writeRates) {
 				WriteRates(stderr);
@@ -1126,10 +1091,10 @@ int seq_gen_main(int argc, char **argv)
 					ch = fgetc(text_fv);
 					if (!feof(text_fv))
 //WCC						fputc(ch, stdout);
-						fputc(ch, R_temp_file_pointer);
+						fputc(ch, R_seq_gen_file_pointer);
 				}
 //WCC				fputc('\n', stdout);
-				fputc('\n', R_temp_file_pointer);
+				fputc('\n', R_seq_gen_file_pointer);
 				rewind(text_fv);
 			}
 			
@@ -1169,7 +1134,7 @@ int seq_gen_main(int argc, char **argv)
 	free(sequences);
 
 	
-	if (treeFile)
+//WCC	if (treeFile)
 		fclose(tree_fv);
 
 	if (textFile)

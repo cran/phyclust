@@ -1,5 +1,7 @@
 /* This file contains declarations for Nelder-Mead. */
 
+#include "phyclust_constant.h"
+
 #ifndef __PHYCLUST_APE_NJ_
 #define __PHYCLUST_APE_NJ_
 

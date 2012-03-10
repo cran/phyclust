@@ -1,6 +1,6 @@
 \name{bootstrap.star.trees}
 \alias{bootstrap.star.trees}
-\title{Bootstrap a star tree from a fitted model.}
+\title{Bootstrap a Star Tree from a Fitted Model.}
 \description{
   This function bootstraps a star tree from a model fitted by \code{phyclust}.
   Each cluster corresponds to a star tree and a center sequence where
@@ -49,4 +49,4 @@ ret.1 <- phyclust(seq.data.toy$org, 2, EMC = EMC.1)
 ret.trees <- bootstrap.star.trees(ret.1)
 }
 }
-\keyword{programming}
+\keyword{bootstrap}

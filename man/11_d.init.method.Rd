@@ -1,7 +1,7 @@
 \name{.init.method}
 \alias{.init.method}
 \docType{data}
-\title{Initialization methods for EM algorithms}
+\title{Initialization Methods for EM Algorithms}
 \description{
   The varied initialization methods are implemented in C.
   The first element is the default value.
