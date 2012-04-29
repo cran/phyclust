@@ -21,5 +21,6 @@ struct _emptr_se{
 
 EMPTR_SE allocate_emptr_se(void);
 SEXP initialize_emptr_se(EMPTR_SE emptr_se, phyclust_struct *pcs);
+void update_emptr_se(EMPTR_SE emptr_se, phyclust_struct *pcs, SEXP emobj);
 void copy_all_to_emptr_se(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, EMPTR_SE emptr_se);
 

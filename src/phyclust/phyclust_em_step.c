@@ -389,7 +389,7 @@ void Update_Z_modified(em_phyclust_struct *empcs, Q_matrix_array *QA){
 				for(s_to = 0; s_to < empcs->ncode; s_to++){
 					empcs->Z_modified[n_X][k] += QA->Q[k]->log_Pt[s_from][s_to] *
 						empcs->count_Mu_X[n_X][k][s_from][s_to];
-					/* For missing.
+					/* For gap.
 					 * This can be skipped for Z_normalized, but can NOT be skipped
 					 * for the complete logL, the R function and the M steps. */
 				}

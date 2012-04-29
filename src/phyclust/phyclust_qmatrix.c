@@ -152,7 +152,7 @@ void assign_FP_to_Q_matrix(int substitution_model, Q_matrix *Q){
 			Q->Print_Q_matrix = &Print_Q_matrix_SNP_F81;
 			break;
 		default:
-			fprintf(stderr, "PE: The substitution model is not found.\n");
+			fprintf_stderr("PE: The substitution model is not found.\n");
 			exit(1);
 	}
 } /* End of assign_FP_to_Q_matrix(). */

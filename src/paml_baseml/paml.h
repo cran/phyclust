@@ -2,10 +2,6 @@
 */
 
 
-//WCC:add
-#include "R_paml.h"
-
-
 #if (!defined PAML_H)
 #define PAML_H
 
@@ -22,14 +18,16 @@
 
 #define square(a) ((a)*(a))
 #define FOR(i,n) for(i=0; i<n; i++)
+
 #define FPN(file) fputc('\n', file)
-#define F0 stdout
+//WCC #define F0 stdout
+
 #define min2(a,b) ((a)<(b)?(a):(b))
 #define max2(a,b) ((a)>(b)?(a):(b))
 #define swap2(a,b,y) { y=a; a=b; b=y; }
 #define Pi  3.1415926535897932384626433832795
 
-#define beep putchar('\a')
+//WCC #define beep putchar('\a')
 #define spaceming2(n) ((n)*((n)*2+9+2)*sizeof(double))
 
 int ReadSeq (FILE *fout, FILE *fseq, int cleandata);
@@ -367,18 +365,13 @@ enum {PrBranch=1, PrNodeNum=2, PrLabel=4, PrAge=8, PrOmega=16} OutTreeOptions;
 
 
 //WCC:add
-#ifdef __HAVE_R_ 
-	#include <R.h>
-	#include <Rinternals.h>
-	#ifdef R_EXT_PRINT_H_
-	#undef printf
-	#define printf Rprintf
-	#undef exit
-	#define exit(a) error("%d\n", a)
-	#endif
-#endif
 FILE *R_paml_baseml_file_pointer;
 
 
 #endif
+
+
+//WCC:add
+#include "R_paml.h"
+
 

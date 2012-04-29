@@ -82,8 +82,8 @@ struct _em_phyclust_struct{
 	/* Define code type. */
 	int		code_type;		/* NUCLEOTIDE/SNP. */
 	int		ncode;			/* = NN or NSNP, indicates the dimension. */
-	int		missing_index;		/* = NNG or NSNPG, indicates the missing index. */
-	int		missing_flag;		/* = 0 or 1 for data without missing or with missing. */
+	int		gap_index;		/* = NNG or NSNPG, indicates the gap index. */
+	int		gap_flag;		/* = 0 or 1 for data without gap or with gap. */
 	/* Constant points to phylcust_struct *pcs. */
 	int		N_X_org;		/* Number of original sequences. */
 	int		N_X;			/* Number of sequences. */
@@ -110,8 +110,8 @@ struct _em_phyclust_struct{
 	double		logL_observed;		/* Observed logL. */
 
 	/* Computing storage. */
-	int		****count_Mu_X;		/* Used in update_Z_modified(), logL_observed(), initialize_count_Mu_X_and_missing(). */
-	int		***count_Mu_X_missing;	/* Used in update_Z_modified(), logL_observed(), initialize_count_Mu_X_and_missing(). */
+	int		****count_Mu_X;		/* Used in update_Z_modified(), logL_observed(), initialize_count_Mu_X_and_gap(). */
+	int		***count_Mu_X_gap;	/* Used in update_Z_modified(), logL_observed(), initialize_count_Mu_X_and_gap(). */
 
 /* Extension applications. */
 	/* For labels, only owned pointers memory and need to be freed.
@@ -130,8 +130,8 @@ struct _em_phyclust_struct{
 
 	/* For sequencing error model. */
 	int		se_type;			/* For sequencing error types. */
-	double		***Z_err_modified;		/* Unnormalized log Z_err, dim = K * L * NCODE_WIMISSING[code_type]. */
-	double		***Z_err_normalized;		/* Normalized Z_err, dim = K * L * NCODE_WIMISSING[code_type]. */
+	double		***Z_err_modified;		/* Unnormalized log Z_err, dim = K * L * NCODE_WIGAP[code_type]. */
+	double		***Z_err_normalized;		/* Normalized Z_err, dim = K * L * NCODE_WIGAP[code_type]. */
 	double		*Eta_err;			/* Proportion, dim = 2. */
 	double		*log_Eta_err;			/* Proportion, dim = 2. */
 	SE_P_matrix	*SE_P;				/* Parameters of sequencing error models. */
@@ -212,7 +212,7 @@ struct _em_fp{
 	void	(*Copy_empcs_to_pcs)(em_phyclust_struct*, phyclust_struct*);			/* copy empcs to pcs. */
 	void	(*Copy_pcs_to_empcs)(phyclust_struct*, em_phyclust_struct*);			/* copy empcs to pcs. */
 
-/* Deal with missing or non-missing sequences. */
+/* Deal with gap or non-gap sequences. */
 	/* In "phyclust_logpL.c". */
 	void	(*Update_Mu_given_QA)(em_phyclust_struct*, Q_matrix_array*, Q_matrix_array*);	/* Update Mu given QA in logpL. */
 	double	(*Compute_R)(em_phyclust_struct*, Q_matrix_array*, Q_matrix_array*);		/* Update function R(). */

@@ -1,8 +1,15 @@
+2012-04-29: Ver. 0.1-12
+  * fix a bug in ms().
+  * fix more F0, stdout, putchar, ...etc in baseml() for CRAN.
+  * fix fprintf(stderr, ...) bugs everywhere replacing by REprintf(...).
+  * check demo examples and vignettes.
+  * add missing to C and R code.
+  * add an update function to phyclust.
+  * fix memory overwrite problems in sequencing error probability.
+
 2012-03-01: Ver. 0.1-11
   * add sequencing error models in C and R, phyclust.se(), phyclust.se.update().
   * fix stdout, stderr, fprintf, printf, puts, ...etc for CRAN.
-
-2012-01-03: Ver. 0.1-11
   * add PAML C function baseml to find tree using maximum likelihood.
   * modify PAML functions for baseml and fix bugs.
   * fix the fclose() problem in baseml.
@@ -90,7 +97,7 @@
   * Rebuild R code.
 
 2009-07-28:
-  * Rewirte in C.
+  * Rewrite in C.
   * Rename to phyclust.
 
 2009-07-01:

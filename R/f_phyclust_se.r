@@ -1,7 +1,8 @@
 # This file contains functions to call phyclust in C.
 
-phyclust.se <- function(X, K, EMC = .EMC, manual.id = NULL,
-    label = NULL, byrow = TRUE){
+phyclust.se <- function(X, K, EMC = .EMC, manual.id = NULL, byrow = TRUE){
+  label <- NULL
+
   if(K <= 0){
     stop("K > 0")
   }
@@ -65,7 +66,7 @@ translate.ret.se <- function(ret, EMC = NULL){
     ret$init.procedure <- .init.procedure[EMC$init.procedure + 1]
     ret$init.method <- .init.method[EMC$init.method + 1]
     ret$substitution.model <-
-      as.character(.substitution$model[EMC$substitution.model + 1])
+      as.character(.substitution.model$model[EMC$substitution.model + 1])
     ret$edist.model <- .edist.model[EMC$edist.model + 1]
     ret$QA$identifier <- .identifier[EMC$identifier + 1]
     ret$code.type <- .code.type[EMC$code.type + 1]
@@ -145,10 +146,10 @@ translate.EMC.se <- function(EMC){
     stop("The initial method is not found.")
   }
 
-  if(EMC$substitution.model[1] %in% as.character(.substitution$model)){
+  if(EMC$substitution.model[1] %in% as.character(.substitution.model$model)){
     EMC$substitution.model <-
       as.integer(which(EMC$substitution.model ==
-                       as.character(.substitution$model)) - 1)
+                       as.character(.substitution.model$model)) - 1)
   } else{
     stop("The substitution model is not found.")
   }

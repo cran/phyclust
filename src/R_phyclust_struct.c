@@ -14,8 +14,8 @@ phyclust_struct* R_initialize_phyclust_struct(int code_type, int N_X_org, int L,
 	pcs = (phyclust_struct*) malloc(sizeof(phyclust_struct));
 	pcs->code_type = code_type;
 	pcs->ncode = NCODE[code_type];
-	pcs->missing_index = MISSING_INDEX[code_type];
-	pcs->missing_flag = 0;
+	pcs->gap_index = GAP_INDEX[code_type];
+	pcs->gap_flag = 0;
 	pcs->n_param = K - 1 + K * L;
 	pcs->N_X_org = N_X_org;
 	pcs->N_X = 0;

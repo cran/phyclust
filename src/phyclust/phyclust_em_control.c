@@ -131,7 +131,7 @@ void update_em_control(em_control *EMC){
 			}
 			break;
 		default:
-			fprintf(stderr, "PE: The code type is not found.\n");
+			fprintf_stderr("PE: The code type is not found.\n");
 			exit(1);
 	}
 

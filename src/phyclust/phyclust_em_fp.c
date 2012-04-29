@@ -36,7 +36,7 @@ em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
 			EMFP->Update_init = &Update_init_manually;
 			break;
 		default:
-			fprintf(stderr, "PE: The initial method is not found.\n");
+			fprintf_stderr("PE: The initial method is not found.\n");
 			exit(1);
 	}
 
@@ -67,7 +67,7 @@ em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
 			EMFP->Maximize_logpL = &Maximize_logpL;
 			break;
 		default:
-			fprintf(stderr, "PE: The EM method is not found.\n");
+			fprintf_stderr("PE: The EM method is not found.\n");
 			exit(1);
 	}
 
@@ -91,7 +91,7 @@ em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
 			EMFP->Copy_pcs_to_empcs = &Copy_pcs_to_empcs_label;
 			break;
 		default:
-			fprintf(stderr, "PE: The label method is not found.\n");
+			fprintf_stderr("PE: The label method is not found.\n");
 			exit(1);
 	}
 
@@ -104,19 +104,19 @@ em_fp* initialize_em_fp(em_control *EMC, phyclust_struct *pcs){
 			EMFP->Update_Eta_given_Z = &Update_Eta_given_Z_ADJUST;
 			break;
 		default:
-			fprintf(stderr, "PE: The boundary method is not found.\n");
+			fprintf_stderr("PE: The boundary method is not found.\n");
 			exit(1);
 	}
 
 	/* For GAPs. */
-	if(pcs->missing_flag){
-		EMFP->LogL_complete = &LogL_complete_missing;
-		EMFP->LogL_profile = &LogL_profile_missing;
-		EMFP->Compute_R = &Compute_R_missing;
+	if(pcs->gap_flag){
+		EMFP->LogL_complete = &LogL_complete_gap;
+		EMFP->LogL_profile = &LogL_profile_gap;
+		EMFP->Compute_R = &Compute_R_gap;
 		if(EMC->est_non_seg_site != 0){
-			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_full_missing;
+			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_full_gap;
 		} else{
-			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_skip_non_seg_missing;
+			EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_skip_non_seg_gap;
 		}
 	} else{
 		EMFP->LogL_complete = &LogL_complete;

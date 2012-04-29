@@ -240,7 +240,7 @@ gensam( char **list, double *pprobss, double *ptmrca, double *pttot )
 		     start = seglst[seg].beg ;
 		     len = end - start + 1 ;
 //WCC		     fprintf(stdout,"[%d]", len);
-		     fprintf(temp_file_pointer, "[%d]", len);
+		     fprintf(R_ms_file_pointer, "[%d]", len);
 	      }
 	      prtree( seglst[seg].ptree, nsam ) ;
 	      if( (segsitesin == 0) && ( theta == 0.0 ) && ( pars.mp.timeflag == 0 ) ) 
@@ -418,11 +418,14 @@ getpars(int argc, char *argv[], int *phowmany )
 	
 
   if( count == 0 ) {
-	if( argc < 4 ){ fprintf(stderr,"Too few command line arguments\n"); usage();}
+//WCC	if( argc < 4 ){ fprintf(stderr,"Too few command line arguments\n"); usage();}
+	if( argc < 4 ){ REprintf("Too few command line arguments\n"); usage();}
 	pars.cp.nsam = atoi( argv[1] );
-	if( pars.cp.nsam <= 0 ) { fprintf(stderr,"First argument error. nsam <= 0. \n"); usage();}
+//WCC	if( pars.cp.nsam <= 0 ) { fprintf(stderr,"First argument error. nsam <= 0. \n"); usage();}
+	if( pars.cp.nsam <= 0 ) { REprintf("First argument error. nsam <= 0. \n"); usage();}
 	*phowmany = atoi( argv[2] );
-	if( *phowmany  <= 0 ) { fprintf(stderr,"Second argument error. howmany <= 0. \n"); usage();}
+//WCC	if( *phowmany  <= 0 ) { fprintf(stderr,"Second argument error. howmany <= 0. \n"); usage();}
+	if( *phowmany  <= 0 ) { REprintf("Second argument error. howmany <= 0. \n"); usage();}
 	pars.commandlineseedflag = 0 ;
 	pars.cp.r = pars.mp.theta =  pars.cp.f = 0.0 ;
 	pars.cp.track_len = 0. ;
@@ -451,14 +454,17 @@ getpars(int argc, char *argv[], int *phowmany )
 	arg = 3 ;
 
 	while( arg < argc ){
-		if( argv[arg][0] != '-' ) { fprintf(stderr," argument should be -%s ?\n", argv[arg]); usage();}
+//WCC		if( argv[arg][0] != '-' ) { fprintf(stderr," argument should be -%s ?\n", argv[arg]); usage();}
+		if( argv[arg][0] != '-' ) { REprintf(" argument should be -%s ?\n", argv[arg]); usage();}
 		switch ( argv[arg][1] ){
 			case 'f' :
-				if( ntbs > 0 ) { fprintf(stderr," can't use tbs args and -f option.\n"); exit(1); }
+//WCC				if( ntbs > 0 ) { fprintf(stderr," can't use tbs args and -f option.\n"); exit(1); }
+				if( ntbs > 0 ) { REprintf(" can't use tbs args and -f option.\n"); exit(1); }
 				arg++;
 				argcheck( arg, argc, argv);
 				pf = fopen( argv[arg], "r" ) ;
-				if( pf == NULL ) {fprintf(stderr," no parameter file %s\n", argv[arg] ); exit(0);}
+//WCC				if( pf == NULL ) {fprintf(stderr," no parameter file %s\n", argv[arg] ); exit(0);}
+				if( pf == NULL ) {REprintf(" no parameter file %s\n", argv[arg] ); exit(0);}
 				arg++;
 				argc++ ;
 				argv = (char **)malloc(  (unsigned)(argc+1)*sizeof( char *) ) ;
@@ -481,7 +487,8 @@ getpars(int argc, char *argv[], int *phowmany )
 				argcheck( arg, argc, argv);
 				pars.cp.nsites = atoi( argv[arg++]);
 				if( pars.cp.nsites <2 ){
-					fprintf(stderr,"with -r option must specify both rec_rate and nsites>1\n");
+//WCC					fprintf(stderr,"with -r option must specify both rec_rate and nsites>1\n");
+					REprintf("with -r option must specify both rec_rate and nsites>1\n");
 					usage();
 					}
 				break;		
@@ -492,7 +499,8 @@ getpars(int argc, char *argv[], int *phowmany )
 				argcheck( arg, argc, argv);
 				pars.cp.track_len = atof( argv[arg++]);
 				if( pars.cp.track_len <1. ){
-					fprintf(stderr,"with -c option must specify both f and track_len>0\n");
+//WCC					fprintf(stderr,"with -c option must specify both f and track_len>0\n");
+					REprintf("with -c option must specify both f and track_len>0\n");
 					usage();
 					}
 				break;		
@@ -518,7 +526,8 @@ getpars(int argc, char *argv[], int *phowmany )
 				argcheck( arg, argc, argv);
 				pars.mp.mfreq = atoi(  argv[arg++] );
                                 if( (pars.mp.mfreq < 2 ) || (pars.mp.mfreq > pars.cp.nsam/2 ) ){
-                                    fprintf(stderr," mfreq must be >= 2 and <= nsam/2.\n");
+//WCC                                    fprintf(stderr," mfreq must be >= 2 and <= nsam/2.\n");
+                                    REprintf(" mfreq must be >= 2 and <= nsam/2.\n");
                                     usage();
                                     }
 				break;
@@ -568,7 +577,8 @@ getpars(int argc, char *argv[], int *phowmany )
 			     for( i=0; i< pars.cp.npop; i++) pars.cp.mig_mat[i][i] = migr ;
 			     break;
 			case 'm' :
-			     if( npop < 2 ) { fprintf(stderr,"Must use -I option first.\n"); usage();}
+//WCC			     if( npop < 2 ) { fprintf(stderr,"Must use -I option first.\n"); usage();}
+			     if( npop < 2 ) { REprintf("Must use -I option first.\n"); usage();}
 			     if( argv[arg][2] == 'a' ) {
 				    arg++;
 				    for( pop = 0; pop <npop; pop++)
@@ -596,7 +606,8 @@ getpars(int argc, char *argv[], int *phowmany )
 			    }
 				break;
 			case 'n' :
-			     if( npop < 2 ) { fprintf(stderr,"Must use -I option first.\n"); usage();}
+//WCC			     if( npop < 2 ) { fprintf(stderr,"Must use -I option first.\n"); usage();}
+			     if( npop < 2 ) { REprintf("Must use -I option first.\n"); usage();}
 			    arg++;
 			    argcheck( arg, argc, argv);
 			    pop = atoi( argv[arg++] ) -1;
@@ -605,17 +616,20 @@ getpars(int argc, char *argv[], int *phowmany )
 			    pars.cp.size[pop] = psize ;
 			   break;
 			case 'g' :
-			     if( npop < 2 ) { fprintf(stderr,"Must use -I option first.\n"); usage();}
+//WCC			     if( npop < 2 ) { fprintf(stderr,"Must use -I option first.\n"); usage();}
+			     if( npop < 2 ) { REprintf("Must use -I option first.\n"); usage();}
 			    arg++;
 			    argcheck( arg, argc, argv);
 			    pop = atoi( argv[arg++] ) -1;
-			    if( arg >= argc ) { fprintf(stderr,"Not enough arg's after -G.\n"); usage(); }
+//WCC			    if( arg >= argc ) { fprintf(stderr,"Not enough arg's after -G.\n"); usage(); }
+			    if( arg >= argc ) { REprintf("Not enough arg's after -G.\n"); usage(); }
 			    palpha = atof( argv[arg++] );
 			    pars.cp.alphag[pop] = palpha ;
 			   break;
 			case 'G' :
 			    arg++;
-			    if( arg >= argc ) { fprintf(stderr,"Not enough arg's after -G.\n"); usage(); }
+//WCC			    if( arg >= argc ) { fprintf(stderr,"Not enough arg's after -G.\n"); usage(); }
+			    if( arg >= argc ) { REprintf("Not enough arg's after -G.\n"); usage(); }
 			    palpha = atof( argv[arg++] );
 			    for( i=0; i<pars.cp.npop; i++) 
 			       pars.cp.alphag[i] = palpha ;
@@ -643,7 +657,8 @@ getpars(int argc, char *argv[], int *phowmany )
 				      pt->paramv = atof( argv[arg++] ) ;
 				      break;
 				case 'G' :
-				  if( arg >= argc ) { fprintf(stderr,"Not enough arg's after -eG.\n"); usage(); }
+//WCC				  if( arg >= argc ) { fprintf(stderr,"Not enough arg's after -eG.\n"); usage(); }
+				  if( arg >= argc ) { REprintf("Not enough arg's after -eG.\n"); usage(); }
 				  pt->paramv = atof( argv[arg++] ) ;
 				  break;
 				case 'M' :
@@ -659,7 +674,8 @@ getpars(int argc, char *argv[], int *phowmany )
 				case 'g' :
 			          argcheck( arg, argc, argv);
 				  pt->popi = atoi( argv[arg++] ) -1 ;
-				  if( arg >= argc ) { fprintf(stderr,"Not enough arg's after -eg.\n"); usage(); }
+//WCC				  if( arg >= argc ) { fprintf(stderr,"Not enough arg's after -eg.\n"); usage(); }
+				  if( arg >= argc ) { REprintf("Not enough arg's after -eg.\n"); usage(); }
 				  pt->paramv = atof( argv[arg++] ) ;
 				  break;
 				case 's' :
@@ -706,21 +722,25 @@ getpars(int argc, char *argv[], int *phowmany )
 			          argcheck( arg, argc, argv);
 				  pt->popj = atoi( argv[arg++] ) -1 ;
 				  break;
-				default: fprintf(stderr,"e event\n");  usage();
+//WCC				default: fprintf(stderr,"e event\n");  usage();
+				default: REprintf("e event\n");  usage();
 			    }
 			 break;
-			default: fprintf(stderr," option default\n");  usage() ;
+//WCC			default: fprintf(stderr," option default\n");  usage() ;
+			default: REprintf(" option default\n");  usage() ;
 			}
 		}
 		if( (pars.mp.theta == 0.0) && ( pars.mp.segsitesin == 0 ) && ( pars.mp.treeflag == 0 ) && (pars.mp.timeflag == 0) ) {
-			fprintf(stderr," either -s or -t or -T option must be used. \n");
+//WCC			fprintf(stderr," either -s or -t or -T option must be used. \n");
+			REprintf(" either -s or -t or -T option must be used. \n");
 			usage();
 			exit(1);
 			}
 		sum = 0 ;
 		for( i=0; i< pars.cp.npop; i++) sum += (pars.cp.config)[i] ;
 		if( sum != pars.cp.nsam ) {
-			fprintf(stderr," sum sample sizes != nsam\n");
+//WCC			fprintf(stderr," sum sample sizes != nsam\n");
+			REprintf(" sum sample sizes != nsam\n");
 			usage();
 			exit(1);
 			}
@@ -731,8 +751,10 @@ getpars(int argc, char *argv[], int *phowmany )
 argcheck( int arg, int argc, char *argv[] )
 {
 	if( (arg >= argc ) || ( argv[arg][0] == '-') ) {
-	   fprintf(stderr,"not enough arguments after %s\n", argv[arg-1] ) ;
-	   fprintf(stderr,"For usage type: ms<return>\n");
+//WCC	   fprintf(stderr,"not enough arguments after %s\n", argv[arg-1] ) ;
+	   REprintf("not enough arguments after %s\n", argv[arg-1] ) ;
+//WCC	   fprintf(stderr,"For usage type: ms<return>\n");
+	   REprintf("For usage type: ms<return>\n");
 	   exit(0);
 	  }
 }
@@ -935,21 +957,21 @@ parens( struct node *ptree, int *descl, int *descr,  int noden)
 
    if( descl[noden] == -1 ) {
 //WCC	printf("%d:%5.3lf", noden+1, (ptree+ ((ptree+noden)->abv))->time );
-	fprintf(temp_file_pointer, "s%d:%15.12lf", noden+1, (ptree+ ((ptree+noden)->abv))->time );
+	fprintf(R_ms_file_pointer, "s%d:%15.12lf", noden+1, (ptree+ ((ptree+noden)->abv))->time );
 	}
    else{
 //WCC	printf("(");
-	fprintf(temp_file_pointer, "(");
+	fprintf(R_ms_file_pointer, "(");
 	parens( ptree, descl,descr, descl[noden] ) ;
 //WCC	printf(",");
-	fprintf(temp_file_pointer, ",");
+	fprintf(R_ms_file_pointer, ",");
 	parens(ptree, descl, descr, descr[noden] ) ;
 //WCC	if( (ptree+noden)->abv == 0 ) printf(");\n"); 
-	if( (ptree+noden)->abv == 0 ) fprintf(temp_file_pointer, ");\n"); 
+	if( (ptree+noden)->abv == 0 ) fprintf(R_ms_file_pointer, ");\n"); 
 	else {
 	  time = (ptree + (ptree+noden)->abv )->time - (ptree+noden)->time ;
 //WCC	  printf("):%5.3lf", time );
-	  fprintf(temp_file_pointer, "):%15.12lf", time );
+	  fprintf(R_ms_file_pointer, "):%15.12lf", time );
 	  }
         }
 }

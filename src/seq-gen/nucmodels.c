@@ -430,7 +430,8 @@ void SetupGTR()
 	seq_gen_abyx(1.0/mr, Qij, SQNUM_NUC);
 
 	if ((k=eigen(1, Qij, NUM_NUC, Root, T1, U, V, T2))!=0) {
-		fprintf(stderr, "\ncomplex roots in SetupGTR");
+//WCC		fprintf(stderr, "\ncomplex roots in SetupGTR");
+		REprintf("\ncomplex roots in SetupGTR");
 		exit(0);
 	}
 //WCC	xtoy (U, V, SQNUM_NUC);

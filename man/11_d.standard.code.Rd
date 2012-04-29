@@ -4,6 +4,7 @@
 \alias{.codon}
 \alias{.amino.acid}
 \alias{.genetic.code}
+\alias{.missing.code}
 \docType{data}
 \title{Standard Codes and ids for Nucleotides, SNPs, Codon, Amino Acid and Genetic Code}
 \description{
@@ -25,7 +26,8 @@
 \details{
   \strong{Note}: All ids are coding started from \strong{0}.
 
-  Nucleotides, A, G, C, T, and - have codes 0, 1, 2, 3, and 4.
+  Nucleotides, A, G, C, T, and - have codes 0, 1, 2, 3, and 4 where
+  "-" is for gaps.
   SNPs, 1, 2, and - have code codes 0, 1, and 2.
 
   These are objects are in data frames unlike other internal objects due
@@ -60,6 +62,7 @@
 .codon
 .amino.acid
 .genetic.code
+.missing.code
 }
 }
 \keyword{data}

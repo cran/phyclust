@@ -5,7 +5,7 @@
   This computes transition probabilities of \code{phyclust} given time.
 }
 \usage{
-phyclust.Pt(Q, Tt, substitution.model = .substitution$model[1])
+phyclust.Pt(Q, Tt, substitution.model = .substitution.model$model[1])
 }
 \arguments{
   \item{Q}{a list according to the substitution model.}
@@ -48,7 +48,7 @@ phyclust.Pt(Q, Tt, substitution.model = .substitution$model[1])
   Wei-Chen Chen \email{phyclust@gmail.com}
 }
 \seealso{
-  \code{\link{.substitution}},
+  \code{\link{.substitution.model}},
   \code{\link{phyclust}},
   \code{\link{phyclust.em.step}}.
 }

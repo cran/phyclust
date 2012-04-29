@@ -47,9 +47,11 @@ int nucleotide_to_id(char x){
 		case 'T': case 't': case 'U': case 'u':
 			ret = T;
 			break;
-		default:
-			/* fprintf(stderr, "PW: unrecognized nucleotide %c\n", x); */
+		case '-':
 			ret = GAP;
+			break;
+		default:
+			ret = MISSING_ALLELE;
 			break;
 	}
 	return(ret);
@@ -59,7 +61,7 @@ int nucleotide_to_id(char x){
 int is_nucleotide(char X_org){
 	if(X_org == 'A' || X_org == 'G' || X_org == 'C' || X_org == 'T' || X_org == 'U' ||
 		X_org == 'a' || X_org == 'g' || X_org == 'c' || X_org == 't' || X_org == 'u' ||
-		X_org == '-' ||
+		X_org == '-' || X_org == '.' ||
 		X_org == 'K' || X_org == 'M' || X_org == 'N' || X_org == 'R' || X_org == 'W' || X_org == 'Y' ||
 		X_org == 'k' || X_org == 'm' || X_org == 'n' || X_org == 'r' || X_org == 'w' || X_org == 'y'
 		){
@@ -80,11 +82,11 @@ input_struct* read_input_phylip(char *file_name){
 	fp = fopen(file_name, "r");
 
 	if(fp == NULL){
-		fprintf(stderr, "PE: can't open file \"%s\".\n", file_name);
+		fprintf_stderr("PE: can't open file \"%s\".\n", file_name);
 		exit(1);
 	} else{
 		if(!fscanf(fp, "%d %d", &N_X_org, &L)) {
-			fprintf(stderr, "PE: invalid PHYLIP format in file \"%s\".\n", file_name);
+			fprintf_stderr("PE: invalid PHYLIP format in file \"%s\".\n", file_name);
 			exit(1);
 		}
 		printf("Read PHYLIP(%s): N_X_org=%d L=%d code_type=%s\n", file_name, N_X_org, L, CODE_TYPE[NUCLEOTIDE]);
@@ -143,7 +145,7 @@ input_struct* read_input_fasta(char *file_name){
 	fp = fopen(file_name, "r");
 
 	if(fp == NULL){
-		fprintf(stderr, "PE: can't open file \"%s\".\n", file_name);
+		fprintf_stderr("PE: can't open file \"%s\".\n", file_name);
 		exit(1);
 	} else{
 		/* Count total sequences. */
@@ -229,9 +231,11 @@ int snp_to_id(char x){
 		case '2':
 			ret = SU;
 			break;
-		default:
-			/* fprintf(stderr, "PW: unrecognized nucleotide %c\n", x); */
+		case '-':
 			ret = UN;
+			break;
+		default:
+			ret = MISSING_ALLELE;
 			break;
 	}
 	return(ret);
@@ -239,7 +243,7 @@ int snp_to_id(char x){
 
 
 int is_snp(char X_org){
-	if(X_org == '1' || X_org == '2' || X_org == '-'){
+	if(X_org == '1' || X_org == '2' || X_org == '-' || X_org == '.'){
 		return(1);
 	} else{
 		return(0);
@@ -257,11 +261,11 @@ input_struct* read_input_snp(char *file_name){
 	fp = fopen(file_name, "r");
 
 	if(fp == NULL){
-		fprintf(stderr, "PE: can't open file \"%s\".\n", file_name);
+		fprintf_stderr("PE: can't open file \"%s\".\n", file_name);
 		exit(1);
 	} else{
 		if(!fscanf(fp, "%d %d", &N_X_org, &L)) {
-			fprintf(stderr, "PE: invalid PHYLIP format in file \"%s\".\n", file_name);
+			fprintf_stderr("PE: invalid PHYLIP format in file \"%s\".\n", file_name);
 			exit(1);
 		}
 		printf("Read SNP(%s): N_X_org=%d L=%d code_type=%s\n", file_name, N_X_org, L, CODE_TYPE[SNP]);

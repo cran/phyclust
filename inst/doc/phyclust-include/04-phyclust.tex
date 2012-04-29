@@ -56,7 +56,7 @@ assessed by bootstrap \citep{Maitra2010}.
 Available choices for the $Q_k$ parameterization in \pkg{phyclust} include
 \code{JC69} \citep{Jukes1969}, \code{K80} \citep{Kimura1980},
 and \code{HKY85} \citep{Hasegawa1985}.
-These choices are listed in \code{.substitution}.
+These choices are listed in \code{.substitution.model}.
 In addition, $Q_k$ and $t_k$ can be constrained across clusters as shown
 in Table~\ref{tab:identifier} (also see \code{.identifier}).
 \begin{table}[h]
@@ -83,7 +83,7 @@ for the EM algorithm use pairwise distances, and
 the available models for computing the 
 evolutionary distance are listed in \code{.edist.model}.
 The model used for computing distances need not match the model
-used to model evolution in phylogenetic clustering (in \code{.substitution}).
+used to model evolution in phylogenetic clustering (in \code{.substitution.model}).
 There are additional pairwise distance models available
 in the \pkg{ape} package \citep{Paradis2004}.
 

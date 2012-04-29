@@ -20,7 +20,7 @@ void free_phyclust_se_struct(phyclust_struct *pcs){
 void update_phyclust_se_struct(phyclust_struct *pcs, em_control *EMC){
 	pcs->se_type = EMC->se_type;
 	if(pcs->code_type == NUCLEOTIDE && EMC->se_type == SE_YES){
-		pcs->SE_P = initialize_SE_P_matrix(pcs->code_type, EMC->se_model, EMC->se_constant, pcs->missing_flag, pcs->K);
+		pcs->SE_P = initialize_SE_P_matrix(pcs->code_type, EMC->se_model, EMC->se_constant, pcs->gap_flag, pcs->K);
 		pcs->n_param = pcs->n_param + pcs->SE_P->n_param;
 	}
 } /* End of update_phyclust_se_struct(). */

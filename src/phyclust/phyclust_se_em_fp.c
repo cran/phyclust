@@ -14,11 +14,11 @@
 void update_em_fp_se(em_fp *EMFP, em_control *EMC, phyclust_struct *pcs){
 	if(pcs->se_type == SE_YES){
 		if(EMC->em_method != EM){
-			fprintf(stderr, "PE: The em_method is not implemented.\n");
+			fprintf_stderr("PE: The em_method is not implemented.\n");
 			exit(1);
 		}
 		if(pcs->label->label_method != NONE){
-			fprintf(stderr, "PE: The semi-supervised method with sqeuencing error is not implemented.\n");
+			fprintf_stderr("PE: The semi-supervised method with sqeuencing error is not implemented.\n");
 			exit(1);
 		}
 
@@ -46,28 +46,28 @@ void update_em_fp_se(em_fp *EMFP, em_control *EMC, phyclust_struct *pcs){
 						EMFP->Update_Eta_given_Z = &Update_Eta_given_Z_ADJUST;
 						break;
 					default:
-						fprintf(stderr, "PE: The boundary method is not found.\n");
+						fprintf_stderr("PE: The boundary method is not found.\n");
 						exit(1);
 				}
 
 				/* Different implementations for EM.
-				 * The missing implementations are totally different to the original
-				 * missing mechanism. Original, we can ignore GAPs in observed logL, but
+				 * The gap implementations are totally different to the original
+				 * gap mechanism. Original, we can ignore GAPs in observed logL, but
 				 * not complete logL. Here, we have to take into account the error probability
 				 * int observed logL, and adjust for complete logL, and maximize profile logL.
 				 * The memory copy mechanism is also needed to take care. */
-				if(pcs->missing_flag){
-					EMFP->Update_Z_modified = &Update_Z_modified_missing_se_convolution;
+				if(pcs->gap_flag){
+					EMFP->Update_Z_modified = &Update_Z_modified_gap_se_convolution;
 				} else{
 					EMFP->Update_Z_modified = &Update_Z_modified_se_convolution;
 				}
 
 				EMFP->Maximize_logpL = &Maximize_logpL_se_convolution;
 
-				if(pcs->missing_flag){
-					EMFP->LogL_observed = &LogL_observed_missing_se_convolution;
-					EMFP->LogL_complete = &LogL_complete_missing_se_convolution;
-					EMFP->LogL_profile = &LogL_profile_missing_se_convolution;
+				if(pcs->gap_flag){
+					EMFP->LogL_observed = &LogL_observed_gap_se_convolution;
+					EMFP->LogL_complete = &LogL_complete_gap_se_convolution;
+					EMFP->LogL_profile = &LogL_profile_gap_se_convolution;
 				} else{
 					EMFP->LogL_observed = &LogL_observed_se_convolution;
 					EMFP->LogL_complete = &LogL_complete_se_convolution;
@@ -77,11 +77,11 @@ void update_em_fp_se(em_fp *EMFP, em_control *EMC, phyclust_struct *pcs){
 				EMFP->Copy_pcs_to_empcs = &Copy_pcs_to_empcs_se;
 				EMFP->Copy_empcs_to_pcs = &Copy_empcs_to_pcs_se;
 
-				if(pcs->missing_flag){
+				if(pcs->gap_flag){
 					if(EMC->est_non_seg_site != 0){
-						EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_full_missing_se_convolution;
+						EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_full_gap_se_convolution;
 					} else{
-						EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_skip_non_seg_missing_se_convolution;
+						EMFP->Update_Mu_given_QA = &Update_Mu_given_QA_skip_non_seg_gap_se_convolution;
 					}
 				} else{
 					if(EMC->est_non_seg_site != 0){
@@ -91,11 +91,11 @@ void update_em_fp_se(em_fp *EMFP, em_control *EMC, phyclust_struct *pcs){
 					}
 				}
 
-				/* The same as EM without missing. */
+				/* The same as EM without gap. */
 				EMFP->Compute_R = &Compute_R;
 				break;
 			default:
-				fprintf(stderr, "PE: The SE_P model is not found.\n");
+				fprintf_stderr("PE: The SE_P model is not found.\n");
 				exit(1);
 				break;
 		}

@@ -18,8 +18,8 @@ em_phyclust_struct* initialize_em_phyclust_struct(phyclust_struct *pcs){
 	empcs = (em_phyclust_struct*) malloc(sizeof(em_phyclust_struct));
 	empcs->code_type = pcs->code_type;
 	empcs->ncode = pcs->ncode;
-	empcs->missing_index = pcs->missing_index;
-	empcs->missing_flag = pcs->missing_flag;
+	empcs->gap_index = pcs->gap_index;
+	empcs->gap_flag = pcs->gap_flag;
 	empcs->N_X_org = N_X_org;
 	empcs->N_X = N_X;
 	empcs->N_seg_site = pcs->N_seg_site;
@@ -53,12 +53,12 @@ em_phyclust_struct* initialize_em_phyclust_struct(phyclust_struct *pcs){
 	}
 	empcs->logL_observed = 0.0;
 	empcs->count_Mu_X = allocate_int_RT_4D(N_X, pcs->K, pcs->ncode, pcs->ncode);
-	if(empcs->missing_flag){
-		empcs->count_Mu_X_missing = allocate_int_RT_3D(N_X, pcs->K, pcs->ncode);
+	if(empcs->gap_flag){
+		empcs->count_Mu_X_gap = allocate_int_RT_3D(N_X, pcs->K, pcs->ncode);
 	}
 
 	reset_Mu_non_seg_site(empcs);	/* Reset Mu for non-segregating sites. */
-	initialize_count_Mu_X_and_missing(empcs);
+	initialize_count_Mu_X_and_gap(empcs);
 
 	/* For labels, only owned pointers memory and need to be freed.
 	 * This can be an independent object, em_phyclust_label/empcl. */
@@ -87,8 +87,8 @@ void free_em_phyclust_struct(em_phyclust_struct *empcs){
 	free(empcs->Eta);
 	free(empcs->log_Eta);
 	free_int_RT_4D(empcs->N_X, empcs->K, empcs->ncode, empcs->count_Mu_X);
-	if(empcs->missing_flag){
-		free_int_RT_3D(empcs->N_X, empcs->K, empcs->count_Mu_X_missing);
+	if(empcs->gap_flag){
+		free_int_RT_3D(empcs->N_X, empcs->K, empcs->count_Mu_X_gap);
 	}
 
 	free(empcs);
@@ -101,8 +101,8 @@ em_phyclust_struct* duplicate_em_phyclust_struct(em_phyclust_struct *org_empcs){
 	new_empcs = (em_phyclust_struct*) malloc(sizeof(em_phyclust_struct));
 	new_empcs->code_type = org_empcs->code_type;
 	new_empcs->ncode = org_empcs->ncode;
-	new_empcs->missing_index = org_empcs->missing_index;
-	new_empcs->missing_flag = org_empcs->missing_flag;
+	new_empcs->gap_index = org_empcs->gap_index;
+	new_empcs->gap_flag = org_empcs->gap_flag;
 	new_empcs->N_X_org = org_empcs->N_X_org;
 	new_empcs->N_X = N_X;
 	new_empcs->N_seg_site = org_empcs->N_seg_site;
@@ -124,8 +124,8 @@ em_phyclust_struct* duplicate_em_phyclust_struct(em_phyclust_struct *org_empcs){
 	new_empcs->Eta = allocate_double_1D(K);
 	new_empcs->log_Eta = allocate_double_1D(K);
 	new_empcs->count_Mu_X = allocate_int_RT_4D(org_empcs->N_X, org_empcs->K, org_empcs->ncode, org_empcs->ncode);
-	if(org_empcs->missing_flag){
-		new_empcs->count_Mu_X_missing = allocate_int_RT_3D(org_empcs->N_X, org_empcs->K, org_empcs->ncode);
+	if(org_empcs->gap_flag){
+		new_empcs->count_Mu_X_gap = allocate_int_RT_3D(org_empcs->N_X, org_empcs->K, org_empcs->ncode);
 	}
 
 	/* For labels. */

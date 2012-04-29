@@ -51,7 +51,7 @@
 #ifndef __HAVE_R_
 #define ERROR(message) fprintf(stderr,message),NL,exit(1)
 #else
-#define ERROR(message) REprintf(message),error("%d\n",1)
+#define ERROR(message) REprintf(message),error("%d",1)
 #endif
 
 //WCC #define SEGINC 80 
@@ -210,7 +210,8 @@ segtre_mig(struct c_params *cp, int *pnsegs )
 		   for( j=0; j<npop; j++) 
 			if( config[j] > 0 ) i++;
 		   if( i > 1 ) {
-			fprintf(stderr," Infinite coalescent time. No migration.\n");
+//WCC			fprintf(stderr," Infinite coalescent time. No migration.\n");
+			REprintf(" Infinite coalescent time. No migration.\n");
 			exit(1);
 		   }
 		}
@@ -264,7 +265,8 @@ segtre_mig(struct c_params *cp, int *pnsegs )
  	      }
 
 	    if( (eflag == 0) && ( nextevent == NULL) ) {
-	      fprintf(stderr,
+//WCC	      fprintf(stderr,
+	      REprintf(
                " infinite time to next event. Negative growth rate in last time interval or non-communicating subpops.\n");
 	      exit( 0);
 	    }
@@ -595,7 +597,7 @@ if( !(chrom[ic].pseg =
 	   	      seglst =
 	   	      	 (struct segl *)realloc( seglst,(unsigned)(sizeof(struct segl)*seglimit));
 	   	      if(seglst == NULL ) perror("realloc error. 2. segtre_mig.c");
-	   	      /*  fprintf(temp_file_pointer, "seglimit: %d\n",seglimit);  */
+	   	      /*  fprintf(R_ms_file_pointer, "seglimit: %d\n",seglimit);  */
 	   	      } 
 	   	   seglst[nsegs].next = seglst[i].next;
 	   	   seglst[i].next = nsegs;

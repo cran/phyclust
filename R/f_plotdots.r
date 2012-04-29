@@ -3,8 +3,13 @@
 
 plotdots <- function(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
     diff.only = TRUE, fill = FALSE, label = TRUE,
-    with.missing = FALSE, xlim = NULL, ylim = NULL,
-    main = "Dots Plot", xlab = "Sites", ylab = "Sequences", ...){
+    with.gap = FALSE, xlim = NULL, ylim = NULL,
+    main = "Dots Plot", xlab = "Sites", ylab = "Sequences",
+    missing.col = "gray95", ...){
+  if(! is.matrix(X)){
+    stop("X is not a matrix.")
+  }
+
   if(sum(code.type %in% .code.type) != 1){
     stop("The code.type is not found.")
   }
@@ -22,7 +27,7 @@ plotdots <- function(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
   }
 
   if(is.null(Mu)){
-    Mu <- find.consensus(X, code.type = code.type, with.missing = with.missing)
+    Mu <- find.consensus(X, code.type = code.type, with.gap = with.gap)
   } else{
     if(length(Mu) != ncol(X)){
       stop("length(Mu) != L.")
@@ -30,7 +35,7 @@ plotdots <- function(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
   }
 
   if(diff.only){
-    tl.diff <- apply(X, 2, function(x) length(unique(x)))
+    tl.diff <- apply(X, 2, function(x) length(unique(x[x != .missing.code$mid])))
     X <- X[, tl.diff > 1]
     Mu <- Mu[tl.diff > 1]
   }
@@ -54,9 +59,9 @@ plotdots <- function(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
   }
 
   if(code.type == .code.type[1]){
-    my.col <- c("green3", "blue2", "#CC00CC", "red2", "gray")
+    my.col <- c("green3", "blue2", "#CC00CC", "red2", "gray", missing.col)
   } else if(code.type == .code.type[2]){
-    my.col <- c("green3", "blue2", "gray")
+    my.col <- c("green3", "blue2", "gray", missing.col)
   } else{
     stop("code.type is not implemented.")
   }
@@ -64,15 +69,18 @@ plotdots <- function(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
 
   X <- X + 1
   Mu <- Mu + 1
+  missing.code.mid <- .missing.code$mid + 1
   plot(NULL, NULL, type = "n", xlim = xlim, ylim = ylim,
        main = main, xlab = xlab, ylab = ylab)
 
   ### Consensus sequence.
   y.top <- -3
   for(j in 1:L){
+    tmp.Mu <- ifelse(Mu[j] != missing.code.mid, Mu[j], length(my.col))
     x.left <- j
     rect(x.left, y.top + 4, x.left + 1, y.top,
-         col = my.col[Mu[j]], border = NA)
+         col = my.col[tmp.Mu],
+         border = NA)
   }
   abline(h = y.top + 4, lty = 3, lwd = 0.5)
 
@@ -80,18 +88,19 @@ plotdots <- function(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
   plot.column.fill <- function(j){
     x.left <- j
     x.right <- j + 1
-    tmp.X.col <- my.col[X[, j]]
+    tmp.X <- X[, j]
+    tmp.X[tmp.X == missing.code.mid] <- length(my.col)
     for(i in 1:N){
-      rect(x.left, i + 1, x.right, i, col = tmp.X.col[i], border = NA)
+      rect(x.left, i + 1, x.right, i, col = my.col[tmp.X[i]], border = NA)
     }
   }
   plot.column <- function(j){
     x.left <- j
     x.right <- j + 1
     tmp.X <- X[, j]
-    tmp.X.col <- my.col[tmp.X]
+    tmp.X[tmp.X == missing.code.mid] <- length(my.col)
     for(i in which(tmp.X != Mu[j])){
-      rect(x.left, i + 1, x.right, i, col = tmp.X.col[i], border = NA)
+      rect(x.left, i + 1, x.right, i, col = my.col[tmp.X[i]], border = NA)
     }
   }
 

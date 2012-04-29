@@ -1,6 +1,6 @@
 \name{seq.data}
 \alias{seq.data.toy}
-\alias{seq.data.missing}
+\alias{seq.data.gap}
 \alias{Class seq.data}
 \alias{Data Toy}
 \docType{data}
@@ -8,7 +8,7 @@
 \description{
    A toy dataset, \code{seq.data.toy}, with 100 nucleotide sequences
    and 200 sites in 4 clusters.
-   \code{seq.data.missing} contains some missing values indicated by "-".
+   \code{seq.data.gap} contains some missing values indicated by "-".
 }
 \format{
   This data contains a list with a \code{seq.data} structure described
@@ -45,11 +45,11 @@
 \examples{
 \dontrun{
 seq.data.toy
-seq.data.missing
+seq.data.gap
 
 par(mfrow = c(1, 2))
 plotdots(seq.data.toy$org)
-plotdots(seq.data.missing$org)
+plotdots(seq.data.gap$org)
 }
 }
 \keyword{datasets}

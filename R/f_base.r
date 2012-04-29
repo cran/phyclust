@@ -19,7 +19,7 @@ code2nid.default <- function(codeseq){
   for(i in 1:nrow(.nucleotide)){
     nidseq[codeseq %in% c(code.char[i], code.l.char[i])] <- code.nid[i]
   }
-  nidseq[! codeseq %in% c(code.char, code.l.char)] <- code.nid[code.char == "-"]
+  nidseq[! codeseq %in% c(code.char, code.l.char)] <- .missing.code$mid
   nidseq <- as.numeric(nidseq)
 
   if(is.matrix(codeseq)){
@@ -51,7 +51,7 @@ nid2code.default <- function(nidseq, lower.case = TRUE){
   for(i in 1:nrow(.nucleotide)){
     codeseq[nidseq == code.nid[i]] <- code.char[i]
   }
-  codeseq[!nidseq %in% code.nid] <- "-"
+  codeseq[!nidseq %in% code.nid] <- .missing.code$code
 
   if(is.matrix(nidseq)){
     dim(codeseq) <- dim(nidseq)
@@ -88,7 +88,7 @@ snp2sid.default <- function(snpseq){
   for(i in 1:nrow(.snp)){
     sidseq[snpseq == code.char[i]] <- code.sid[i]
   }
-  sidseq[! snpseq %in% code.char] <- code.sid[code.char == "-"]
+  sidseq[! snpseq %in% code.char] <- .missing.code$mid
   sidseq <- as.numeric(sidseq)
 
   if(is.matrix(snpseq)){
@@ -116,7 +116,7 @@ sid2snp.default <- function(sidseq){
   for(i in 1:nrow(.snp)){
     snpseq[sidseq == code.sid[i]] <- code.char[i]
   }
-  snpseq[!sidseq %in% code.sid] <- "-"
+  snpseq[!sidseq %in% code.sid] <- .missing.code$code
 
   if(is.matrix(sidseq)){
     dim(snpseq) <- dim(sidseq)
@@ -139,7 +139,8 @@ code2snp.default <- function(codeseq){
   snpseq <- codeseq
   snpseq[codeseq %in% c("A", "a", "G", "g")] <- "1"
   snpseq[codeseq %in% c("C", "c", "T", "t")] <- "2"
-  snpseq[!(snpseq %in% c("1", "2"))] <- "-"
+  # snpseq[codeseq %in% c("-")] <- "-"
+  snpseq[!(snpseq %in% c("1", "2", "-"))] <- "."
 
   if(is.matrix(codeseq)){
     dim(snpseq) <- dim(codeseq)
@@ -173,7 +174,8 @@ snp2code.default <- function(snpseq, half = TRUE){
     codeseq[snpseq == "2"] <- "C"
   }
 
-  codeseq[!(snpseq %in% c("1", "2"))] <- "-"
+  # codeseq[codeseq == "-"] <- "-"
+  codeseq[!(snpseq %in% c("1", "2", "-"))] <- "."
 
   if(is.matrix(snpseq)){
     dim(codeseq) <- dim(snpseq)

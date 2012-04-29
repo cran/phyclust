@@ -36,10 +36,10 @@ void Update_Z_modified_se_convolution(em_phyclust_struct *empcs, Q_matrix_array 
 } /* End of Update_Z_modified_se_convolution(). */
 
 /* For each sequence, compute log_Pt for all (n, k) cells and save in empcs->Z_modified (log and unnormalized). */
-void Update_Z_modified_missing_se_convolution(em_phyclust_struct *empcs, Q_matrix_array *QA){
+void Update_Z_modified_gap_se_convolution(em_phyclust_struct *empcs, Q_matrix_array *QA){
 	int s_from, s_to, n_X, k;
 
-	update_convolution_Pt_f_err_missing(QA, empcs->SE_P);
+	update_convolution_Pt_f_err_gap(QA, empcs->SE_P);
 
 	for(n_X = 0; n_X < empcs->N_X; n_X++){
 		for(k = 0; k < empcs->K; k++){
@@ -50,13 +50,13 @@ void Update_Z_modified_missing_se_convolution(em_phyclust_struct *empcs, Q_matri
 						empcs->count_Mu_X[n_X][k][s_from][s_to];
 				}
 			}
-			/* For missing. */
-			s_to = empcs->ncode;	/* Observed missing. */
+			/* For gap. */
+			s_to = empcs->ncode;	/* Observed gap. */
 			for(s_from = 0; s_from < empcs->ncode; s_from++){
 				empcs->Z_modified[n_X][k] += empcs->SE_P->log_conv[k][s_from][s_to] *
-					empcs->count_Mu_X_missing[n_X][k][s_from];
+					empcs->count_Mu_X_gap[n_X][k][s_from];
 			}
 		}
 	}
-} /* End of Update_Z_modified_missing_se_convolution(). */
+} /* End of Update_Z_modified_gap_se_convolution(). */
 

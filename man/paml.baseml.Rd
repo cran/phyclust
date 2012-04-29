@@ -65,7 +65,9 @@ paml.baseml.show.default()
 }
 \section{Warning(s)}{
   Carefully read the PAML's original document before using the
-  \code{paml.baseml} function.
+  \code{paml.baseml} function, and \code{paml.baseml} may not be ported
+  well from \code{baseml} of PAML. Please double check with the standalone
+  version.
 
   \code{baseml} may not be a well designed program, and may run slowly.
   If it were stuck, temporary files would all store at a directory obtained

@@ -21,13 +21,13 @@
 
 %% almost as usual
 \author{Wei-Chen Chen\\
-\\
-\Large
-Computer Science and Mathematics Division\\
-\Large
-Oak Ridge National Laboratory\\
-\Large
-Oak Ridge, TN, USA
+%\\
+%\Large
+%Computer Science and Mathematics Division\\
+%\Large
+%Oak Ridge National Laboratory\\
+%\Large
+%Oak Ridge, TN, USA
 } %\\ \today}
 \title{Model-Based Phylogenetic Clustering}
 %\\

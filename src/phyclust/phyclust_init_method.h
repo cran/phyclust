@@ -13,11 +13,11 @@ int rdunif(int n);
 void srswor(int n, int k, int *x);
 int init_m_step(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP);
 int check_all_min_n_class(int k, int *n_class, int min_n_class);
-void assign_Mu_by_class(int N_X_org, int K, int L, int ncode, int missing_index, int *class_id, int **X_org, int **Mu);
+void assign_Mu_by_class(int N_X_org, int K, int L, int ncode, int gap_index, int *class_id, int **X_org, int **Mu);
 
 /* consensus_Mu[L]. */
-void find_consensus_Mu(int N_X_org, int L, int ncode, int missing_index, int **X_org, int *consensus_Mu);
-void find_consensus_Mu_WIMISSING(int N_X_org, int L, int ncode, int missing_index, int **X_org, int *consensus_Mu);
+void find_consensus_Mu(int N_X_org, int L, int ncode, int gap_index, int **X_org, int *consensus_Mu);
+void find_consensus_Mu_gap(int N_X_org, int L, int ncode, int gap_index, int **X_org, int *consensus_Mu);
 
 
 /* Initialization functions.
@@ -47,6 +47,9 @@ int Update_init_k_medoids(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 
 /* By hand-coding or a prespecified input file. */
 int Update_init_manually(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP);
+
+/* By sampling each locus. */
+int Update_init_sampleL_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP);
 
 
 /* File: "phyclust_init_method_nj.c". */

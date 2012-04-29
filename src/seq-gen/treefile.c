@@ -263,7 +263,8 @@ void WriteAvailInfo()
 		count++;	
 	}
 
-	fprintf(stderr, "Avail: %d nodes - availed: %ld, malloced: %ld\n", count, usedAvail, usedMalloc);
+//WCC	fprintf(stderr, "Avail: %d nodes - availed: %ld, malloced: %ld\n", count, usedAvail, usedMalloc);
+	REprintf("Avail: %d nodes - availed: %ld, malloced: %ld\n", count, usedAvail, usedMalloc);
 } /* WriteAvailInfo */
 
 
@@ -402,9 +403,14 @@ TNode *ReadNode(FILE *fv, TTree *tree, int numNames, char **names, int detectPol
 		ch=fgetc(fv);
 		
 	if (detectPolytomies && ch==',') {
+/*WCC
 		fprintf(stderr, "This tree contains nodes which aren't bifurcations. Resolve the node\n");
 		fprintf(stderr, "with zero branch lengths to obtain correct results. This can be done\n");
 		fprintf(stderr, "with a program called TreeEdit: http://evolve.zoo.ox.ac.uk/software/TreeEdit\n");
+*/
+		REprintf("This tree contains nodes which aren't bifurcations. Resolve the node\n");
+		REprintf("with zero branch lengths to obtain correct results. This can be done\n");
+		REprintf("with a program called TreeEdit: http://evolve.zoo.ox.ac.uk/software/TreeEdit\n");
 		exit(0);
 	}
 
@@ -514,7 +520,8 @@ void ReadTree(FILE *fv, TTree *tree, int treeNum, int numNames, char **names,
 	}
 	
 	if (ch!='(' || (tree->root=ReadNode(fv, tree, numNames, names, 0))==NULL) {
-		fprintf(stderr, "Error reading tree number %d: %s.\n", treeNum, treeErrorMsg);
+//WCC		fprintf(stderr, "Error reading tree number %d: %s.\n", treeNum, treeErrorMsg);
+		REprintf("Error reading tree number %d: %s.\n", treeNum, treeErrorMsg);
 		exit(0);
 	}
 	
@@ -525,7 +532,8 @@ void ReadTree(FILE *fv, TTree *tree, int treeNum, int numNames, char **names,
 	if (ch==',') {		/* the tree is unrooted */
 		tree->rooted=0;
 		if ((tree->root->branch0=ReadBranch(fv, tree, numNames, names))==NULL) {
-			fprintf(stderr, "Error reading tree number %d: %s.\n", treeNum, treeErrorMsg);
+//WCC			fprintf(stderr, "Error reading tree number %d: %s.\n", treeNum, treeErrorMsg);
+			REprintf("Error reading tree number %d: %s.\n", treeNum, treeErrorMsg);
 			exit(0);
 		}
 		tree->root->branch0->branch0=tree->root;

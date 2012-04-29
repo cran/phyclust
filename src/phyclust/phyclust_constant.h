@@ -48,6 +48,9 @@ static const char SNP_ID[NSNPG] = {'1', '2', '-'};
 // static const char AMINO_ACID_CODE[N_AMINO_ACID] = {};
 // static const char AMINO_ACID_ID[N_AMINO_ACID_G] = {};
 
+/* Common missing Allele for all code types. */
+#define MISSING_ALLELE -1
+
 
 /* CODEs. */
 #define N_CODE_TYPE 4							/* Total number of code type. */
@@ -56,11 +59,11 @@ static char VARIABLE_IS_NOT_USED *CODE_TYPE[N_CODE_TYPE] =
 	{"NUCLEOTIDE", "SNP", "CODON", "AMINO_ACID"};
 static const int NCODE[N_CODE_TYPE] =
 	{NN, NSNP, N_CODON, N_AMINO_ACID};				/* Indicate the dimension. */
-static const int NCODE_WIMISSING[N_CODE_TYPE] =
+static const int NCODE_WIGAP[N_CODE_TYPE] =
 	{NNG, NSNPG, N_CODON_G, N_AMINO_ACID_G};			/* Indicate the dimension. */
 #define PRINT_CODE_TYPE 0						/* 0 for CODE, 1 for CODE_ID. */
-static const int MISSING_INDEX[N_CODE_TYPE] =
-	{NN, NSNP, N_CODON, N_AMINO_ACID};				/* Indicate the missing index. */
+static const int GAP_INDEX[N_CODE_TYPE] =
+	{NN, NSNP, N_CODON, N_AMINO_ACID};				/* Indicate the gap index. */
 
 
 /* EM procedures. */
@@ -70,10 +73,10 @@ static char VARIABLE_IS_NOT_USED *INIT_PROCEDURE[N_INIT_PROCEDURE] =
 	{"exhaustEM", "emEM", "RndEM", "RndpEM"};
 
 /* Initialization methods. */
-#define N_INIT_METHOD 6
-enum {randomMu, NJ, randomNJ, PAM, kMedoids, manualMu};			/* Initialization methods. */
+#define N_INIT_METHOD 7
+enum {randomMu, NJ, randomNJ, PAM, kMedoids, manualMu, sampleL};	/* Initialization methods. */
 static char VARIABLE_IS_NOT_USED *INIT_METHOD[N_INIT_METHOD] =
-	{"randomMu", "NJ", "randomNJ", "PAM", "K-Medoids", "manualMu"};
+	{"randomMu", "NJ", "randomNJ", "PAM", "K-Medoids", "manualMu", "sampleL"};
 
 
 /* Substitution models. */
@@ -135,18 +138,6 @@ static char VARIABLE_IS_NOT_USED *LABEL_METHOD[N_LABEL_METHOD] =
 	{"NONE", "SEMI", "GENERAL"};
 
 
-/* Rprintf: print message to R console. */
-#ifdef __HAVE_R_
-
-#undef printf
-#define printf Rprintf
-#undef exit
-#define exit(a) error("%d\n", a)
-#define fprintf(stderr, ...) REprintf(__VA_ARGS__)
-
-#endif
-
-
 /* EM Debugging only. */
 /* Ex: 1 for em steps, 2 for m steps, 3 for em and m steps. */
 #define EMDEBUG 0		/* 0  = 000000 for no output,
@@ -161,5 +152,24 @@ static char VARIABLE_IS_NOT_USED *LABEL_METHOD[N_LABEL_METHOD] =
 #define verbosity_exhaust_EM 0	/* 1 */		/* 0 for no output, >0 for print information. */
 #define PRINT_ERROR 0		/* 1 */		/* 0 for no output, >0 for error messages. */
 
-#endif	/* End of __PHYCLUST_CONSTANT_. */
 
+/* For error messages. */
+#define fprintf_stderr(...) fprintf(stderr, __VA_ARGS__)
+
+
+/* Deal with R. */
+#ifdef __HAVE_R_
+
+#undef printf
+#define printf Rprintf
+
+#undef exit
+#define exit(a) error("%d\n", a)
+
+#undef fprintf_stderr
+#define fprintf_stderr REprintf
+
+#endif
+
+
+#endif	/* End of __PHYCLUST_CONSTANT_. */

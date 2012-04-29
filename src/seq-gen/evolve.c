@@ -198,7 +198,8 @@ void SetSequence(char *seq, char *source, int inFromSite, int inNumSites)
 			if (*Q == stateCharacters[j]) break;
 		}
 		if (j == numStates) {
-			fprintf(stderr, "Bad state in ancestoral sequence\n");
+//WCC			fprintf(stderr, "Bad state in ancestoral sequence\n");
+			REprintf("Bad state in ancestoral sequence\n");
 			exit(0);
 		}
 		*P = j;

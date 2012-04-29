@@ -130,7 +130,7 @@ Q_matrix_array* initialize_Q_matrix_array(int code_type, int K, int substitution
 			}
 			break;
 		default:
-			fprintf(stderr, "PE: Identifier is not found.\n");
+			fprintf_stderr("PE: Identifier is not found.\n");
 			exit(1);
 	}
 
@@ -194,7 +194,7 @@ void free_Q_matrix_array(Q_matrix_array *QA){
 			}
 			break;
 		default:
-			fprintf(stderr, "PE: Identifier is not found.\n");
+			fprintf_stderr("PE: Identifier is not found.\n");
 			exit(1);
 	}
 	free(QA->Q);

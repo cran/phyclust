@@ -13,7 +13,7 @@
 
 /* Initial a phyclust structure without assigning data X.
  * Assign X later by calling update_phyclust_struct() to update pcs.
- * Assign MISSING_CODE by code_type.
+ * Assign GAP_CODE by code_type.
  * Assign labeled data if any by calling update_phyclust_label().
  * Assign sequencing error if any by calling update_phyclust_struct_se().
  */
@@ -23,8 +23,8 @@ phyclust_struct* initialize_phyclust_struct(int code_type, int N_X_org, int L, i
 	pcs = (phyclust_struct*) malloc(sizeof(phyclust_struct));
 	pcs->code_type = code_type;
 	pcs->ncode = NCODE[code_type];
-	pcs->missing_index = MISSING_INDEX[code_type];	/* For missings. */
-	pcs->missing_flag = 0;				/* Assigned by update_phyclust_struct(). */
+	pcs->gap_index = GAP_INDEX[code_type];		/* For gaps. */
+	pcs->gap_flag = 0;				/* Assigned by update_phyclust_struct(). */
 	pcs->n_param = K - 1 + K * L;
 	pcs->N_X_org = N_X_org;
 	pcs->N_X = 0;					/* Assigned by update_phyclust_struct(). */
@@ -83,7 +83,7 @@ void free_phyclust_struct(phyclust_struct *pcs){
  * and update the pcs including: N_X, X, map_X_to_X_org, replication_X,
  * seg_site_id, and N_seg_site. */
 void update_phyclust_struct(phyclust_struct *pcs){
-	int i, n_X, l, flag, flag_missing, N_X_org = pcs->N_X_org, N_X, L = pcs->L;
+	int i, n_X, l, flag, flag_gap, N_X_org = pcs->N_X_org, N_X, L = pcs->L;
 	int map_X_to_X_org[N_X_org], replication_X[N_X_org], seg_site_id[L], N_seg_site = 0;
 
 	pcs->map_X_org_to_X = allocate_int_1D(N_X_org);
@@ -122,42 +122,42 @@ void update_phyclust_struct(phyclust_struct *pcs){
 	pcs->N_X = N_X;
 
 
-	/* Assign missing_flag. */
-	flag_missing = 0;
+	/* Assign gap_flag. */
+	flag_gap = 0;
 	for(n_X = 0; n_X < pcs->N_X; n_X++){
 		for(l = 0; l < L; l++){
-			if(pcs->X[n_X][l] == pcs->missing_index){
-				flag_missing = 1;
+			if(pcs->X[n_X][l] == pcs->gap_index){
+				flag_gap = 1;
 				break;
 			}
 		}
-		if(flag_missing){
+		if(flag_gap){
 			break;
 		}
 	}
 	/* Copy to pcs. */
-	pcs->missing_flag = flag_missing;
+	pcs->gap_flag = flag_gap;
 
 
-	/* Assign seg_site_id, and N_seg_site. If all are missing, set as seg_site. */
+	/* Assign seg_site_id, and N_seg_site. If all are gap, set as seg_site. */
 	for(l = 0; l < L; l++){
 		flag = 0;
-		flag_missing = 0;
+		flag_gap = 0;
 
-		if(pcs->X[0][l] == pcs->missing_index){
-			flag_missing = 1;
+		if(pcs->X[0][l] == pcs->gap_index || pcs->X[0][l] == MISSING_ALLELE){
+			flag_gap = 1;
 		}
 		for(n_X = 1; n_X < pcs->N_X; n_X++){
 			if(pcs->X[n_X][l] != pcs->X[0][l]){
 				flag |= 1;
 				break;
 			}
-			if(pcs->X[n_X][l] == pcs->missing_index){
-				flag_missing++;
+			if(pcs->X[n_X][l] == pcs->gap_index || pcs->X[n_X][l] == MISSING_ALLELE){
+				flag_gap++;
 			}
 		}
 
-		if(flag || flag_missing == pcs->N_X){	/* All are missing, set as seg_site. */
+		if(flag || flag_gap == pcs->N_X){	/* All are gap, set as seg_site. */
 			seg_site_id[N_seg_site++] = l;
 		}
 	}

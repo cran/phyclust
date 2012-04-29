@@ -10,14 +10,14 @@
  */
 
 
-/* Without missing (row sum = 1, * sum = se_constant)
+/* Without gap (row sum = 1, * sum = se_constant)
  *   A G C T
  * A ~ * * *
  * G * ~ * *
  * C * * ~ *
  * T * * * ~
  *
- * With missing (row sum = 1, * sum = se_constant)
+ * With gap (row sum = 1, * sum = se_constant)
  *   A G C T -
  * A ~ * * * *
  * G * ~ * * *
@@ -35,21 +35,21 @@
 
 
 /* Initial a SE_P matrix by given sequencing error model. */
-SE_P_matrix* initialize_SE_P_matrix(int code_type, int se_model, double se_constant, int missing_flag, int K){
+SE_P_matrix* initialize_SE_P_matrix(int code_type, int se_model, double se_constant, int gap_flag, int K){
 	SE_P_matrix *SE_P;
 	int tmp_ncode;
 
 	if(code_type != NUCLEOTIDE){
-		fprintf(stderr, "PE: The code_type is not supported except NUCLEOTIDE.\n");
+		fprintf_stderr("PE: The code_type is not supported except NUCLEOTIDE.\n");
 		exit(1);
 	}
 
 	SE_P = (SE_P_matrix*) malloc(sizeof(SE_P_matrix));
 	SE_P->code_type = code_type;
 	SE_P->ncode = NCODE[code_type];
-	SE_P->ncode_wimissing = NCODE_WIMISSING[code_type];
-	SE_P->missing_index = MISSING_INDEX[code_type];		/* For missings. */
-	SE_P->missing_flag = missing_flag;
+	SE_P->ncode_wigap = NCODE_WIGAP[code_type];
+	SE_P->gap_index = GAP_INDEX[code_type];		/* For gaps. */
+	SE_P->gap_flag = gap_flag;
 	SE_P->se_model = se_model;
 
 	assign_FP_to_SE_P_matrix(SE_P);
@@ -74,7 +74,7 @@ SE_P_matrix* initialize_SE_P_matrix(int code_type, int se_model, double se_const
 	 * set K = 0. */
 	SE_P->K = K;
 	if(K > 0){
-		tmp_ncode = missing_flag ? SE_P->ncode_wimissing : SE_P->ncode;
+		tmp_ncode = gap_flag ? SE_P->ncode_wigap : SE_P->ncode;
 		SE_P->log_conv = allocate_double_RT_3D(K, SE_P->ncode, tmp_ncode);
 	}
 
@@ -92,7 +92,7 @@ void free_SE_P_matrix(SE_P_matrix *SE_P){
 SE_P_matrix* duplicate_SE_P_matrix(SE_P_matrix *org_SE_P){
 	SE_P_matrix *new_SE_P;
 
-	new_SE_P = initialize_SE_P_matrix(org_SE_P->code_type, org_SE_P->se_model, org_SE_P->se_constant, org_SE_P->missing_flag, org_SE_P->K);
+	new_SE_P = initialize_SE_P_matrix(org_SE_P->code_type, org_SE_P->se_model, org_SE_P->se_constant, org_SE_P->gap_flag, org_SE_P->K);
 	new_SE_P->se_constant = org_SE_P->se_constant;
 	new_SE_P->lower_bound = org_SE_P->lower_bound;
 	new_SE_P->upper_bound = org_SE_P->upper_bound;
@@ -108,13 +108,13 @@ SE_P_matrix* duplicate_SE_P_matrix(SE_P_matrix *org_SE_P){
 void assign_FP_to_SE_P_matrix(SE_P_matrix *SE_P){
 	switch(SE_P->se_model){
 		case SE_CONVOLUTION:
-			if(SE_P->missing_flag){
+			if(SE_P->gap_flag){
 				SE_P->n_param = 15;
-				SE_P->Check_param = &Check_param_f_err_se_convolution_missing;
-				SE_P->Print_f_err = &Print_f_err_common_missing;
-				SE_P->Convert_vect_to_f_err = &Convert_vect_to_f_err_se_convolution_missing;
-				SE_P->Convert_f_err_to_vect = &Convert_f_err_to_vect_se_convolution_missing;
-				SE_P->Copy_f_err = &Copy_f_err_common_missing;
+				SE_P->Check_param = &Check_param_f_err_se_convolution_gap;
+				SE_P->Print_f_err = &Print_f_err_common_gap;
+				SE_P->Convert_vect_to_f_err = &Convert_vect_to_f_err_se_convolution_gap;
+				SE_P->Convert_f_err_to_vect = &Convert_f_err_to_vect_se_convolution_gap;
+				SE_P->Copy_f_err = &Copy_f_err_common_gap;
 			} else{
 				SE_P->n_param = 11;
 				SE_P->Check_param = &Check_param_f_err_se_convolution;
@@ -125,7 +125,7 @@ void assign_FP_to_SE_P_matrix(SE_P_matrix *SE_P){
 			}
 			break;
 		default:
-			fprintf(stderr, "PE: The SE_P model is not found.\n");
+			fprintf_stderr("PE: The SE_P model is not found.\n");
 			exit(1);
 			break;
 	}
@@ -134,7 +134,7 @@ void assign_FP_to_SE_P_matrix(SE_P_matrix *SE_P){
 
 void initialize_f_err(SE_P_matrix *SE_P){
 	int i, j;
-	int tmp_ncode = SE_P->missing_flag ? SE_P->ncode_wimissing : SE_P->ncode;
+	int tmp_ncode = SE_P->gap_flag ? SE_P->ncode_wigap : SE_P->ncode;
 	double tmp_prob, tmp_prob_err;
 
 	switch(SE_P->se_model){
@@ -153,7 +153,7 @@ void initialize_f_err(SE_P_matrix *SE_P){
 			}
 			break;
 		default:
-			fprintf(stderr, "PE: The SE_P model is not found.\n");
+			fprintf_stderr("PE: The SE_P model is not found.\n");
 			exit(1);
 			break;
 	}
@@ -185,12 +185,12 @@ void Check_param_f_err_se_convolution(SE_P_matrix *SE_P){
 	SE_P->check_param = flag;
 } /* End of Check_param_f_err_se_convolution(). */
 
-void Check_param_f_err_se_convolution_missing(SE_P_matrix *SE_P){
+void Check_param_f_err_se_convolution_gap(SE_P_matrix *SE_P){
 	int i, j, flag = 1;
 	double tmp_error = 0.0;
 
 	for(i = 0; i < SE_P->ncode; i++){
-		for(j = 0; j < SE_P->ncode_wimissing; j++){
+		for(j = 0; j < SE_P->ncode_wigap; j++){
 			if(i != j){
 				flag = flag &&
 					(SE_P->f_err[i][j] > SE_P->lower_bound) &&
@@ -205,7 +205,7 @@ void Check_param_f_err_se_convolution_missing(SE_P_matrix *SE_P){
 	}
 
 	SE_P->check_param = flag;
-} /* End of Check_param_f_err_se_convolution_missing(). */
+} /* End of Check_param_f_err_se_convolution_gap(). */
 
 
 
@@ -246,14 +246,14 @@ void Convert_vect_to_f_err_se_convolution(double *vect, SE_P_matrix *SE_P){
 	SE_P->Check_param(SE_P);
 } /* End of Convert_vect_to_f_err_se_convolution(). */
 
-void Convert_vect_to_f_err_se_convolution_missing(double *vect, SE_P_matrix *SE_P){
+void Convert_vect_to_f_err_se_convolution_gap(double *vect, SE_P_matrix *SE_P){
 	double *tmp_vect = vect, tmp_sum, tmp_error;
 	int i, j;
 
 	tmp_error = 0.0;
 	for(i = 0; i < SE_P->ncode - 1; i++){
 		tmp_sum = 0.0;
-		for(j = 0; j < SE_P->ncode_wimissing; j++){
+		for(j = 0; j < SE_P->ncode_wigap; j++){
 			if(i != j){
 				SE_P->f_err[i][j] = *tmp_vect;
 				tmp_sum += *tmp_vect;
@@ -266,20 +266,20 @@ void Convert_vect_to_f_err_se_convolution_missing(double *vect, SE_P_matrix *SE_
 
 	/* i == SE_P->ncode - 1 */
 	tmp_sum = 0.0;
-	for(j = 0; j < SE_P->ncode_wimissing - 2; j++){
+	for(j = 0; j < SE_P->ncode_wigap - 2; j++){
 		SE_P->f_err[i][j] = *tmp_vect;
 		tmp_sum += *tmp_vect;
 		tmp_vect++;
 	}
 
-	/* j == SE_P->ncode_wimissing - 1. */
+	/* j == SE_P->ncode_wigap - 1. */
 	tmp_error += tmp_sum;
 	SE_P->f_err[i][j + 1] = SE_P->se_constant - tmp_error;
 	tmp_sum += SE_P->f_err[i][j + 1];
 	SE_P->f_err[i][i] = 1.0 - tmp_sum;
 
 	SE_P->Check_param(SE_P);
-} /* End of Convert_vect_to_f_err_se_convolution_missing(). */
+} /* End of Convert_vect_to_f_err_se_convolution_gap(). */
 
 
 
@@ -306,12 +306,12 @@ void Convert_f_err_to_vect_se_convolution(SE_P_matrix *SE_P, double *vect){
 	}
 } /* End of Convert_f_err_to_vect_se_convolution(). */
 
-void Convert_f_err_to_vect_se_convolution_missing(SE_P_matrix *SE_P, double *vect){
+void Convert_f_err_to_vect_se_convolution_gap(SE_P_matrix *SE_P, double *vect){
 	double *tmp_vect = vect;
 	int i, j;
 
 	for(i = 0; i < SE_P->ncode - 1; i++){
-		for(j = 0; j < SE_P->ncode_wimissing; j++){
+		for(j = 0; j < SE_P->ncode_wigap; j++){
 			if(i == j){
 				continue;
 			}
@@ -321,11 +321,11 @@ void Convert_f_err_to_vect_se_convolution_missing(SE_P_matrix *SE_P, double *vec
 	}
 
 	/* i == SE_P->ncode - 1 */
-	for(j = 0; j < SE_P->ncode_wimissing - 2; j++){
+	for(j = 0; j < SE_P->ncode_wigap - 2; j++){
 		*tmp_vect = SE_P->f_err[i][j];
 		tmp_vect++;
 	}
-} /* End of Convert_f_err_to_vect_se_convolution_missing(). */
+} /* End of Convert_f_err_to_vect_se_convolution_gap(). */
 
 
 
@@ -354,7 +354,7 @@ void Print_f_err_common(SE_P_matrix *SE_P){
 	printf("  total error = %.16f\n", total_error);
 } /* End of Print_f_err_common(). */
 
-void Print_f_err_common_missing(SE_P_matrix *SE_P){
+void Print_f_err_common_gap(SE_P_matrix *SE_P){
 	int i, j;
 	double tmp_sum, total_error = 0.0;
 
@@ -363,7 +363,7 @@ void Print_f_err_common_missing(SE_P_matrix *SE_P){
 	for(i = 0; i < SE_P->ncode; i++){
 		printf("  p(.|%c):", NUCLEOTIDE_CODE[i]);
 		tmp_sum = 0.0;
-		for(j = 0; j < SE_P->ncode_wimissing; j++){
+		for(j = 0; j < SE_P->ncode_wigap; j++){
 			printf(" %.8f", SE_P->f_err[i][j]);
 			tmp_sum = tmp_sum + SE_P->f_err[i][j];
 			if(i != j){
@@ -375,7 +375,7 @@ void Print_f_err_common_missing(SE_P_matrix *SE_P){
 	}
 
 	printf("  total error = %.16f\n", total_error);
-} /* End of Print_f_err_common_missing(). */
+} /* End of Print_f_err_common_gap(). */
 
 
 
@@ -385,9 +385,9 @@ void Copy_f_err_common(SE_P_matrix *SE_P_from, SE_P_matrix *SE_P_to){
 	copy_double_RT(SE_P_from->ncode, SE_P_from->ncode, SE_P_from->f_err, SE_P_to->f_err);
 } /* End of Copy_f_err_common(). */
 
-void Copy_f_err_common_missing(SE_P_matrix *SE_P_from, SE_P_matrix *SE_P_to){
-	copy_double_RT(SE_P_from->ncode, SE_P_from->ncode_wimissing, SE_P_from->f_err, SE_P_to->f_err);
-} /* End of Copy_f_err_common_missing(). */
+void Copy_f_err_common_gap(SE_P_matrix *SE_P_from, SE_P_matrix *SE_P_to){
+	copy_double_RT(SE_P_from->ncode, SE_P_from->ncode_wigap, SE_P_from->f_err, SE_P_to->f_err);
+} /* End of Copy_f_err_common_gap(). */
 
 
 void copy_SE_P_matrix(SE_P_matrix *SE_P_from, SE_P_matrix *SE_P_to){
@@ -396,7 +396,7 @@ void copy_SE_P_matrix(SE_P_matrix *SE_P_from, SE_P_matrix *SE_P_to){
 } /* End of copy_SE_P_matrix(). */
 
 void reset_SE_P_matrix(SE_P_matrix *SE_P){
-	SE_P_matrix *org_SE_P = initialize_SE_P_matrix(SE_P->code_type, SE_P->se_model, SE_P->se_constant, SE_P->missing_flag, SE_P->K);
+	SE_P_matrix *org_SE_P = initialize_SE_P_matrix(SE_P->code_type, SE_P->se_model, SE_P->se_constant, SE_P->gap_flag, SE_P->K);
 
 	copy_SE_P_matrix(org_SE_P, SE_P);
 	free_SE_P_matrix(org_SE_P);

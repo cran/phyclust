@@ -37,7 +37,7 @@ phyclust.logL(X, ret.phyclust = NULL, K = NULL, Eta = NULL,
   is the result of unsupervised clustering.
 }
 \value{
-  This function return a log-likelihood value of \code{phyclust}.
+  This function returns a log-likelihood value of \code{phyclust}.
 }
 \references{
   Phylogenetic Clustering Website:

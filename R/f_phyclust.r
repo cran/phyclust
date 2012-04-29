@@ -5,13 +5,6 @@ phyclust <- function(X, K, EMC = .EMC, manual.id = NULL,
   if(K <= 0){
     stop("K > 0")
   }
-  if(byrow){
-    X <- t(X)
-  }
-
-  N.X.org <- ncol(X)
-  L <- nrow(X)
-
   if(! is.null(manual.id)){
     if(! is.null(label)){
       stop("The manual.id is only for unsupervised clustering.")
@@ -25,6 +18,12 @@ phyclust <- function(X, K, EMC = .EMC, manual.id = NULL,
       stop("The manual.id is missing.")
     }
   }
+
+  if(byrow){
+    X <- t(X)
+  }
+  N.X.org <- ncol(X)
+  L <- nrow(X)
 
   EMC <- check.EMC(EMC)
   EMC <- translate.EMC(EMC)
@@ -91,7 +90,7 @@ translate.ret <- function(ret, EMC = NULL){
     ret$init.procedure <- .init.procedure[EMC$init.procedure + 1]
     ret$init.method <- .init.method[EMC$init.method + 1]
     ret$substitution.model <-
-      as.character(.substitution$model[EMC$substitution.model + 1])
+      as.character(.substitution.model$model[EMC$substitution.model + 1])
     ret$edist.model <- .edist.model[EMC$edist.model + 1]
     ret$QA$identifier <- .identifier[EMC$identifier + 1]
     ret$code.type <- .code.type[EMC$code.type + 1]
@@ -164,10 +163,10 @@ translate.EMC <- function(EMC){
     stop("The initial method is not found.")
   }
 
-  if(EMC$substitution.model[1] %in% as.character(.substitution$model)){
+  if(EMC$substitution.model[1] %in% as.character(.substitution.model$model)){
     EMC$substitution.model <-
       as.integer(which(EMC$substitution.model ==
-                       as.character(.substitution$model)) - 1)
+                       as.character(.substitution.model$model)) - 1)
   } else{
     stop("The substitution model is not found.")
   }

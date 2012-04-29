@@ -23,6 +23,7 @@
  * PAM		exhaustEM(iter=1)	all		NONE
  * kMedoids	all			all		NONE
  * manualMu	exhaustEM(iter=1)	all		NONE
+ * sampleL	all			all		NONE
  */
 
 /* Collection of all initialization procedures. */
@@ -30,7 +31,7 @@ void init_em_step(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, em_
 	double lower_bound_org, lower_bound;
 
 	if(pcs->K * EMC->min_n_class >= pcs->N_X){
-		fprintf(stderr, "PE: K is too huge.\n");
+		fprintf_stderr("PE: K is too huge.\n");
 		exit(1);
 	}
 	lower_bound_org = (double) EMC->min_n_class / (double) pcs->N_X_org;
@@ -72,7 +73,7 @@ void init_em_step(phyclust_struct *pcs, Q_matrix_array *QA, em_control *EMC, em_
 			Rnd_EM(pcs, QA, EMC, EMFP);
 			break;
 		default:
-			fprintf(stderr, "PE: The initial procedure is not found.\n");
+			fprintf_stderr("PE: The initial procedure is not found.\n");
 			exit(1);
 	}
 } /* End of init_em_step(). */
@@ -88,7 +89,7 @@ void update_Q_matrix_array(Q_matrix_array *QA, phyclust_struct *pcs){
 	}
 	for(n_X_org = 0; n_X_org < pcs->N_X_org; n_X_org++){
 		for(l = 0; l < pcs->L; l++){
-			if(pcs->X_org[n_X_org][l] == pcs->missing_index){	/* For missings. */
+			if(pcs->X_org[n_X_org][l] == pcs->gap_index){	/* For gaps. */
 				continue;
 			}
 			pi[pcs->X_org[n_X_org][l]]++;
@@ -104,7 +105,7 @@ void update_Q_matrix_array(Q_matrix_array *QA, phyclust_struct *pcs){
 		flag |= ((pi[s] <= QA->lower_bound) || (pi[s] >= QA->upper_bound));
 	}
 	if(flag){
-		fprintf(stderr, "PE: Empirical pi's:");
+		fprintf_stderr("PE: Empirical pi's:");
 		for(s = 0; s < QA->ncode; s++){
 			printf(" %e", pi[s]);
 		}
@@ -152,7 +153,7 @@ void exhaust_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EM
 		free_em_control(new_EMC);
 		free_em_phyclust_struct(org_empcs);
 		free_em_phyclust_struct(new_empcs);
-		fprintf(stderr, "PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
+		fprintf_stderr("PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
 				INIT_METHOD[org_EMC->init_method]);
 		exit(1);
 	}
@@ -204,7 +205,7 @@ void exhaust_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EM
 		free_em_control(new_EMC);
 		free_em_phyclust_struct(org_empcs);
 		free_em_phyclust_struct(new_empcs);
-		fprintf(stderr, "PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
+		fprintf_stderr("PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
 				INIT_METHOD[org_EMC->init_method]);
 		exit(1);
 	}
@@ -273,7 +274,7 @@ void Rnd_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, e
 		free_em_control(new_EMC);
 		free_em_phyclust_struct(org_empcs);
 		free_em_phyclust_struct(new_empcs);
-		fprintf(stderr, "PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
+		fprintf_stderr("PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
 				INIT_METHOD[org_EMC->init_method]);
 		exit(1);
 	}
@@ -343,7 +344,7 @@ void Rndp_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, 
 		free_em_control(new_EMC);
 		free_em_phyclust_struct(org_empcs);
 		free_em_phyclust_struct(new_empcs);
-		fprintf(stderr, "PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
+		fprintf_stderr("PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
 				INIT_METHOD[org_EMC->init_method]);
 		exit(1);
 	}
@@ -410,7 +411,7 @@ void em_EM(phyclust_struct *pcs, Q_matrix_array *org_QA, em_control *org_EMC, em
 		free_em_control(new_EMC);
 		free_em_phyclust_struct(org_empcs);
 		free_em_phyclust_struct(new_empcs);
-		fprintf(stderr, "PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
+		fprintf_stderr("PE: Initialization error. (%s, %s)\n", INIT_PROCEDURE[org_EMC->init_procedure],
 				INIT_METHOD[org_EMC->init_method]);
 		exit(1);
 	}

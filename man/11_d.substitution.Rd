@@ -1,5 +1,5 @@
-\name{.substitution}
-\alias{.substitution}
+\name{.substitution.model}
+\alias{.substitution.model}
 \docType{data}
 \title{Substitution Models for Mutation Processes}
 \description{
@@ -7,7 +7,7 @@
   for Continuous Time Markov Chain theory.
   \strong{This is a read-only object and the elemental order is followed in C.}
 }
-\usage{.substitution}
+\usage{.substitution.model}
 \format{
   A data frame contains two character vectors, \code{mode} and \code{code.type}.
 }
@@ -65,7 +65,7 @@
 }
 \examples{
 \dontrun{
-.substitution
+.substitution.model
 }
 }
 \keyword{data}

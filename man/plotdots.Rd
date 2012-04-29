@@ -7,9 +7,9 @@
 }
 \usage{
 plotdots(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
-    diff.only = TRUE, fill = FALSE, label = TRUE, with.missing = FALSE,
+    diff.only = TRUE, fill = FALSE, label = TRUE, with.gap = FALSE,
     xlim = NULL, ylim = NULL, main = "Dots Plot", xlab = "Sites",
-    ylab = "Sequences", ...)
+    ylab = "Sequences", missing.col = "gray95", ...)
 }
 \arguments{
   \item{X}{numerical data matrix with \eqn{N}{N} rows/sequences and \eqn{L}{L} columns/sites.}
@@ -19,20 +19,21 @@ plotdots(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
   \item{diff.only}{draw the segregating sites only, default = TRUE.}
   \item{fill}{fill in all dots, default = FALSE.}
   \item{label}{indicate segregating sites, default = TRUE.}
-  \item{with.missing}{pass to \code{find.consensus} if \code{Mu} is \code{NULL}, default = FALSE}
+  \item{with.gap}{pass to \code{find.consensus} if \code{Mu} is \code{NULL}, default = FALSE}
   \item{xlim}{limit of x-axis.}
   \item{ylim}{limit of y-axis.}
   \item{main}{main label, default = "Dots Plot".}
   \item{xlab}{x-axis label, default = "Sites". }
   \item{ylab}{y-axis label, default = "Sequences". }
+  \item{missing.col}{color for the missing allele, default = NA. }
   \item{\dots}{other options passed to \code{plot}.}
 }
 \details{
   The first rows in \code{Mu} will be drawn entirely on dots plots
-  in colors which are "green3", "blue2", "\#CC00CC", "red2", and "black",
-  according the ids + 1. If \code{fill} is FALSE, other sequences will be
-  drawn by the mutation sites comparing to the first sequences. Otherwise,
-  they be drawn entirely.
+  in colors which are "green3", "blue2", "\#CC00CC", "red2", "gray",
+  and "white", according the ids + 1. If \code{fill} is FALSE, other sequences
+  will be drawn by the mutation sites comparing to the first sequences.
+  Otherwise, they be drawn entirely.
 
   If \code{X.class} is set, the sequences will be drawn in cluster order.
 
@@ -41,7 +42,7 @@ plotdots(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
   If \code{label} is TRUE, the bottom row will be drawn in color "orange"
   to indicate segregating sites.
 
-  \code{with.missing} is only used when \code{Mu} is \code{NULL}.
+  \code{with.gap} is only used when \code{Mu} is \code{NULL}.
 }
 \value{
   A dots plot will be drawn.

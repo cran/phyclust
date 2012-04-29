@@ -20,7 +20,7 @@
     est.non.seg.site = FALSE, max.init.iter = 50,
     init.procedure = .init.procedure[1],
     init.method = .init.method[1],
-    substitution.model = .substitution$model[1],
+    substitution.model = .substitution.model$model[1],
     edist.model = .edist.model[1], identifier = .identifier[1],
     code.type = .code.type[1], em.method = .em.method[1],
     boundary.method = .boundary.method[1], min.n.class = 1,
@@ -120,7 +120,7 @@
   \code{\link{.identifier}},
   \code{\link{.init.method}},
   \code{\link{.init.procedure}},
-  \code{\link{.substitution}},
+  \code{\link{.substitution.model}},
   \code{\link[stats]{optim}},
   \code{\link{phyclust}},
   \code{\link{phyclust.se}}.

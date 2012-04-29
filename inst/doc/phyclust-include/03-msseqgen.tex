@@ -100,7 +100,7 @@ Without further options, HKY85 is equivalent to the JC69 model \citep{Jukes1969}
 > ret.ms <- ms(nsam = 5, nreps = 1, opts = "-T")
 > tree.anc <- read.tree(text = ret.ms[3])
 > set.seed(123)
-> seqgen(opts = "-mHKY -l40", newick.tree = ret.ms[3])
+> seqgen(opts = "-mHKY -l40 -q", newick.tree = ret.ms[3])
  5 40
 s1        CTCTCATTGGACGCACACTTTAGGGGGGGATTGCACTGCA
 s5        CTCTCTCTGGACGCACACTTTAAGGGGGGATTGAACTACA
@@ -108,7 +108,7 @@ s2        CTCTTCGGGCTCGGATAAGTTTGGAGGGTTGTTCTCTACA
 s3        CTCTGAGTGCTCGGATTAGTTAGGGGGAATGACGTCTACA
 s4        CTCTTATCTCTCGGATAAGTTGGGGGTGATGGCTTTTACA
 > set.seed(123)
-> (ret.seq <- seqgen(opts = "-mHKY -l40", rooted.tree = tree.anc))
+> (ret.seq <- seqgen(opts = "-mHKY -l40 -q", rooted.tree = tree.anc))
  5 40
 s1        CTCTCATTGGACGCACACTTTAGGGGGGGATTGCACTGCA
 s5        CTCTCTCTGGACGCACACTTTAAGGGGGGATTGAACTACA

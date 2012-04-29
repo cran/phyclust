@@ -9,19 +9,18 @@
   Continuous Time Markov Chain theory.
 }
 \usage{
-phyclust.se(X, K, EMC = .EMC, manual.id = NULL, label = NULL, byrow = TRUE)
+phyclust.se(X, K, EMC = .EMC, manual.id = NULL, byrow = TRUE)
 }
 \arguments{
   \item{X}{nid/sid matrix with \eqn{N}{N} rows/sequences and \eqn{L}{L} columns/sites.}
   \item{K}{number of clusters.}
   \item{EMC}{EM control.}
   \item{manual.id}{manually input class ids.}
-  \item{label}{label of sequences for semi-supervised clustering}
   \item{byrow}{advanced option for \code{X}, default = TRUE.}
 }
 \details{
   \code{phyclust.se} considers mutations with sequencing error, but only
-  for NUCLEOTIDE data without labeling and only the EM algorithm is
+  for NUCLEOTIDE data and only the EM algorithm is
   implemented. Currently, \code{phyclust.se} implements the following steps:
   \tabular{ll}{
   1 \tab assume non-sequencing errors as the \code{phyclust} does. \cr

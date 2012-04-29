@@ -324,7 +324,8 @@ void SetupAAMatrix()
 	seq_gen_abyx(1.0/mr, Qij, SQNUM_AA);
 
 	if ((k=eigen(1, Qij, NUM_AA, Root, T1, U, V, T2))!=0) {
-		fprintf(stderr, "\ncomplex roots in SetupAAMatrix");
+//WCC		fprintf(stderr, "\ncomplex roots in SetupAAMatrix");
+		REprintf("\ncomplex roots in SetupAAMatrix");
 		exit(0);
 	}
 //WCC	xtoy (U, V, SQNUM_AA);

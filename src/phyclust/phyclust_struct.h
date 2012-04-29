@@ -16,13 +16,13 @@ struct _phyclust_struct{
 	/* Define code type. */
 	int		code_type;		/* NUCLEOTIDE/SNP. */
 	int		ncode;			/* = NN or NSNP, indicates the dimension. */
-	int		missing_index;		/* = NNG or NSNPG, indicates the missing index. */
-	int		missing_flag;		/* = 0 or 1 for data without missing or with missing. */
+	int		gap_index;		/* = NNG or NSNPG, indicates the gapgap index. */
+	int		gap_flag;		/* = 0 or 1 for data without gap or with gap. */
 	/* Storage. */
 	int		n_param;		/* Number of parameters, including Mu's, and eta's. */
 	int		N_X_org;		/* Number of original sequences. */
 	int		N_X;			/* Number of sequences. */
-	int		N_seg_site;		/* Total segregating sites, including all are missing. */
+	int		N_seg_site;		/* Total segregating sites, including all are gap. */
 	int		L;			/* Number of loci. */
 	int		K;			/* Number of clusters. */
 	int		**X_org;		/* Original data pointer, dim = N_X_org * L. */

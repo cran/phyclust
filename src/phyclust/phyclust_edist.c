@@ -23,7 +23,7 @@ edist_struct* initialize_edist_struct(int form, int N_X){
 		eds->EDM = allocate_s_double_LT_pam(N_X - 1);
 		eds->get_pair_edist = &get_pair_edist_LT_pam;
 	} else{
-		fprintf(stderr, "PE: The form of edist structure is not found.\n");
+		fprintf_stderr("PE: The form of edist structure is not found.\n");
 		exit(1);
 	}
 	return(eds);
@@ -91,7 +91,7 @@ double (*get_edist_D(int edist_model))(int, int*, int*){
 			return(&edist_D_HAMMING_WOGAP);
 			break;
 		default:
-			fprintf(stderr, "PE: Evolution distance model is not found.\n");
+			fprintf_stderr("PE: Evolution distance model is not found.\n");
 			exit(1);
 			return(NULL);
 			break;
@@ -103,7 +103,8 @@ double edist_D_JC69(int L, int *x, int *mu){
 	double d;
 
 	for(i = 0; i < L; i++){
-		if(x[i] == GAP || mu[i] == GAP){
+		if(x[i] == GAP || mu[i] == GAP ||
+			x[i] == MISSING_ALLELE || mu[i] == MISSING_ALLELE){
 			L_NOGAP--;
 			continue;
 		}
@@ -129,7 +130,8 @@ double edist_D_K80(int L, int *x, int *mu){
 	double PQ = 0.0, P = 0, Q = 0, d_1, d_2;
 
 	for(i = 0; i < L; i++){
-		if(x[i] == GAP || mu[i] == GAP){
+		if(x[i] == GAP || mu[i] == GAP ||
+			x[i] == MISSING_ALLELE || mu[i] == MISSING_ALLELE){
 			L_NOGAP--;
 			continue;
 		}
@@ -173,7 +175,11 @@ double edist_D_HAMMING_WOGAP(int L, int *x, int *mu){
 	int i, diff = 0;
 
 	for(i = 0; i < L; i++){
-		if(x[i] != mu[i] && x[i] != GAP && mu[i] != GAP){
+		if(x[i] == GAP || mu[i] == GAP ||
+			x[i] == MISSING_ALLELE || mu[i] == MISSING_ALLELE){
+			continue;
+		}
+		if(x[i] != mu[i]){
 			diff++;
 		}
 	}

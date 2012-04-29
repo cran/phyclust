@@ -3,7 +3,7 @@ library(phyclust)
 ### Test ms() and seqgen()
 set.seed(123)
 (ret.ms <- ms(nsam = 5, nreps = 1, opts = "-T"))
-seqgen(opts = "-mHKY -l40", newick.tree = ret.ms[3])
+seqgen(opts = "-mHKY -l40 -q", newick.tree = ret.ms[3])
 
 ### Test phyclust()
 X <- seq.data.toy$org

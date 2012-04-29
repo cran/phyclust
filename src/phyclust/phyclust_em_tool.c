@@ -165,7 +165,7 @@ double LogL_complete(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_arr
 	return(logL_complete);
 } /* End of LogL_complete(). */
 
-double LogL_complete_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H){	/* QA_H != QA */
+double LogL_complete_gap(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H){	/* QA_H != QA */
 	int s_from, s_to, n_X, k;
 	double logL_complete, total_sum, a_Z_modified;
 
@@ -180,9 +180,9 @@ double LogL_complete_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_ma
 						empcs->count_Mu_X[n_X][k][s_from][s_to];
 				}
 			}
-			/* For missing. */
+			/* For gap. */
 			for(s_from = 0; s_from < empcs->ncode; s_from++){
-				a_Z_modified += QA_H->Q[k]->H[s_from] * empcs->count_Mu_X_missing[n_X][k][s_from];
+				a_Z_modified += QA_H->Q[k]->H[s_from] * empcs->count_Mu_X_gap[n_X][k][s_from];
 			}
 			total_sum += a_Z_modified * empcs->Z_normalized[n_X][k];
 		}
@@ -194,7 +194,7 @@ double LogL_complete_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_ma
 	}
 
 	return(logL_complete);
-} /* End of LogL_complete_missing(). */
+} /* End of LogL_complete_gap(). */
 
 
 
@@ -227,7 +227,7 @@ double LogL_profile(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_arra
 	return(logL_complete);
 } /* End of LogL_profile(). */
 
-double LogL_profile_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H){	/* QA_H != QA */
+double LogL_profile_gap(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H){	/* QA_H != QA */
 	int s_from, s_to, n_X, k;
 	double logL_complete, total_sum, a_Z_modified;
 
@@ -242,9 +242,9 @@ double LogL_profile_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_mat
 						empcs->count_Mu_X[n_X][k][s_from][s_to];
 				}
 			}
-			/* For missing. */
+			/* For gap. */
 			for(s_from = 0; s_from < empcs->ncode; s_from++){
-				a_Z_modified += QA_H->Q[k]->H[s_from] * empcs->count_Mu_X_missing[n_X][k][s_from];
+				a_Z_modified += QA_H->Q[k]->H[s_from] * empcs->count_Mu_X_gap[n_X][k][s_from];
 			}
 			total_sum += a_Z_modified * empcs->Z_normalized[n_X][k];
 		}
@@ -256,7 +256,7 @@ double LogL_profile_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_mat
 	}
 
 	return(logL_complete);
-} /* End of LogL_profile_missing(). */
+} /* End of LogL_profile_gap(). */
 
 
 
@@ -268,7 +268,7 @@ double LogL_profile_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_mat
  * "ALWAYS and ONLY" unique sequences (decided by empcs->N_X) are counted.
  * For non-unique data, empcs->replication_X will involve or multiply to the targets,
  * such as computing likelihood, finding Mu. */
-void initialize_count_Mu_X_and_missing(em_phyclust_struct *empcs){
+void initialize_count_Mu_X_and_gap(em_phyclust_struct *empcs){
 	int s_from, s_to, n_X, k, l;
 
 	for(n_X = 0; n_X < empcs->N_X; n_X++){
@@ -277,20 +277,23 @@ void initialize_count_Mu_X_and_missing(em_phyclust_struct *empcs){
 				for(s_to = 0; s_to < empcs->ncode; s_to++){
 					empcs->count_Mu_X[n_X][k][s_from][s_to] = 0;
 				}
-				if(empcs->missing_flag){
-					empcs->count_Mu_X_missing[n_X][k][s_from] = 0;
+				if(empcs->gap_flag){
+					empcs->count_Mu_X_gap[n_X][k][s_from] = 0;
 				}
 			}
 			for(l = 0; l < empcs->L; l++){
-				if(empcs->X[n_X][l] != empcs->missing_index){
+				if(empcs->X[n_X][l] >= 0 && empcs->X[n_X][l] < empcs->gap_index){
 					empcs->count_Mu_X[n_X][k][empcs->Mu[k][l]][empcs->X[n_X][l]]++;
-				} else{	/* For missings. */
-					empcs->count_Mu_X_missing[n_X][k][empcs->Mu[k][l]]++;
+				} else if(empcs->X[n_X][l] == empcs->gap_index){
+					/* For gaps. */
+					empcs->count_Mu_X_gap[n_X][k][empcs->Mu[k][l]]++;
+				} else{
+					/* For missing, skip and do nothing. */
 				}
 			}
 		}
 	}
-} /* End of initialize_count_Mu_X_and_missing(). */
+} /* End of initialize_count_Mu_X_and_gap(). */
 
 void reset_Mu_non_seg_site(em_phyclust_struct *empcs){
 	int i = 0, k, l;
@@ -360,9 +363,9 @@ void Copy_empcs(em_phyclust_struct *empcs_from, em_phyclust_struct *empcs_to){
 	empcs_to->logL_observed = empcs_from->logL_observed;
 	copy_int_RT_4D(empcs_from->N_X, empcs_from->K, empcs_from->ncode, empcs_from->ncode, empcs_from->count_Mu_X,
 			empcs_to->count_Mu_X);
-	if(empcs_to->missing_flag){
-		copy_int_RT_3D(empcs_from->N_X, empcs_from->K, empcs_from->ncode, empcs_from->count_Mu_X_missing,
-				empcs_to->count_Mu_X_missing);
+	if(empcs_to->gap_flag){
+		copy_int_RT_3D(empcs_from->N_X, empcs_from->K, empcs_from->ncode, empcs_from->count_Mu_X_gap,
+				empcs_to->count_Mu_X_gap);
 	}
 } /* End of Copy_empcs(). */
 
@@ -628,15 +631,15 @@ void print_count_Mu_X(em_phyclust_struct *empcs, int n_X, int k){
 	printf(" total: %d\n", total);
 } /* End of print_count_Mu_X(). */
 
-void print_count_Mu_X_missing(em_phyclust_struct *empcs, int n_X, int k){
+void print_count_Mu_X_gap(em_phyclust_struct *empcs, int n_X, int k){
 	int i, total = 0;
 
 	printf("n=%d, k=%d:", n_X, k);
 	for(i = 0; i < empcs->ncode; i++){
-		printf(" %d", empcs->count_Mu_X_missing[n_X][k][i]);
-		total += empcs->count_Mu_X_missing[n_X][k][i];
+		printf(" %d", empcs->count_Mu_X_gap[n_X][k][i]);
+		total += empcs->count_Mu_X_gap[n_X][k][i];
 		printf(" ");
 	}
 	printf(" total: %d\n", total);
-} /* End of print_count_Mu_X_missing(). */
+} /* End of print_count_Mu_X_gap(). */
 

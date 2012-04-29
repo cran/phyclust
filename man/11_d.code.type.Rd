@@ -25,7 +25,7 @@
 }
 \seealso{
   \code{\link{.show.option}},
-  \code{\link{.substitution}},
+  \code{\link{.substitution.model}},
   \code{\link{.EMControl}},
   \code{\link{phyclust}}.
 }

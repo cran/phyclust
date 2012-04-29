@@ -64,7 +64,7 @@ int init_m_step(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, 
 	int ret_stop = 0;
 	Q_matrix_array *QA_H;
 
-	initialize_count_Mu_X_and_missing(empcs);		/* Initialize count_Mu_X and count_Mu_X_missing. */
+	initialize_count_Mu_X_and_gap(empcs);		/* Initialize count_Mu_X and count_Mu_X_gap. */
 	ret_stop = EMFP->Update_Eta_given_Z(empcs, EMC);	/* Find Eta. */
 	if(ret_stop > 0){
 		return(ret_stop);
@@ -91,7 +91,7 @@ int check_all_min_n_class(int K, int *n_class, int min_n_class){
 	return(ret);
 } /* End of check_n_class(). */
 
-void assign_Mu_by_class(int N_X_org, int K, int L, int ncode, int missing_index, int *class_id, int **X_org, int **Mu){
+void assign_Mu_by_class(int N_X_org, int K, int L, int ncode, int gap_index, int *class_id, int **X_org, int **Mu){
 	int i, n_X_org, k, l;
 	int count_K_N[K][ncode], count_N[ncode], tmp_count;
 
@@ -104,7 +104,7 @@ void assign_Mu_by_class(int N_X_org, int K, int L, int ncode, int missing_index,
 			}
 		}
 		for(n_X_org = 0; n_X_org < N_X_org; n_X_org++){
-			if(X_org[n_X_org][l] == missing_index){	/* For missings. */
+			if(X_org[n_X_org][l] == gap_index || X_org[n_X_org][l] == MISSING_ALLELE){
 				continue;
 			}
 			count_N[X_org[n_X_org][l]]++;
@@ -126,7 +126,7 @@ void assign_Mu_by_class(int N_X_org, int K, int L, int ncode, int missing_index,
 	}
 } /* End of assign_Mu_by_class(). */
 
-void find_consensus_Mu(int N_X_org, int L, int ncode, int missing_index, int **X_org, int *consensus_Mu){
+void find_consensus_Mu(int N_X_org, int L, int ncode, int gap_index, int **X_org, int *consensus_Mu){
 	int i, n_X_org, l, flag, max_i;
 	int count_L_N[L][ncode], count_N[ncode], tmp_count;
 
@@ -139,7 +139,7 @@ void find_consensus_Mu(int N_X_org, int L, int ncode, int missing_index, int **X
 	}
 	for(l = 0; l < L; l++){
 		for(n_X_org = 0; n_X_org < N_X_org; n_X_org++){
-			if(X_org[n_X_org][l] == missing_index){	/* Skip missings. */
+			if(X_org[n_X_org][l] == gap_index || X_org[n_X_org][l] == MISSING_ALLELE){
 				continue;
 			}
 			count_L_N[l][X_org[n_X_org][l]]++;
@@ -177,18 +177,18 @@ void find_consensus_Mu(int N_X_org, int L, int ncode, int missing_index, int **X
 					consensus_Mu[l] = i;
 				}
 			}
-		} else{	/* All are missing, replace by the max. */
+		} else{	/* All are gap, replace by the max. */
 			consensus_Mu[l] = max_i;
 		}
 	}
 } /* End of find_consensus_Mu(). */
 
-void find_consensus_Mu_WIMISSING(int N_X_org, int L, int ncode_wimissing, int missing_index, int **X_org, int *consensus_Mu){
+void find_consensus_Mu_gap(int N_X_org, int L, int ncode_wigap, int gap_index, int **X_org, int *consensus_Mu){
 	int i, n_X_org, l, flag, max_i;
-	int count_L_N[L][ncode_wimissing], count_N[ncode_wimissing], tmp_count;
+	int count_L_N[L][ncode_wigap], count_N[ncode_wigap], tmp_count;
 
 	/* Summarize overall. */
-	for(i = 0; i < ncode_wimissing; i++){
+	for(i = 0; i < ncode_wigap; i++){
 		count_N[i] = 0;
 		for(l = 0; l < L; l++){
 			count_L_N[l][i] = 0;
@@ -196,6 +196,9 @@ void find_consensus_Mu_WIMISSING(int N_X_org, int L, int ncode_wimissing, int mi
 	}
 	for(l = 0; l < L; l++){
 		for(n_X_org = 0; n_X_org < N_X_org; n_X_org++){
+			if(X_org[n_X_org][l] == MISSING_ALLELE){
+				continue;
+			}
 			count_L_N[l][X_org[n_X_org][l]]++;
 			count_N[X_org[n_X_org][l]]++;
 		}
@@ -203,7 +206,7 @@ void find_consensus_Mu_WIMISSING(int N_X_org, int L, int ncode_wimissing, int mi
 
 	max_i = 0;
 	tmp_count = count_N[0];
-	for(i = 1; i < ncode_wimissing; i++){
+	for(i = 1; i < ncode_wigap; i++){
 		if(count_N[i] > tmp_count){
 			max_i = i;
 			tmp_count = count_N[i];
@@ -213,7 +216,7 @@ void find_consensus_Mu_WIMISSING(int N_X_org, int L, int ncode_wimissing, int mi
 	/* Find the consensus. */
 	for(l = 0; l < L; l++){
 		flag = 0;
-		for(i = 0; i < ncode_wimissing; i++){
+		for(i = 0; i < ncode_wigap; i++){
 			if(count_L_N[l][i] > 0){
 				flag = 1;
 				break;
@@ -222,7 +225,7 @@ void find_consensus_Mu_WIMISSING(int N_X_org, int L, int ncode_wimissing, int mi
 
 		if(flag){
 			tmp_count = -1;
-			for(i = 0; i < ncode_wimissing; i++){
+			for(i = 0; i < ncode_wigap; i++){
 				if(count_L_N[l][i] > tmp_count){
 					tmp_count = count_L_N[l][i];
 					consensus_Mu[l] = i;
@@ -231,11 +234,11 @@ void find_consensus_Mu_WIMISSING(int N_X_org, int L, int ncode_wimissing, int mi
 					consensus_Mu[l] = i;
 				}
 			}
-		} else{	/* All are missing, replace by the max. */
+		} else{	/* All are gap, replace by the max. */
 			consensus_Mu[l] = max_i;
 		}
 	}
-} /* End of find_consensus_Mu_WIMISSING(). */
+} /* End of find_consensus_Mu_gap(). */
 
 
 
@@ -254,18 +257,18 @@ int Update_init_manually(em_phyclust_struct *empcs, Q_matrix_array *QA, em_contr
 	if(EMC->se_type == SE_YES){
 		reset_SE_P_matrix(empcs->SE_P);
 	}
-	assign_Mu_by_class(empcs->N_X_org, empcs->K, empcs->L, empcs->ncode, empcs->missing_index,
+	assign_Mu_by_class(empcs->N_X_org, empcs->K, empcs->L, empcs->ncode, empcs->gap_index,
 				empcs->class_id, empcs->X_org, empcs->Mu);
 	ret_stop = init_m_step(empcs, QA, EMC, EMFP);
 	if(ret_stop > 0){
 		#if PRINT_ERROR > 0
-			fprintf(stderr, "PE: Initialization error.\n");
+			fprintf_stderr("PE: Initialization error.\n");
 		#endif
 		return(ret_stop);
 	}
 	if(!is_finite(EMFP->LogL_observed(empcs, QA))){
 		#if PRINT_ERROR > 0
-			fprintf(stderr, "PE: manual initialization leads to non-finite observed log likelihood\n");
+			fprintf_stderr("PE: manual initialization leads to non-finite observed log likelihood\n");
 		#endif
 		return(1);
 	}
@@ -288,7 +291,7 @@ int Update_init_random_Mu_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 	double tmp, tmp_min, init_logL_observed = 0.0;
 	edist_struct *eds;
 
-	find_consensus_Mu(empcs->N_X_org, L, empcs->ncode, empcs->missing_index, empcs->X_org, consensus_Mu);
+	find_consensus_Mu(empcs->N_X_org, L, empcs->ncode, empcs->gap_index, empcs->X_org, consensus_Mu);
 	eds = initialize_edist_struct_UT(EMC->edist_model, N_X, L, empcs->X);
 
 	while(init_iter < EMC->max_init_iter){
@@ -327,10 +330,10 @@ int Update_init_random_Mu_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 			empcs->n_class[tmp_id] += empcs->replication_X[n_X];
 		}
 
-		/* Replace missings by the concensus. */
+		/* Replace gaps by the concensus. */
 		for(k = 0; k < K; k++){
 			for(l = 0; l < L; l++){
-				if(empcs->Mu[k][l] == empcs->missing_index){
+				if(empcs->Mu[k][l] == empcs->gap_index || empcs->Mu[k][l] == MISSING_ALLELE){
 					empcs->Mu[k][l] = consensus_Mu[l];
 				}
 			}
@@ -352,7 +355,7 @@ int Update_init_random_Mu_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 		ret_stop = init_m_step(empcs, QA, EMC, EMFP);
 		if(ret_stop > 0){
 			#if PRINT_ERROR > 0
-				fprintf(stderr, "PE: Initialization error. (%s)\n", INIT_METHOD[EMC->init_method]);
+				fprintf_stderr("PE: Initialization error. (%s)\n", INIT_METHOD[EMC->init_method]);
 			#endif
 			free_edist_struct(eds);
 			return(ret_stop);
@@ -360,7 +363,7 @@ int Update_init_random_Mu_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 		init_logL_observed = EMFP->LogL_observed(empcs, QA);
 		if(!is_finite(init_logL_observed)){
 			#if PRINT_ERROR > 0
-				fprintf(stderr, "PE: Initial logL_observed is not finit. (%s)\n",
+				fprintf_stderr("PE: Initial logL_observed is not finit. (%s)\n",
 						INIT_METHOD[EMC->init_method]);
 			#endif
 			free_edist_struct(eds);
@@ -382,7 +385,7 @@ int Update_init_random_Mu_unique_label(em_phyclust_struct *empcs, Q_matrix_array
 	double tmp, tmp_min, init_logL_observed = 0.0;
 	edist_struct *eds;
 
-	find_consensus_Mu(empcs->N_X_org, L, empcs->ncode, empcs->missing_index, empcs->X_org, consensus_Mu);
+	find_consensus_Mu(empcs->N_X_org, L, empcs->ncode, empcs->gap_index, empcs->X_org, consensus_Mu);
 	eds = initialize_edist_struct_UT(EMC->edist_model, N_X, L, empcs->X);
 
 	while(init_iter < EMC->max_init_iter){
@@ -461,10 +464,10 @@ int Update_init_random_Mu_unique_label(em_phyclust_struct *empcs, Q_matrix_array
 			empcs->n_class[tmp_id] += empcs->replication_X[n_X];
 		}
 
-		/* Replace missings by the concensus. */
+		/* Replace gaps by the concensus. */
 		for(k = 0; k < K; k++){
 			for(l = 0; l < L; l++){
-				if(empcs->Mu[k][l] == empcs->missing_index){
+				if(empcs->Mu[k][l] == empcs->gap_index || empcs->Mu[k][l] == MISSING_ALLELE){
 					empcs->Mu[k][l] = consensus_Mu[l];
 				}
 			}
@@ -486,7 +489,7 @@ int Update_init_random_Mu_unique_label(em_phyclust_struct *empcs, Q_matrix_array
 		ret_stop = init_m_step(empcs, QA, EMC, EMFP);
 		if(ret_stop > 0){
 			#if PRINT_ERROR > 0
-				fprintf(stderr, "PE: Initialization error. (%s)\n", INIT_METHOD[EMC->init_method]);
+				fprintf_stderr("PE: Initialization error. (%s)\n", INIT_METHOD[EMC->init_method]);
 			#endif
 			free_edist_struct(eds);
 			return(ret_stop);
@@ -494,7 +497,7 @@ int Update_init_random_Mu_unique_label(em_phyclust_struct *empcs, Q_matrix_array
 		init_logL_observed = EMFP->LogL_observed(empcs, QA);
 		if(!is_finite(init_logL_observed)){
 			#if PRINT_ERROR > 0
-				fprintf(stderr, "PE: Initial logL_observed is not finit. (%s)\n",
+				fprintf_stderr("PE: Initial logL_observed is not finit. (%s)\n",
 						INIT_METHOD[EMC->init_method]);
 			#endif
 			free_edist_struct(eds);
@@ -527,7 +530,7 @@ int Update_init_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 	phyclust_ape_nj(njs);
 	if(! check_njs(njs)){
 		#if PRINT_ERROR > 0
-			fprintf(stderr, "PE: NJ may be not valid!\n");
+			fprintf_stderr("PE: NJ may be not valid!\n");
 		#endif
 		print_njs(njs->n_edge, njs);
 		free_edist_struct(eds);
@@ -542,7 +545,7 @@ int Update_init_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 	ret_stop = assign_class_by_njs_branch(K, njs, largest_branch_id, class_id);
 	if(ret_stop != 0){
 		#if PRINT_ERROR > 0
-			fprintf(stderr, "PE: Class assignment fails.\n");
+			fprintf_stderr("PE: Class assignment fails.\n");
 		#endif
 		free_edist_struct(eds);
 		free_nj_struct(njs);
@@ -553,7 +556,7 @@ int Update_init_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 	for(n_X_org = 0; n_X_org < N_X_org; n_X_org++){
 		empcs->class_id[n_X_org] = class_id[empcs->map_X_org_to_X[n_X_org]];
 	}
-	assign_Mu_by_class(empcs->N_X_org, empcs->K, empcs->L, empcs->ncode, empcs->missing_index,
+	assign_Mu_by_class(empcs->N_X_org, empcs->K, empcs->L, empcs->ncode, empcs->gap_index,
 				empcs->class_id, empcs->X_org, empcs->Mu);
 	for(k = 0; k < K; k++){
 		empcs->n_class[k] = 0;
@@ -572,7 +575,7 @@ int Update_init_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 		ret_stop = init_m_step(empcs, QA, EMC, EMFP);
 		if(ret_stop > 0){
 			#if PRINT_ERROR > 0
-				fprintf(stderr, "PE: Initialization error. (%s)\n", INIT_METHOD[EMC->init_method]);
+				fprintf_stderr("PE: Initialization error. (%s)\n", INIT_METHOD[EMC->init_method]);
 			#endif
 			free_edist_struct(eds);
 			free_nj_struct(njs);
@@ -581,7 +584,7 @@ int Update_init_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 		init_logL_observed = EMFP->LogL_observed(empcs, QA);
 		if(!is_finite(init_logL_observed)){
 			#if PRINT_ERROR > 0
-				fprintf(stderr, "PE: Initial logL_observed is not finit. (%s)\n",
+				fprintf_stderr("PE: Initial logL_observed is not finit. (%s)\n",
 						INIT_METHOD[EMC->init_method]);
 			#endif
 			free_edist_struct(eds);
@@ -590,7 +593,7 @@ int Update_init_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 		}
 	} else{
 		#if PRINT_ERROR > 0
-			fprintf(stderr, "PE: Initialization is not valid for min_n_class = %d. (%s)\n", EMC->min_n_class,
+			fprintf_stderr("PE: Initialization is not valid for min_n_class = %d. (%s)\n", EMC->min_n_class,
 					INIT_METHOD[EMC->init_method]);
 		#endif
 		free_edist_struct(eds);
@@ -620,7 +623,7 @@ int Update_init_random_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 	phyclust_ape_nj(njs);
 	if(! check_njs(njs)){
 		#if PRINT_ERROR > 0
-			fprintf(stderr, "PE: NJ may be not valid!\n");
+			fprintf_stderr("PE: NJ may be not valid!\n");
 		#endif
 		print_njs(njs->n_edge, njs);
 		free_edist_struct(eds);
@@ -651,7 +654,7 @@ int Update_init_random_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 		for(n_X_org = 0; n_X_org < N_X_org; n_X_org++){
 			empcs->class_id[n_X_org] = class_id[empcs->map_X_org_to_X[n_X_org]];
 		}
-		assign_Mu_by_class(empcs->N_X_org, empcs->K, empcs->L, empcs->ncode, empcs->missing_index,
+		assign_Mu_by_class(empcs->N_X_org, empcs->K, empcs->L, empcs->ncode, empcs->gap_index,
 					empcs->class_id, empcs->X_org, empcs->Mu);
 		for(k = 0; k < K; k++){
 			empcs->n_class[k] = 0;
@@ -683,7 +686,7 @@ int Update_init_random_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 		ret_stop = init_m_step(empcs, QA, EMC, EMFP);
 		if(ret_stop > 0){
 			#if PRINT_ERROR > 0
-				fprintf(stderr, "PE: Initialization error. (%s)\n", INIT_METHOD[EMC->init_method]);
+				fprintf_stderr("PE: Initialization error. (%s)\n", INIT_METHOD[EMC->init_method]);
 			#endif
 			free_edist_struct(eds);
 			free_nj_struct(njs);
@@ -692,7 +695,7 @@ int Update_init_random_nj_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, 
 		init_logL_observed = EMFP->LogL_observed(empcs, QA);
 		if(!is_finite(init_logL_observed)){
 			#if PRINT_ERROR > 0
-				fprintf(stderr, "PE: Initial logL_observed is not finit. (%s)\n",
+				fprintf_stderr("PE: Initial logL_observed is not finit. (%s)\n",
 						INIT_METHOD[EMC->init_method]);
 			#endif
 			free_edist_struct(eds);
@@ -717,7 +720,7 @@ int Update_init_k_medoids(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 	double init_logL_observed;
 	edist_struct *eds;
 
-	find_consensus_Mu(empcs->N_X_org, L, empcs->ncode, empcs->missing_index, empcs->X_org, consensus_Mu);
+	find_consensus_Mu(empcs->N_X_org, L, empcs->ncode, empcs->gap_index, empcs->X_org, consensus_Mu);
 	eds = initialize_edist_struct_UT(EMC->edist_model, N_X_org, L, empcs->X_org);
 
 	while(init_iter < EMC->max_init_iter){
@@ -749,10 +752,10 @@ int Update_init_k_medoids(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 			empcs->n_class[class_id[n_X_org]]++;
 		}
 
-		/* Replace missings by the concensus. */
+		/* Replace gaps by the concensus. */
 		for(k = 0; k < K; k++){
 			for(l = 0; l < L; l++){
-				if(empcs->Mu[k][l] == empcs->missing_index){
+				if(empcs->Mu[k][l] == empcs->gap_index || empcs->Mu[k][l] == MISSING_ALLELE){
 					empcs->Mu[k][l] = consensus_Mu[l];
 				}
 			}
@@ -774,7 +777,7 @@ int Update_init_k_medoids(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 		ret_stop = init_m_step(empcs, QA, EMC, EMFP);
 		if(ret_stop > 0){
 			#if PRINT_ERROR > 0
-				fprintf(stderr, "PE: Initialization error. (%s)\n", INIT_METHOD[EMC->init_method]);
+				fprintf_stderr("PE: Initialization error. (%s)\n", INIT_METHOD[EMC->init_method]);
 			#endif
 			free_edist_struct(eds);
 			return(ret_stop);	
@@ -782,7 +785,7 @@ int Update_init_k_medoids(em_phyclust_struct *empcs, Q_matrix_array *QA, em_cont
 		init_logL_observed = EMFP->LogL_observed(empcs, QA);
 		if(!is_finite(init_logL_observed)){
 			#if PRINT_ERROR > 0
-				fprintf(stderr, "PE: Initial logL_observed is not finit. (%s)\n",
+				fprintf_stderr("PE: Initial logL_observed is not finit. (%s)\n",
 						INIT_METHOD[EMC->init_method]);
 			#endif
 			free_edist_struct(eds);
@@ -809,7 +812,7 @@ int Update_init_pam(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *E
 	double init_logL_observed;
 	edist_struct *eds;
 	
-	find_consensus_Mu(empcs->N_X_org, L, empcs->ncode, empcs->missing_index, empcs->X_org, consensus_Mu);
+	find_consensus_Mu(empcs->N_X_org, L, empcs->ncode, empcs->gap_index, empcs->X_org, consensus_Mu);
 	eds = initialize_edist_struct_LT_pam(EMC->edist_model, N_X_org, L, empcs->X_org);
 	assign_class_by_pam(N_X_org, K, eds->EDM, center_id, class_id);
 
@@ -832,10 +835,10 @@ int Update_init_pam(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *E
 		empcs->n_class[class_id[n_X_org]]++;
 	}
 
-	/* Replace missings by the concensus. */
+	/* Replace gaps by the concensus. */
 	for(k = 0; k < K; k++){
 		for(l = 0; l < L; l++){
-			if(empcs->Mu[k][l] == empcs->missing_index){
+			if(empcs->Mu[k][l] == empcs->gap_index || empcs->Mu[k][l] == MISSING_ALLELE){
 				empcs->Mu[k][l] = consensus_Mu[l];
 			}
 		}
@@ -845,7 +848,7 @@ int Update_init_pam(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *E
 		ret_stop = init_m_step(empcs, QA, EMC, EMFP);
 		if(ret_stop > 0){
 			#if PRINT_ERROR > 0
-				fprintf(stderr, "PE: Initialization error. (%s)\n", INIT_METHOD[EMC->init_method]);
+				fprintf_stderr("PE: Initialization error. (%s)\n", INIT_METHOD[EMC->init_method]);
 			#endif
 			free_edist_struct(eds);
 			return(ret_stop);
@@ -853,7 +856,7 @@ int Update_init_pam(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *E
 		init_logL_observed = EMFP->LogL_observed(empcs, QA);
 		if(!is_finite(init_logL_observed)){
 			#if PRINT_ERROR > 0
-				fprintf(stderr, "PE: Initial logL_observed is not finit. (%s)\n",
+				fprintf_stderr("PE: Initial logL_observed is not finit. (%s)\n",
 						INIT_METHOD[EMC->init_method]);
 			#endif
 			free_edist_struct(eds);
@@ -861,7 +864,7 @@ int Update_init_pam(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *E
 		}
 	} else{
 		#if PRINT_ERROR > 0
-			fprintf(stderr, "PE: Initialization is not valid for min_n_class = %d. (%s)\n",
+			fprintf_stderr("PE: Initialization is not valid for min_n_class = %d. (%s)\n",
 					EMC->min_n_class, INIT_METHOD[EMC->init_method]);
 		#endif
 		free_edist_struct(eds);
@@ -871,6 +874,16 @@ int Update_init_pam(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *E
 	free_edist_struct(eds);
 	return(ret_stop);
 } /* End of Update_init_pam(). */
+
+
+
+
+/* Sample alleles for each locus by the frequence of alleles. */
+int Update_init_sampleL_unique(em_phyclust_struct *empcs, Q_matrix_array *QA, em_control *EMC, em_fp *EMFP){
+	/* WCC: TBD. */
+
+	return(0);
+} /* End of Update_init_sampleL_unique(). */
 
 
 

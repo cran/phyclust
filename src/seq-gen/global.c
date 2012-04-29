@@ -56,14 +56,16 @@ void *AllocMem(long n, char *name, char *func, int showInfo)
 	void *P;
 	
 	if ( (P=malloc(n))==NULL ) {
-		fprintf(stderr, "Out of memory allocating '%s': %s()\n", name, func);
+//WCC		fprintf(stderr, "Out of memory allocating '%s': %s()\n", name, func);
+		REprintf("Out of memory allocating '%s': %s()\n", name, func);
 		exit(0);
 	}
 	
 	totalMem+=n;
 
 	if (showInfo && verboseMemory)
-		fprintf(stderr, "%s in %s() - %ld bytes\n", name, func, n);
+		REprintf("%s in %s() - %ld bytes\n", name, func, n);
+//WCC		fprintf(stderr, "%s in %s() - %ld bytes\n", name, func, n);
 	
 	return P;
 }
@@ -75,13 +77,15 @@ void *CAllocMem(long n, char *name, char *func, int showInfo)
 	void *P;
 	
 	if ( (P=calloc(n, 1))==NULL ) {
-		fprintf(stderr, "Out of memory allocating '%s': %s()\n", name, func);
+//WCC		fprintf(stderr, "Out of memory allocating '%s': %s()\n", name, func);
+		REprintf("Out of memory allocating '%s': %s()\n", name, func);
 		exit(0);
 	}
 	
 	totalMem+=n;
 	if (showInfo && verboseMemory)
-		fprintf(stderr, "%s in %s() - %ld bytes\n", name, func, n);
+//WCC		fprintf(stderr, "%s in %s() - %ld bytes\n", name, func, n);
+		REprintf("%s in %s() - %ld bytes\n", name, func, n);
 	
 	return P;
 }

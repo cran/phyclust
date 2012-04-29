@@ -3,7 +3,7 @@
 ### These orders are matter for C.
 .init.procedure <- c("exhaustEM", "emEM", "RndEM", "RndpEM")
 .init.method <- c("randomMu", "NJ", "randomNJ", "PAM", "K-Medoids", "manualMu")
-.substitution <- data.frame(
+.substitution.model <- data.frame(
   model = c("JC69", "K80", "F81", "HKY85", "SNP_JC69", "SNP_F81",
             "E_F81", "E_HKY85", "E_SNP_F81"),
   code.type = c(rep("NUCLEOTIDE", 4), rep("SNP", 2),

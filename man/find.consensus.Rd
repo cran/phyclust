@@ -7,12 +7,12 @@
   one of the data.
 }
 \usage{
-find.consensus(X, code.type = .code.type[1], with.missing = FALSE)
+find.consensus(X, code.type = .code.type[1], with.gap = FALSE)
 }
 \arguments{
   \item{X}{nid/sid matrix with \eqn{N}{N} rows/sequences and \eqn{L}{L} columns/sites.}
   \item{code.type}{either "NUCLEOTIDE" (default) or "SNP".}
-  \item{with.missing}{FALSE (default) for no missing in consensus sequence.}
+  \item{with.gap}{FALSE (default) for no gap in consensus sequence.}
 }
 \details{
   \code{X} should be a numerical matrix containing sequence data that

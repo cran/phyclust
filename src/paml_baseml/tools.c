@@ -4093,7 +4093,7 @@ int ScatterPlot (int n, int nseries, int yLorR[], double x[], double y[],
    xgap=(xmax-xmin)/ncol;   
    for (iy=0; iy<ny; iy++) ygap[iy]=(ymax[iy]-ymin[iy])/nrow;
 
-/* WCC
+/*WCC
    printf ("\n%10s", "legend: ");
    for (is=0; is<nseries; is++) printf ("%2c", symbol[is]);
    printf ("\n%10s", "y axies: ");
@@ -4138,7 +4138,7 @@ int ScatterPlot (int n, int nseries, int yLorR[], double x[], double y[],
 
       }
    }
-/* WCC
+/*WCC
    printf ("\n");
    for (i=0; i<nrow+1; i++) {
      if (i%5==0) printf (fmt[ForE], w-1, wd, ymin[0]+(nrow-i)*ygap[0]);
@@ -5325,7 +5325,8 @@ int DescriptiveStatistics (FILE *fout, char infile[], int nbin, int nrho, int pr
    fprintf(fout,"\n2.5%%    "); for(j=SkipColumn;j<p;j++) fprintf(fout,fmt,x025[j]);
    fprintf(fout,"\n97.5%%   "); for(j=SkipColumn;j<p;j++) fprintf(fout,fmt,x975[j]);
    fprintf(fout,"\nESS*    ");  for(j=SkipColumn;j<p;j++) fprintf(fout,fmt1,n/Tint[j]);
-   FPN(F0); 
+//WCC   FPN(F0); 
+   FPN(fout); 
    fflush(fout);
 
    /*
@@ -5990,7 +5991,8 @@ double LineSearch2 (double(*fun)(double x[],int n), double *f, double x0[],
             status='C';
       }
       f4 = fun_LineSearch(a4, fun,x0,p,x,n);
-      if(!PAML_RELEASE && noisy>2) putchar(status);
+//WCC      if(!PAML_RELEASE && noisy>2) putchar(status);
+      if(!PAML_RELEASE && noisy>2) fprintf(R_paml_baseml_file_pointer, "%c", (char) status);
       if (fabs(f2-f4)<e*(1+fabs(f2))) {
          if(!PAML_RELEASE && noisy>2) 
 //WCC            for(nsymb+=ii+1; nsymb<5; nsymb++) printf(" ");
@@ -6000,7 +6002,7 @@ double LineSearch2 (double(*fun)(double x[],int n), double *f, double x0[],
 
       /* possible multiple local optima during line search */
       if(!PAML_RELEASE  && noisy>2 && ((a4<a2&&f4>f1) || (a4>a2&&f4>f3))) {
-/* WCC
+/*WCC
          printf("\n\na %12.6f %12.6f %12.6f %12.6f",   a1,a2,a3,a4);
          printf(  "\nf %12.6f %12.6f %12.6f %12.6f\n", f1,f2,f3,f4);
 */
@@ -6008,7 +6010,7 @@ double LineSearch2 (double(*fun)(double x[],int n), double *f, double x0[],
          fprintf(R_paml_baseml_file_pointer, "\nf %12.6f %12.6f %12.6f %12.6f\n", f1,f2,f3,f4);
 
          for(a5=a1; a5<=a3; a5+=(a3-a1)/20) {
-/*
+/*WCC
             printf("\t%.6e ",a5);
             if(n<5) FOR(i,n) printf("\t%.6f",x0[i] + a5*p[i]);
             printf("\t%.6f\n", fun_LineSearch(a5, fun,x0,p,x,n));
@@ -6094,12 +6096,12 @@ int Newton (FILE *fout, double *f, double (* fun)(double x[], int n),
 
    H=space,  x=H+n*n;   g=x+n;   p=g+n, tv=p+n;
 
-/*
+/*WCC
    printf ("\n\nIterating by Newton\tnp:%6d\nInitial:", n);
    FOR (i,n) printf ("%8.4f", x0[i]);       FPN (F0);
 */
    fprintf(R_paml_baseml_file_pointer, "\n\nIterating by Newton\tnp:%6d\nInitial:", n);
-   FOR (i,n) fprintf(R_paml_baseml_file_pointer, "%8.4f", x0[i]);       FPN (F0);
+   FOR (i,n) fprintf(R_paml_baseml_file_pointer, "%8.4f", x0[i]);       FPN (R_paml_baseml_file_pointer);
    if (fout) fprintf (fout, "\n\nNewton\tnp:%6d\n", n);
    if (testx (x0, n)) error2("Newton..invalid initials.");
    FOR (Iround, maxround) {
@@ -6129,7 +6131,7 @@ int Newton (FILE *fout, double *f, double (* fun)(double x[], int n),
 
        FOR (i,n)  x[i]=x0[i]+t*p[i];
        if (noisy>2) {
-/*
+/*WCC
             printf ("\n%3d h:%7.4f %12.6f  x", Iround+1, SIZEp, *f);
             FOR (i,n) printf ("%7.4f  ", x0[i]);
 */
@@ -6228,15 +6230,15 @@ int ming2 (FILE *fout, double *f, double (*fun)(double x[], int n),
       ix[nfree++]=i;
    }
    if(noisy>2 && nfree<n && n<50) {
-/*
+/*WCC
       FPN(F0);  FOR(j,n) printf(" %9.6f", x[j]);  FPN(F0);
       FOR(j,n) printf(" %9.5f", xb[j][0]);  FPN(F0);
       FOR(j,n) printf(" %9.5f", xb[j][1]);  FPN(F0);
       if(nfree<n && noisy>=3) printf("warning: ming2, %d paras at boundary.",n-nfree);
 */
-      FPN(F0);  FOR(j,n) fprintf(R_paml_baseml_file_pointer, " %9.6f", x[j]);  FPN(F0);
-      FOR(j,n) fprintf(R_paml_baseml_file_pointer, " %9.5f", xb[j][0]);  FPN(F0);
-      FOR(j,n) fprintf(R_paml_baseml_file_pointer, " %9.5f", xb[j][1]);  FPN(F0);
+      FPN(R_paml_baseml_file_pointer);  FOR(j,n) fprintf(R_paml_baseml_file_pointer, " %9.6f", x[j]);  FPN(R_paml_baseml_file_pointer);
+      FOR(j,n) fprintf(R_paml_baseml_file_pointer, " %9.5f", xb[j][0]);  FPN(R_paml_baseml_file_pointer);
+      FOR(j,n) fprintf(R_paml_baseml_file_pointer, " %9.5f", xb[j][1]);  FPN(R_paml_baseml_file_pointer);
       if(nfree<n && noisy>=3) fprintf(R_paml_baseml_file_pointer, "warning: ming2, %d paras at boundary.",n-nfree);
    }
 
@@ -6244,12 +6246,12 @@ int ming2 (FILE *fout, double *f, double (*fun)(double x[], int n),
    xtoy(x,x0,n);
    SIZEp=99;
    if (noisy>2) {
-/*
+/*WCC
       printf ("\nIterating by ming2\nInitial: fx= %12.6f\nx=",f0);
       FOR(i,n) printf(" %8.5f", x[i]);   FPN(F0);
 */
       fprintf(R_paml_baseml_file_pointer, "\nIterating by ming2\nInitial: fx= %12.6f\nx=",f0);
-      FOR(i,n) fprintf(R_paml_baseml_file_pointer, " %8.5f", x[i]);   FPN(F0);
+      FOR(i,n) fprintf(R_paml_baseml_file_pointer, " %8.5f", x[i]);   FPN(R_paml_baseml_file_pointer);
    }
 
    if (dfun)  (*dfun) (x0, &f0, g0, n);
@@ -6379,7 +6381,7 @@ for(i=0; i<n; i++) fprintf(frst,"%9.2f", g[i]); FPN(frst);
 
    /* try to remove this after updating LineSearch2() */
    *f=(*fun)(x,n);  
-   if(noisy>2) FPN(F0);
+   if(noisy>2) FPN(R_paml_baseml_file_pointer);
 
    if (Iround==maxround) {
       if (fout) fprintf (fout,"\ncheck convergence!\n");
@@ -6411,17 +6413,17 @@ int ming1 (FILE *fout, double *f, double (* fun)(double x[], int n),
    double w,v, t, h;
 
    if (testx (x0, n))
-      { fprintf(R_paml_baseml_file_pointer, "\nInvalid initials..\n"); matout(F0,x0,1,n); return(-1); }
+      { fprintf(R_paml_baseml_file_pointer, "\nInvalid initials..\n"); matout(R_paml_baseml_file_pointer,x0,1,n); return(-1); }
 //WCC      { printf ("\nInvalid initials..\n"); matout(F0,x0,1,n); return(-1); }
    f0 = *f = (*fun)(x0, n);
 
    if (noisy>2) {
-/*
+/*WCC
       printf ("\n\nIterating by ming1\nInitial: fx= %12.6f\nx=", f0);
       FOR (i,n) printf ("%8.4f", x0[i]);       FPN (F0);
 */
       fprintf(R_paml_baseml_file_pointer, "\n\nIterating by ming1\nInitial: fx= %12.6f\nx=", f0);
-      FOR (i,n) fprintf(R_paml_baseml_file_pointer, "%8.4f", x0[i]);       FPN (F0);
+      FOR (i,n) fprintf(R_paml_baseml_file_pointer, "%8.4f", x0[i]);       FPN (R_paml_baseml_file_pointer);
    }
    if (fout) {
       fprintf (fout, "\n\nIterating by ming1\nInitial: fx= %12.6f\nx=", f0);

@@ -14,13 +14,13 @@ double LogL_observed_label_semi(em_phyclust_struct *empcs, Q_matrix_array *QA);
 double LogL_observed_label_general(em_phyclust_struct *empcs, Q_matrix_array *QA);
 /* For debug only. */
 double LogL_complete(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);		/* QA_H unused */
-double LogL_complete_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);	/* QA_H != QA */
+double LogL_complete_gap(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);	/* QA_H != QA */
 /* For M-step. */
 double LogL_profile(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);		/* QA_H unused */
-double LogL_profile_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);	/* QA_H != QA */
+double LogL_profile_gap(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);	/* QA_H != QA */
 
 /* ----- Initialization tool. ----- */
-void initialize_count_Mu_X_and_missing(em_phyclust_struct *empcs);
+void initialize_count_Mu_X_and_gap(em_phyclust_struct *empcs);
 void reset_Mu_non_seg_site(em_phyclust_struct *empcs);
 
 /* ----- Checking tool. ----- */
@@ -47,6 +47,6 @@ void print_Eta(em_phyclust_struct *empcs);
 void print_empcs_Mu(em_phyclust_struct *empcs);
 void print_empcs_Mu_seg_site(em_phyclust_struct *empcs);
 void print_count_Mu_X(em_phyclust_struct *empcs, int n_X, int k);
-void print_count_Mu_X_missing(em_phyclust_struct *empcs, int n_X, int k);
+void print_count_Mu_X_gap(em_phyclust_struct *empcs, int n_X, int k);
 
 #endif	/* End of __PHYCLUST_EM_TOOL_. */

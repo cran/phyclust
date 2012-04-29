@@ -1,10 +1,10 @@
 /* This file is modified from "R_phyclust_em_step.c" for updating the results
- * of phyclust() to  phyclust.se() and find.best.se() in R.
+ * of phyclust() and find.best.se() in R.
  *
- * Writen: Wei-Chen Chen on 2012/03/01. */
+ * Writen: Wei-Chen Chen on 2012/04/21. */
 
 
-#include "R_phyclust_se.h"
+#include "R_phyclust.h"
 
 /* Input:
  *   R_N_X_org: SEXP[1], number of sequences.
@@ -18,7 +18,7 @@
  *   R_label: SEXP[1], labeles.
  * Output:
  *   ret: a list contains everythings returned from phyclust in C. */
-SEXP R_phyclust_se_update(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_EMC,
+SEXP R_phyclust_update(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_EMC,
 		SEXP R_K, SEXP R_Eta, SEXP R_Mu, SEXP R_vect,
 		SEXP R_label){
 	/* Declare variables for calling C. */
@@ -31,7 +31,7 @@ SEXP R_phyclust_se_update(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_EMC,
 	em_fp *EMFP;
 
 	/* Declare variables for R's returning. */
-	EMPTR_SE emptr = allocate_emptr_se();
+	EMPTR emptr = allocate_emptr();
 	SEXP emobj;
 	int C_protect_length;
 	
@@ -47,12 +47,12 @@ SEXP R_phyclust_se_update(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_EMC,
 
 	/* Assign controler. */
 	EMC = initialize_em_control();
-	copy_R_EMC_to_EMC_se(R_EMC, EMC);
+	copy_R_EMC_to_EMC(R_EMC, EMC);
 	update_em_control(EMC);
 
 	/* Assign data, read only. */
 	pcs = R_initialize_phyclust_struct(EMC->code_type, *C_N_X_org, *C_L, *C_K);
-	emobj = initialize_emptr_se(emptr, pcs);		/* !! Don't move this. */
+	emobj = initialize_emptr(emptr, pcs);		/* !! Don't move this. */
 	tmp_ptr = INTEGER(R_X);
 	for(i = 0; i < *C_N_X_org; i++){
 		pcs->X_org[i] = tmp_ptr;			/* Assign poiners. */
@@ -73,10 +73,12 @@ SEXP R_phyclust_se_update(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_EMC,
 		tmp_ptr_double++;
 	}
 	update_phyclust_struct(pcs);
-	update_emptr_se(emptr, pcs, emobj);			/* !! Don't move this. */
 
 	/* Assign labels. */
 	R_update_phyclust_label(pcs, R_label);
+
+	/* Assign empcs. */
+	empcs = initialize_em_phyclust_struct(pcs);
 
 	/* Assign function pointers. */
 	EMFP = initialize_em_fp(EMC, pcs);
@@ -86,32 +88,20 @@ SEXP R_phyclust_se_update(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_EMC,
 	QA->Convert_vect_to_Q_matrix_array(C_vect, QA);	/* Copy from the original input. */
 	QA->Update_log_Pt(QA);
 
-	/* Compute for se. */
-	if(EMC->code_type == NUCLEOTIDE){
-		update_phyclust_se_struct(pcs, EMC);
-		update_em_fp_se(EMFP, EMC, pcs);
+	/* EM steps. */
+	EMFP->Em_step(empcs, QA, EMC, EMFP);
+	EMFP->Copy_empcs_to_pcs(empcs, pcs);
 
-		/* Initialize empcs. */
-		empcs = initialize_em_phyclust_struct(pcs);
-	
-		/* EM steps. */
-		EMFP->Em_step(empcs, QA, EMC, EMFP);
-		EMFP->Copy_empcs_to_pcs(empcs, pcs);
-
-		/* Update results. */
-		assign_class(pcs);
-		update_ic(pcs, QA);
-
-		/* Free memory. */
-		free_em_phyclust_struct(empcs);
-	}
+	/* Update results. */
+	assign_class(pcs);
+	update_ic(pcs, QA);
 
 	/* For return. */
-	copy_all_to_emptr_se(pcs, QA, EMC, emptr);
+	copy_all_to_emptr(pcs, QA, EMC, emptr);
 
 	/* Free memory and release protectation. */
+	free_em_phyclust_struct(empcs);
 	free_em_control(EMC);
-	free_phyclust_se_struct(pcs);
 	R_free_phyclust_struct(pcs);
 	free_em_fp(EMFP);
 	free_Q_matrix_array(QA);

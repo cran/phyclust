@@ -11,19 +11,16 @@
   function will be updated through the EM algorithm as \code{phyclust.se}.
 
   Typically, this function run on the \code{find.best} results will yield
-  a better result than on the \code{phyclust}.
+  a better result than on the \code{phyclust.se}.
 }
 \usage{
-phyclust.se.update(X, se.model = .EMC$se.model, se.constant = .EMC$se.constant,
-    ret.phyclust = NULL, K = NULL, Eta = NULL,
-    Mu = NULL, pi = NULL, kappa = NULL, Tt = NULL,
-    substitution.model = NULL, identifier = NULL, code.type = NULL,
-    label = NULL, byrow = TRUE)
+phyclust.se.update(X, EMC = .EMC, ret.phyclust = NULL,
+    K = NULL, Eta = NULL, Mu = NULL, pi = NULL, kappa = NULL,
+    Tt = NULL, byrow = TRUE)
 }
 \arguments{
   \item{X}{nid/sid matrix with \eqn{N}{N} rows/sequences and \eqn{L}{L} columns/sites.}
-  \item{se.model}{sequencing error model, default = "CONVOLUTION".}
-  \item{se.constant}{constrained constant, default = 1e-2.}
+  \item{EMC}{EM control.}
   \item{ret.phyclust}{an object with the class \code{phyclust}.}
   \item{K}{number of clusters.}
   \item{Eta}{proportion of subpopulations, \eqn{\eta_k}{eta_k}, length = \code{K}, sum to 1.}
@@ -31,18 +28,14 @@ phyclust.se.update(X, se.model = .EMC$se.model, se.constant = .EMC$se.constant,
   \item{pi}{equilibrium probabilities, each row sums to 1.}
   \item{kappa}{transition and transversion bias.}
   \item{Tt}{total evolution time, \eqn{t}{t}.}
-  \item{substitution.model}{substitution model.}
-  \item{identifier}{identifier.}
-  \item{code.type}{code type.}
-  \item{label}{label of sequences for semi-supervised clustering.}
   \item{byrow}{advanced option for \code{X}, default = TRUE.}
 }
 \details{
   All the input arguments are the same as the inputs of the function
-  \code{phyclust.em.step}.
+  \code{phyclust.em.step} and \code{phyclust.update}.
 }
 \value{
-  This function return an object with class \code{phyclust}.
+  This function returns an object with class \code{phyclust}.
 }
 \references{
   Phylogenetic Clustering Website:
@@ -53,6 +46,7 @@ phyclust.se.update(X, se.model = .EMC$se.model, se.constant = .EMC$se.constant,
 }
 \seealso{
   \code{\link{phyclust.se}},
+  \code{\link{phyclust.update}},
   \code{\link{phyclust}},
   \code{\link{find.best}}.
 }
@@ -63,7 +57,17 @@ X <- seq.data.toy$org
 
 (ret.1 <- find.best(X, 4))
 (ret.2 <- phyclust.se.update(X, ret.phyclust = ret.1))
-(ret.3 <- phyclust.se.update(X, ret.phyclust = ret.1, se.constant = 1e-3))
+.EMC$se.constant <- 1e-3
+(ret.3 <- phyclust.se.update(X, ret.phyclust = ret.2))
+
+### Search optimal error
+func <- function(C){
+  .EMC$se.constant <<- C
+  -phyclust.se.update(X, ret.phyclust = ret.1)$logL
+}
+(ret.opt <- optimize(f = func, lower = 1e-3, upper = 1e-1))
+.EMC$se.constant <- ret.opt$minimum
+(ret.se.opt <- phyclust.se.update(X, ret.phyclust = ret.1))
 }
 }
 \keyword{phyclust}

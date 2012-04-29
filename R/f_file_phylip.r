@@ -18,10 +18,10 @@ read.phylip.format <- function(filename, byrow = TRUE, sep = ""){
   ret$seqlen <- as.numeric(tmp[2])
 
 ### Read data and transfer to nid.
-  op <- options("stringsAsFactors")
+  op.org <- options("stringsAsFactors")
   options(stringsAsFactors = FALSE)
   tmp <- read.table(filename, sep = "", quote = "", skip = 1, fill = TRUE)
-  options(op)
+  options(op.org)
 
 ### Split the data by reading blocks and rejoin them by sequences.
   ret$org.code <- split(tmp, gl(nrow(tmp) / ret$nseq, ret$nseq))

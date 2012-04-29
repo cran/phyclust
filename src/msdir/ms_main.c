@@ -11,12 +11,12 @@ void ms_main(int argc, char *argv[]){
 	char **list, **cmatrix(), **tbsparamstrs ;
 	double probss, tmrca, ttot ;
 
-	temp_file_pointer = fopen(temp_file_name, "w");
+	R_ms_file_pointer = fopen(R_ms_file_name, "w");
 
 	ntbs = 0 ;   /* these next few lines are for reading in parameters from a file (for each sample) */
 	tbsparamstrs = (char **)malloc( argc*sizeof(char *) ) ;
 
-	for( i=0; i<argc; i++) fprintf(temp_file_pointer, "%s ",argv[i]);
+	for( i=0; i<argc; i++) fprintf(R_ms_file_pointer, "%s ",argv[i]);
 	for( i =0; i<argc; i++) tbsparamstrs[i] = (char *)malloc(30*sizeof(char) ) ;
 	for( i = 1; i<argc ; i++)
 			if( strcmp( argv[i],"tbs") == 0 )  argv[i] = tbsparamstrs[ ntbs++] ;
@@ -50,32 +50,32 @@ void ms_main(int argc, char *argv[]){
 			getpars(argc, argv, &howmany);
 		}
 	   
-		fprintf(temp_file_pointer, "\n//");
+		fprintf(R_ms_file_pointer, "\n//");
 		if(ntbs > 0){
 			for(k = 0; k < ntbs; k++){
-			       fprintf(temp_file_pointer, "\t%s", tbsparamstrs[k]);
+			       fprintf(R_ms_file_pointer, "\t%s", tbsparamstrs[k]);
 			}
 		}
-		fprintf(temp_file_pointer, "\n");
+		fprintf(R_ms_file_pointer, "\n");
 		segsites = gensam(list, &probss, &tmrca, &ttot); 
 		if(pars.mp.timeflag){
-		       fprintf(temp_file_pointer, "time:\t%15.10lf\t%15.10lf\n", tmrca, ttot);
+		       fprintf(R_ms_file_pointer, "time:\t%15.10lf\t%15.10lf\n", tmrca, ttot);
 		}
 		if((segsites > 0) || (pars.mp.theta > 0.0)){
 			if((pars.mp.segsitesin > 0) && (pars.mp.theta > 0.0)){
-				fprintf(temp_file_pointer, "prob: %g\n", probss);
+				fprintf(R_ms_file_pointer, "prob: %g\n", probss);
 			}
-			fprintf(temp_file_pointer, "segsites: %d\n", segsites);
+			fprintf(R_ms_file_pointer, "segsites: %d\n", segsites);
 			if(segsites > 0){
-				fprintf(temp_file_pointer, "positions: ");
+				fprintf(R_ms_file_pointer, "positions: ");
 			}
 			for(i = 0; i < segsites; i++){
-				fprintf(temp_file_pointer, "%15.10lf ", posit[i] );
+				fprintf(R_ms_file_pointer, "%15.10lf ", posit[i] );
 			}
-			fprintf(temp_file_pointer, "\n");
+			fprintf(R_ms_file_pointer, "\n");
 			if(segsites > 0){
 				for(i = 0; i < pars.cp.nsam; i++){
-				       fprintf(temp_file_pointer, "%s\n", list[i]);
+				       fprintf(R_ms_file_pointer, "%s\n", list[i]);
 				}
 			}
 		}
@@ -85,7 +85,7 @@ void ms_main(int argc, char *argv[]){
 	free_char_2D_AP(tbsparamstrs, argc);
 	free_char_2D_AP(list, pars.cp.nsam);
 	free_pars();
-	fclose(temp_file_pointer);
+	fclose(R_ms_file_pointer);
 } /* End of ms_main(). */
 
 

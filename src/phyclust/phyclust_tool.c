@@ -12,7 +12,7 @@ double** allocate_double_2D_AP(int n_X){
 	double **pointerarray = (double **) malloc(n_X * sizeof(double *));
 
 	if(pointerarray == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 	for(i = 0; i < n_X; i++){
@@ -28,7 +28,7 @@ int** allocate_int_2D_AP(int n_X){
 	int **pointerarray = (int **) malloc(n_X * sizeof(int *));
 
 	if(pointerarray == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 	for(i = 0; i < n_X; i++){
@@ -44,7 +44,7 @@ char** allocate_char_2D_AP(int n_X){
 	char **pointerarray = (char **) malloc(n_X * sizeof(char *));
 
 	if(pointerarray == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 	for(i = 0; i < n_X; i++){
@@ -63,7 +63,7 @@ double* allocate_double_1D(int n_X){
 	double *array = (double *) malloc(n_X * sizeof(double));
 
 	if(array == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 	for(i = 0; i < n_X; i++){
@@ -79,7 +79,7 @@ int* allocate_int_1D(int n_X){
 	int *array = (int *) malloc(n_X * sizeof(int));
 
 	if(array == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 	for(i = 0; i < n_X; i++){
@@ -95,7 +95,7 @@ char* allocate_char_1D(int n_X){
 	char *array = (char *) malloc((n_X + 1) * sizeof(char));
 
 	if(array == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 	for(i = 0; i < n_X; i++){
@@ -115,14 +115,14 @@ double** allocate_double_SQ(int n_X){
 	double **pointerarray = allocate_double_2D_AP(n_X);
 
 	if(pointerarray == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 
 	for(i = 0; i < n_X; i++){
 		pointerarray[i] = allocate_double_1D(n_X);
 		if(pointerarray[i] == NULL){
-			fprintf(stderr, "PE: Memory allocation fails!\n");
+			fprintf_stderr("PE: Memory allocation fails!\n");
 			exit(1);
 		}
 		for(j = 0; j < n_X; j++){
@@ -139,14 +139,14 @@ double** allocate_double_UT(int n_X){
 	double **pointerarray = allocate_double_2D_AP(n_X);
 
 	if(pointerarray == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 
 	for(i = 0; i < n_X; i++){
 		pointerarray[i] = allocate_double_1D(n_X - i);
 		if(pointerarray[i] == NULL){
-			fprintf(stderr, "PE: Memory allocation fails!\n");
+			fprintf_stderr("PE: Memory allocation fails!\n");
 			exit(1);
 		}
 		for(j = 0; j < n_X - i; j++){
@@ -163,14 +163,14 @@ double** allocate_double_RT(int nrow, int ncol){
 	double **pointerarray = allocate_double_2D_AP(nrow);
 
 	if(pointerarray == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 
 	for(i = 0; i < nrow; i++){
 		pointerarray[i] = allocate_double_1D(ncol);
 		if(pointerarray[i] == NULL){
-			fprintf(stderr, "PE: Memory allocation fails!\n");
+			fprintf_stderr("PE: Memory allocation fails!\n");
 			exit(1);
 		}
 		for(j = 0; j < ncol; j++){
@@ -187,14 +187,14 @@ int** allocate_int_RT(int nrow, int ncol){
 	int **pointerarray = allocate_int_2D_AP(nrow);
 
 	if(pointerarray == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 
 	for(i = 0; i < nrow; i++){
 		pointerarray[i] = allocate_int_1D(ncol);
 		if(pointerarray[i] == NULL){
-			fprintf(stderr, "PE: Memory allocation fails!\n");
+			fprintf_stderr("PE: Memory allocation fails!\n");
 			exit(1);
 		}
 		for(j = 0; j < ncol; j++){
@@ -211,14 +211,14 @@ char** allocate_char_RT(int nrow, int ncol){
 	char **pointerarray = allocate_char_2D_AP(nrow);
 
 	if(pointerarray == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 
 	for(i = 0; i < nrow; i++){
 		pointerarray[i] = allocate_char_1D(ncol + 1);
 		if(pointerarray[i] == NULL){
-			fprintf(stderr, "PE: Memory allocation fails!\n");
+			fprintf_stderr("PE: Memory allocation fails!\n");
 			exit(1);
 		}
 		for(j = 0; j < ncol; j++){
@@ -314,13 +314,13 @@ double** allocate_s_double_UT(int n_X){
 	double **pointerarray = allocate_double_2D_AP(n_X);
 
 	if(pointerarray == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 
 	pointerarray[0] = allocate_double_1D(total);
 	if(pointerarray[0] == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 
@@ -341,13 +341,13 @@ double** allocate_s_double_LT(int n_X){
 	double **pointerarray = allocate_double_2D_AP(n_X);
 
 	if(pointerarray == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 
 	pointerarray[0] = allocate_double_1D(total);
 	if(pointerarray[0] == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 
@@ -374,13 +374,13 @@ double** allocate_s_double_LT_pam(int n_X){
 	double **pointerarray = allocate_double_2D_AP(n_X);
 
 	if(pointerarray == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 
 	pointerarray[0] = allocate_double_1D(total);
 	if(pointerarray[0] == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 
@@ -405,13 +405,13 @@ int**** allocate_int_RT_4D(int N_X, int K, int nrow, int ncol){
 	int ****pointerarray = (int ****) malloc(N_X * sizeof(int ***));
 
 	if(pointerarray == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 	for(n_X = 0; n_X < N_X; n_X++){
 		pointerarray[n_X] = (int ***) malloc(K * sizeof(int **));
 		if(pointerarray[n_X] == NULL){
-			fprintf(stderr, "PE: Memory allocation fails!\n");
+			fprintf_stderr("PE: Memory allocation fails!\n");
 			exit(1);
 		}
 		for(k = 0; k < K; k++){
@@ -449,13 +449,13 @@ int*** allocate_int_RT_3D(int N_X, int K, int ncode){
 	int ***pointerarray = (int ***) malloc(N_X * sizeof(int **));
 
 	if(pointerarray == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 	for(n_X = 0; n_X < N_X; n_X++){
 		pointerarray[n_X] = (int **) malloc(K * sizeof(int *));
 		if(pointerarray[n_X] == NULL){
-			fprintf(stderr, "PE: Memory allocation fails!\n");
+			fprintf_stderr("PE: Memory allocation fails!\n");
 			exit(1);
 		}
 		for(k = 0; k < K; k++){
@@ -493,13 +493,13 @@ double*** allocate_double_RT_3D(int K, int L, int ncode){
 	double ***pointerarray = (double ***) malloc(K * sizeof(double **));
 
 	if(pointerarray == NULL){
-		fprintf(stderr, "PE: Memory allocation fails!\n");
+		fprintf_stderr("PE: Memory allocation fails!\n");
 		exit(1);
 	}
 	for(k = 0; k < K; k++){
 		pointerarray[k] = (double **) malloc(L * sizeof(double *));
 		if(pointerarray[k] == NULL){
-			fprintf(stderr, "PE: Memory allocation fails!\n");
+			fprintf_stderr("PE: Memory allocation fails!\n");
 			exit(1);
 		}
 		for(l = 0; l < L; l++){

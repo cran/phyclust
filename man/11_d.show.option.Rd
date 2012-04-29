@@ -33,7 +33,7 @@
   \code{\link{.init.procedure}},
   \code{\link{.nucleotide}},
   \code{\link{.snp}},
-  \code{\link{.substitution}},
+  \code{\link{.substitution.model}},
 }
 \examples{
 \dontrun{

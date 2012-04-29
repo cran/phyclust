@@ -443,7 +443,7 @@ int Forestry (FILE *fout)
       if(com.cleandata) 
          nchange=MPScore (com.space);
       if(noisy&&com.ns<99) 
-         { OutTreeN(F0,0,0); fprintf(R_paml_baseml_file_pointer, " MP score: %.2f\n",nchange);}
+         { OutTreeN(R_paml_baseml_file_pointer,0,0); fprintf(R_paml_baseml_file_pointer, " MP score: %.2f\n",nchange);}
 //WCC         { OutTreeN(F0,0,0); printf(" MP score: %.2f\n",nchange);}
       OutTreeN(fout,0,0);  fprintf(fout,"  MP score: %.2f",nchange);
       if(!com.clock && com.model<=REV && com.nhomo<=2 
@@ -473,10 +473,13 @@ int Forestry (FILE *fout)
 
       lnL = com.plfun (x, np);
       if(noisy) {
-//WCC         printf("\nntime & nrate & np:%6d%6d%6d\n",com.ntime,com.nrate,com.np);
-         fprintf(R_paml_baseml_file_pointer, "\nntime & nrate & np:%6d%6d%6d\n",com.ntime,com.nrate,com.np);
+/*WCC
+         printf("\nntime & nrate & np:%6d%6d%6d\n",com.ntime,com.nrate,com.np);
          if(noisy>2 && com.ns<50) { OutTreeB(F0); FPN(F0); matout(F0,x,1,np); }
-//WCC         printf("\nlnL0 = %12.6f\n",-lnL);
+         printf("\nlnL0 = %12.6f\n",-lnL);
+*/
+         fprintf(R_paml_baseml_file_pointer, "\nntime & nrate & np:%6d%6d%6d\n",com.ntime,com.nrate,com.np);
+         if(noisy>2 && com.ns<50) { OutTreeB(R_paml_baseml_file_pointer); FPN(R_paml_baseml_file_pointer); matout(R_paml_baseml_file_pointer,x,1,np); }
          fprintf(R_paml_baseml_file_pointer, "\nlnL0 = %12.6f\n",-lnL);
       }
 
@@ -820,7 +823,7 @@ int GetStepMatrix(char*line)
       fprintf(R_paml_baseml_file_pointer, "rate %d: %d pairs\n", i+1,k);
    }
 //WCC   for(i=0; i<16; i++) { printf("%3d", StepMatrix[i]); if((i+1)%4==0) FPN(F0); }
-   for(i=0; i<16; i++) { fprintf(R_paml_baseml_file_pointer, "%3d", StepMatrix[i]); if((i+1)%4==0) FPN(F0); }
+   for(i=0; i<16; i++) { fprintf(R_paml_baseml_file_pointer, "%3d", StepMatrix[i]); if((i+1)%4==0) FPN(R_paml_baseml_file_pointer); }
 
    return(0);
 }
@@ -1320,8 +1323,8 @@ int SetxBound (int np, double xb[][2])
       FOR(i,np) printf(" %10.6f", xb[i][1]);  FPN(F0);
 */
       fprintf(R_paml_baseml_file_pointer, "\nBounds (np=%d):\n",np);
-      FOR(i,np) fprintf(R_paml_baseml_file_pointer, " %10.6f", xb[i][0]);  FPN(F0);
-      FOR(i,np) fprintf(R_paml_baseml_file_pointer, " %10.6f", xb[i][1]);  FPN(F0);
+      FOR(i,np) fprintf(R_paml_baseml_file_pointer, " %10.6f", xb[i][0]);  FPN(R_paml_baseml_file_pointer);
+      FOR(i,np) fprintf(R_paml_baseml_file_pointer, " %10.6f", xb[i][1]);  FPN(R_paml_baseml_file_pointer);
    }
    return(0);
 }
@@ -1503,7 +1506,8 @@ int TestModel (FILE *fout, double x[], int nsep, double space[])
 
    SiteCat=(int*)malloc((1<<2*com.ns)* sizeof(int));
    if (SiteCat == NULL)  error2 ("oom");
-   CollapsSite (F0, nsep, com.ns, &ncat, SiteCat);
+//WCC   CollapsSite (F0, nsep, com.ns, &ncat, SiteCat);
+   CollapsSite (R_paml_baseml_file_pointer, nsep, com.ns, &ncat, SiteCat);
    fprintf (fout, "\n\nAppr. test of model.. ncat%6d  nsep%6d\n", ncat,nsep);
 
    nobs = pexp+ncat;

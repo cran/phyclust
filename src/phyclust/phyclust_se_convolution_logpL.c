@@ -27,6 +27,9 @@ void Update_Mu_given_QA_full_se_convolution(em_phyclust_struct *empcs, Q_matrix_
 			}
 
 			for(n_X = 0; n_X < N_X; n_X++){
+				if(empcs->X[n_X][l] == MISSING_ALLELE){
+					continue;
+				}
 				if(empcs->replication_X[n_X] == 1){
 					z_k[empcs->X[n_X][l]] += empcs->Z_normalized[n_X][k];
 				} else{
@@ -66,6 +69,9 @@ void Update_Mu_given_QA_full_se_convolution(em_phyclust_struct *empcs, Q_matrix_
 			 * such as computing likelihood, finding Mu. */
 			if(flag){
 				for(n_X = 0; n_X < N_X; n_X++){
+					if(empcs->X[n_X][l] == MISSING_ALLELE){
+						continue;
+					}
 					empcs->count_Mu_X[n_X][k][org_s_mu][empcs->X[n_X][l]]--;
 					empcs->count_Mu_X[n_X][k][empcs->Mu[k][l]][empcs->X[n_X][l]]++;
 				}
@@ -91,6 +97,9 @@ void Update_Mu_given_QA_skip_non_seg_se_convolution(em_phyclust_struct *empcs, Q
 			}
 
 			for(n_X = 0; n_X < N_X; n_X++){
+				if(empcs->X[n_X][l] == MISSING_ALLELE){
+					continue;
+				}
 				if(empcs->replication_X[n_X] == 1){
 					z_k[empcs->X[n_X][l]] += empcs->Z_normalized[n_X][k];
 				} else{
@@ -130,6 +139,9 @@ void Update_Mu_given_QA_skip_non_seg_se_convolution(em_phyclust_struct *empcs, Q
 			 * such as computing likelihood, finding Mu. */
 			if(flag){
 				for(n_X = 0; n_X < N_X; n_X++){
+					if(empcs->X[n_X][l] == MISSING_ALLELE){
+						continue;
+					}
 					empcs->count_Mu_X[n_X][k][org_s_mu][empcs->X[n_X][l]]--;
 					empcs->count_Mu_X[n_X][k][empcs->Mu[k][l]][empcs->X[n_X][l]]++;
 				}
@@ -140,33 +152,36 @@ void Update_Mu_given_QA_skip_non_seg_se_convolution(em_phyclust_struct *empcs, Q
 
 
 /* Missing version: This function will update Mu given QA for full length sequences. */
-void Update_Mu_given_QA_full_missing_se_convolution(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H){
+void Update_Mu_given_QA_full_gap_se_convolution(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H){
 	int org_s_mu, new_s_mu, n_X, k, l, flag = 0;
 	int K = empcs->K, L = empcs->L, Ncode = empcs->ncode, N_X = empcs->N_X;
-	int fix_s_mu = empcs->SE_P->ncode;	/* Observed missing. */
-	double tmp_psi_k, psi_k[empcs->ncode], z_k[empcs->ncode], z_k_missing;
+	int fix_s_mu = empcs->SE_P->ncode;	/* Observed gap. */
+	double tmp_psi_k, psi_k[empcs->ncode], z_k[empcs->ncode], z_k_gap;
 
-	update_convolution_Pt_f_err_missing(QA, empcs->SE_P);
+	update_convolution_Pt_f_err_gap(QA, empcs->SE_P);
 
 	for(k = 0; k < K; k++){
 		for(l = 0; l < L; l++){
 			for(org_s_mu = 0; org_s_mu < Ncode; org_s_mu++){
 				z_k[org_s_mu] = 0.0;
 			}
-			z_k_missing = 0.0;
+			z_k_gap = 0.0;
 
 			for(n_X = 0; n_X < N_X; n_X++){
-				if(empcs->X[n_X][l] != empcs->missing_index){
+				if(empcs->X[n_X][l] == MISSING_ALLELE){
+					continue;
+				}
+				if(empcs->X[n_X][l] != empcs->gap_index){
 					if(empcs->replication_X[n_X] == 1){
 						z_k[empcs->X[n_X][l]] += empcs->Z_normalized[n_X][k];
 					} else{
 						z_k[empcs->X[n_X][l]] += empcs->Z_normalized[n_X][k] * empcs->replication_X[n_X];
 					}
-				} else{	/* For missing. */
+				} else{	/* For gap. */
 					if(empcs->replication_X[n_X] == 1){
-						z_k_missing += empcs->Z_normalized[n_X][k];
+						z_k_gap += empcs->Z_normalized[n_X][k];
 					} else{
-						z_k_missing += empcs->Z_normalized[n_X][k] * empcs->replication_X[n_X];
+						z_k_gap += empcs->Z_normalized[n_X][k] * empcs->replication_X[n_X];
 					}
 				}
 			}
@@ -176,7 +191,7 @@ void Update_Mu_given_QA_full_missing_se_convolution(em_phyclust_struct *empcs, Q
 				for(new_s_mu = 0; new_s_mu < Ncode; new_s_mu++){
 					psi_k[org_s_mu] += z_k[new_s_mu] * empcs->SE_P->log_conv[k][org_s_mu][new_s_mu];
 				}
-				psi_k[org_s_mu] += z_k_missing * empcs->SE_P->log_conv[k][org_s_mu][fix_s_mu];	/* For missing. */
+				psi_k[org_s_mu] += z_k_gap * empcs->SE_P->log_conv[k][org_s_mu][fix_s_mu];	/* For gap. */
 			}
 
 			org_s_mu = empcs->Mu[k][l];
@@ -193,31 +208,34 @@ void Update_Mu_given_QA_full_missing_se_convolution(em_phyclust_struct *empcs, Q
 				}
 			}
 
-			/* Dynamically update empcs->count_Mu_X: See non-missing version for details. */
+			/* Dynamically update empcs->count_Mu_X: See non-gap version for details. */
 			if(flag){
 				for(n_X = 0; n_X < N_X; n_X++){
-					if(empcs->X[n_X][l] != empcs->missing_index){
+					if(empcs->X[n_X][l] == MISSING_ALLELE){
+						continue;
+					}
+					if(empcs->X[n_X][l] != empcs->gap_index){
 						empcs->count_Mu_X[n_X][k][org_s_mu][empcs->X[n_X][l]]--;
 						empcs->count_Mu_X[n_X][k][empcs->Mu[k][l]][empcs->X[n_X][l]]++;
-					} else{	/* For missing. */
-						empcs->count_Mu_X_missing[n_X][k][org_s_mu]--;
-						empcs->count_Mu_X_missing[n_X][k][empcs->Mu[k][l]]++;
+					} else{	/* For gap. */
+						empcs->count_Mu_X_gap[n_X][k][org_s_mu]--;
+						empcs->count_Mu_X_gap[n_X][k][empcs->Mu[k][l]]++;
 					}
 				}
 			}
 		}
 	}
-} /* End of Update_Mu_given_QA_missing_se_convolution(). */
+} /* End of Update_Mu_given_QA_gap_se_convolution(). */
 
 
 /* Missing version: This function will update Mu given QA, but skip non-segregating sites. */
-void Update_Mu_given_QA_skip_non_seg_missing_se_convolution(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H){
+void Update_Mu_given_QA_skip_non_seg_gap_se_convolution(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H){
 	int org_s_mu, new_s_mu, n_X, k, l, i, flag = 0;
 	int K = empcs->K, N_seg_site = empcs->N_seg_site, Ncode = empcs->ncode, N_X = empcs->N_X;
-	int fix_s_mu = empcs->SE_P->ncode;	/* Observed missing. */
-	double tmp_psi_k, psi_k[empcs->ncode], z_k[empcs->ncode], z_k_missing;
+	int fix_s_mu = empcs->SE_P->ncode;	/* Observed gap. */
+	double tmp_psi_k, psi_k[empcs->ncode], z_k[empcs->ncode], z_k_gap;
 
-	update_convolution_Pt_f_err_missing(QA, empcs->SE_P);
+	update_convolution_Pt_f_err_gap(QA, empcs->SE_P);
 
 	for(k = 0; k < K; k++){
 		for(i = 0; i < N_seg_site; i++){
@@ -226,20 +244,23 @@ void Update_Mu_given_QA_skip_non_seg_missing_se_convolution(em_phyclust_struct *
 			for(org_s_mu = 0; org_s_mu < Ncode; org_s_mu++){
 				z_k[org_s_mu] = 0.0;
 			}
-			z_k_missing = 0.0;
+			z_k_gap = 0.0;
 
 			for(n_X = 0; n_X < N_X; n_X++){
-				if(empcs->X[n_X][l] != empcs->missing_index){
+				if(empcs->X[n_X][l] == MISSING_ALLELE){
+					continue;
+				}
+				if(empcs->X[n_X][l] != empcs->gap_index){
 					if(empcs->replication_X[n_X] == 1){
 						z_k[empcs->X[n_X][l]] += empcs->Z_normalized[n_X][k];
 					} else{
 						z_k[empcs->X[n_X][l]] += empcs->Z_normalized[n_X][k] * empcs->replication_X[n_X];
 					}
-				} else{	/* For missing. */
+				} else{	/* For gap. */
 					if(empcs->replication_X[n_X] == 1){
-						z_k_missing += empcs->Z_normalized[n_X][k];
+						z_k_gap += empcs->Z_normalized[n_X][k];
 					} else{
-						z_k_missing += empcs->Z_normalized[n_X][k] * empcs->replication_X[n_X];
+						z_k_gap += empcs->Z_normalized[n_X][k] * empcs->replication_X[n_X];
 					}
 				}
 			}
@@ -249,7 +270,7 @@ void Update_Mu_given_QA_skip_non_seg_missing_se_convolution(em_phyclust_struct *
 				for(new_s_mu = 0; new_s_mu < Ncode; new_s_mu++){
 					psi_k[org_s_mu] += z_k[new_s_mu] * empcs->SE_P->log_conv[k][org_s_mu][new_s_mu];
 				}
-				psi_k[org_s_mu] += z_k_missing * empcs->SE_P->log_conv[k][org_s_mu][fix_s_mu];	/* For missing. */
+				psi_k[org_s_mu] += z_k_gap * empcs->SE_P->log_conv[k][org_s_mu][fix_s_mu];	/* For gap. */
 			}
 
 			org_s_mu = empcs->Mu[k][l];
@@ -266,21 +287,24 @@ void Update_Mu_given_QA_skip_non_seg_missing_se_convolution(em_phyclust_struct *
 				}
 			}
 
-			/* Dynamically update empcs->count_Mu_X: See non-missing version for details. */
+			/* Dynamically update empcs->count_Mu_X: See non-gap version for details. */
 			if(flag){
 				for(n_X = 0; n_X < N_X; n_X++){
-					if(empcs->X[n_X][l] != empcs->missing_index){
+					if(empcs->X[n_X][l] == MISSING_ALLELE){
+						continue;
+					}
+					if(empcs->X[n_X][l] != empcs->gap_index){
 						empcs->count_Mu_X[n_X][k][org_s_mu][empcs->X[n_X][l]]--;
 						empcs->count_Mu_X[n_X][k][empcs->Mu[k][l]][empcs->X[n_X][l]]++;
-					} else{	/* For missing. */
-						empcs->count_Mu_X_missing[n_X][k][org_s_mu]--;
-						empcs->count_Mu_X_missing[n_X][k][empcs->Mu[k][l]]++;
+					} else{	/* For gap. */
+						empcs->count_Mu_X_gap[n_X][k][org_s_mu]--;
+						empcs->count_Mu_X_gap[n_X][k][empcs->Mu[k][l]]++;
 					}
 				}
 			}
 		}
 	}
-} /* End of Update_Mu_given_QA_skip_non_seg_missing_se_convolution(). */
+} /* End of Update_Mu_given_QA_skip_non_seg_gap_se_convolution(). */
 
 
 

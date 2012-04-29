@@ -1,12 +1,9 @@
-### This file contains functions to call phyclust_se_update in C.
+### This file contains functions to call phyclust_update in C.
 
 ### EM step.
-phyclust.se.update <- function(X, EMC = .EMC, ret.phyclust = NULL,
+phyclust.update <- function(X, EMC = .EMC, ret.phyclust = NULL,
     K = NULL, Eta = NULL, Mu = NULL, pi = NULL, kappa = NULL, Tt = NULL,
-    byrow = TRUE){
-
-  label <- NULL
-
+    label = NULL, byrow = TRUE){
   if(is.null(ret.phyclust)){
     if(is.null(K) || is.null(Eta) || is.null(Mu) || is.null(Tt)){
       stop("The parameters are not specified correctly.")
@@ -23,10 +20,6 @@ phyclust.se.update <- function(X, EMC = .EMC, ret.phyclust = NULL,
     }
   }
 
-  if(ret.phyclust$code.type != "NUCLEOTIDE"){
-    stop("The sequencing error model only supports NUCLEOTIDE data.")
-  }
-
   K <- ret.phyclust$K
   if(byrow){
     X <- t(X)
@@ -40,18 +33,16 @@ phyclust.se.update <- function(X, EMC = .EMC, ret.phyclust = NULL,
   EMC$edist.model <- ret.phyclust$edist.model
   EMC$identifier <- ret.phyclust$QA$identifier
   EMC$code.type <- ret.phyclust$code.type
-  EMC$em.method <- "EM"
+  EMC$em.method <- ret.phyclust$em.method
   EMC$boundary.method <- ret.phyclust$boundary.method
-  EMC$se.type <- TRUE
-  EMC$se.model <- "CONVOLUTION"
 
   EMC <- check.EMC(EMC)
-  EMC <- translate.EMC.se(EMC)
+  EMC <- translate.EMC(EMC)
 
   vect <- convert.QA.to.vect(ret.phyclust)
   label <- check.label(label, N.X.org, K, byrow)
 
-  ret <- .Call("R_phyclust_se_update",
+  ret <- .Call("R_phyclust_update",
                as.integer(N.X.org),
                as.integer(L),
                as.integer(X),
@@ -68,8 +59,8 @@ phyclust.se.update <- function(X, EMC = .EMC, ret.phyclust = NULL,
   }
 
   ret$class.id <- ret$class.id + 1
-  ret <- translate.ret.se(ret, EMC)
+  ret <- translate.ret(ret, EMC)
   class(ret) <- "phyclust"
   ret
-} # End of phyclust.se.update().
+} # End of phyclust.update().
 

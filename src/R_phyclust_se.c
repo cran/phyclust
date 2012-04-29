@@ -66,7 +66,7 @@ SEXP initialize_emptr_se(EMPTR_SE emptr, phyclust_struct *pcs){
 	char *names_converge[] = {"eps", "error", "flag", "iter", "inner.iter", "cm.iter", "check.param"};
 	char *names_se[] = {"type", "model", "constant", "f.err"};
 	int emobj_length = 19, QA_length = 3, converge_length = 7, se_length = 4;
-	int i, j, *tmp_ptr_int, tmp_ncode;
+	int i, j, *tmp_ptr_int;
 	double *tmp_ptr_double;
 
 	/* Allocate and protect storages. */
@@ -106,12 +106,22 @@ SEXP initialize_emptr_se(EMPTR_SE emptr, phyclust_struct *pcs){
 	PROTECT(label_method = allocVector(INTSXP, 1));
 
 	/* Assign se. */
-	tmp_ncode = pcs->missing_flag ? NCODE_WIMISSING[NUCLEOTIDE] : NCODE[NUCLEOTIDE];
   	PROTECT(se = allocVector(VECSXP, se_length));
 		PROTECT(se_type = allocVector(INTSXP, 1));
 		PROTECT(se_model = allocVector(INTSXP, 1));
 		PROTECT(se_constant = allocVector(REALSXP, 1));
-		PROTECT(se_f_err = allocVector(REALSXP, pcs->ncode * tmp_ncode));
+		/* BUG!!
+		 * At this stage, X is not loaded yet, so tmp_ncode is not
+		 * accurate. The default is 4, but 5 for data with GAP. This
+		 * can overwrite other memory, and crash R.
+		 * The memory for emobj->SE->se_f_err, emptr->C_se_f_err, or
+		 * ret$SE$se_f_err has to be allocated, protectd, and
+		 * repointed to correct address and amount later by the
+		 * function update_emptr_se().
+		 */
+		// tmp_ncode = pcs->gap_flag ? NCODE_WIGAP[NUCLEOTIDE] : NCODE[NUCLEOTIDE];
+		// PROTECT(se_f_err = allocVector(REALSXP, pcs->ncode * tmp_ncode));
+		se_f_err = R_NilValue;		// No need to protect NULL, R already did.
 
 	/* Set the elments and names. */
 	i = 0;
@@ -225,12 +235,38 @@ SEXP initialize_emptr_se(EMPTR_SE emptr, phyclust_struct *pcs){
 	emptr->C_se_type = INTEGER(se_type);
 	emptr->C_se_model = INTEGER(se_model);
 	emptr->C_se_constant = REAL(se_constant);
-	emptr->C_se_f_err = REAL(se_f_err);
+	/* BUG!!
+	 * We have to set se_f_err as R_NilValue, and repoint it to allocated
+	 * memory later in the function update_emptr_se(), and obtain the address
+	 * to emptr->C_se_f_err after allociation. */
+	// emptr->C_se_f_err = REAL(se_f_err);
 
 	emptr->C_protect_length = 5 + emobj_length + QA_length + converge_length + se_length;
 
 	return(emobj);
 } /* End of initialize_emptr_se(). */
+
+void update_emptr_se(EMPTR_SE emptr, phyclust_struct *pcs, SEXP emobj){
+	SEXP se, se_f_err, names;
+	int i, tl_se, tmp_ncode;
+	
+	se = getListElement(emobj, "SE");
+	names = getAttrib(se, R_NamesSymbol);
+	tl_se = length(se);
+	for(i = 0; i < tl_se; i++){
+		if(strcmp(CHAR(STRING_ELT(names, i)), "f.err") == 0){
+			break;
+		}
+	}
+	if(i == tl_se){
+		error("ret$SE$f.err is not found.\n");
+	}
+		
+	tmp_ncode = pcs->gap_flag ? NCODE_WIGAP[NUCLEOTIDE] : NCODE[NUCLEOTIDE];
+	PROTECT(se_f_err = allocVector(REALSXP, pcs->ncode * tmp_ncode));
+	SET_VECTOR_ELT(se, i, se_f_err);
+	emptr->C_se_f_err = REAL(se_f_err);
+} /* End of update_emptr_se(). */
 
 void copy_all_to_emptr_se(phyclust_struct *pcs, Q_matrix_array *QA,
 		em_control *EMC, EMPTR_SE emptr){
@@ -269,7 +305,7 @@ void copy_all_to_emptr_se(phyclust_struct *pcs, Q_matrix_array *QA,
 	*emptr->C_se_type = EMC->se_type;
 	*emptr->C_se_model = EMC->se_model;
 	*emptr->C_se_constant = EMC->se_constant;
-	tmp_ncode = pcs->missing_flag ? NCODE_WIMISSING[NUCLEOTIDE] : NCODE[NUCLEOTIDE];
+	tmp_ncode = pcs->gap_flag ? NCODE_WIGAP[NUCLEOTIDE] : NCODE[NUCLEOTIDE];
 	i2 = 0;
 	for(i = 0; i < pcs->ncode; i++){
 		for(j = 0; j < tmp_ncode; j++){
@@ -327,7 +363,7 @@ SEXP R_phyclust_se(SEXP R_N_X_org, SEXP R_L, SEXP R_K, SEXP R_X, SEXP R_EMC,
 
 	/* Assign data. */
 	pcs = R_initialize_phyclust_struct(EMC->code_type, *C_N_X_org, *C_L, *C_K);
-	emobj = initialize_emptr_se(emptr, pcs);		/* !! Don't move this. */
+	emobj = initialize_emptr_se(emptr, pcs);	/* !! Don't move this. */
 	tmp_ptr = INTEGER(R_X);
 	for(i = 0; i < *C_N_X_org; i++){
 		pcs->X_org[i] = tmp_ptr;
@@ -339,6 +375,7 @@ SEXP R_phyclust_se(SEXP R_N_X_org, SEXP R_L, SEXP R_K, SEXP R_X, SEXP R_EMC,
 		}
 	}
 	update_phyclust_struct(pcs);
+	update_emptr_se(emptr, pcs, emobj);		/* !! Don't move this. */
 
 	/* Assign labels. */
 	R_update_phyclust_label(pcs, R_label);
@@ -374,10 +411,11 @@ SEXP R_phyclust_se(SEXP R_N_X_org, SEXP R_L, SEXP R_K, SEXP R_X, SEXP R_EMC,
 		EMFP->Em_step(empcs, QA, EMC, EMFP);
 		EMFP->Copy_empcs_to_pcs(empcs, pcs);
 
-		/* Print results. */
+		/* Update results. */
 		assign_class(pcs);
 		update_ic(pcs, QA);
 
+		/* Free memory. */
 		free_em_phyclust_struct(empcs);
 	}
 

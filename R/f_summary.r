@@ -4,6 +4,7 @@
 print.phyclust <- function(x, digits = max(4, getOption("digits") - 3), ...){
   ret.phyclust <- x
 
+  op.org <- options()
   options(digits = digits)
   init <- NULL
 
@@ -51,6 +52,8 @@ print.phyclust <- function(x, digits = max(4, getOption("digits") - 3), ...){
            ", SE_constant: ", ret.phyclust$SE$constant, "\n")
     my.print(ret.phyclust$SE$f.err)
   }
+  options(op.org)
+  invisible()
 } # End of print.phyclust().
 
 summary.phyclust <- function(object, ...){

@@ -42,7 +42,7 @@ phyclust.logL <- function(X, ret.phyclust = NULL,
                as.integer(t(ret.phyclust$Mu)),
                as.double(vect),
                as.integer(which(ret.phyclust$substitution.model ==
-                                as.character(.substitution$model)) - 1),
+                                as.character(.substitution.model$model)) - 1),
                as.integer(which(ret.phyclust$QA$identifier == .identifier) - 1),
                as.integer(which(ret.phyclust$code.type == .code.type) - 1),
                label,

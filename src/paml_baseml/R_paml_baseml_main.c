@@ -9,10 +9,10 @@ FILE *R_paml_baseml_file_pointer;
 int paml_baseml_main(int argc, char **argv);
 
 //WCC SEXP R_paml_baseml_main(SEXP R_argv, SEXP R_temp_dir_name){
-SEXP R_paml_baseml_main(SEXP R_argv, SEXP R_stdout_file_name){
+SEXP R_paml_baseml_main(SEXP R_argv, SEXP R_file_name){
 	int argc, i;
 	const char **argv;
-	const char *stdout_file_name;
+	const char *file_name;
 //WCC	const char *temp_dir_name;
 
 	argc = length(R_argv);
@@ -25,8 +25,8 @@ SEXP R_paml_baseml_main(SEXP R_argv, SEXP R_stdout_file_name){
 		argv[i] = CHAR(STRING_ELT(R_argv, i)); 
 	}
 
-	stdout_file_name = CHAR(STRING_ELT(R_stdout_file_name, 0));
-	R_paml_baseml_file_pointer = fopen(stdout_file_name, "w");
+	file_name = CHAR(STRING_ELT(R_file_name, 0));
+	R_paml_baseml_file_pointer = fopen(file_name, "w");
 
 /* WCC
 	temp_dir_name = CHAR(STRING_ELT(R_temp_dir_name, 0));

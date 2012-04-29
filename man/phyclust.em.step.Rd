@@ -37,7 +37,7 @@ phyclust.em.step(X, ret.phyclust = NULL, K = NULL, Eta = NULL,
   clustering.
 }
 \value{
-  This function return an object with class \code{phyclust}.
+  This function returns an object with class \code{phyclust}.
 }
 \references{
   Phylogenetic Clustering Website:

@@ -156,7 +156,7 @@ int assign_class_by_njs_branch(int K, nj_struct *njs, int *branch_id, int *class
 	int i, n, k, ret, new_class_id[N], K_id[K], max_K, flag;
 
 	if(K < 1 || K > njs->n_internal_edge){
-		fprintf(stderr, "PE: K is out of range (%d, %d)\n", 2, njs->n_internal_edge);
+		fprintf_stderr("PE: K is out of range (%d, %d)\n", 2, njs->n_internal_edge);
 		exit(1);
 	}
 
@@ -179,7 +179,7 @@ int assign_class_by_njs_branch(int K, nj_struct *njs, int *branch_id, int *class
 			} else if(ret == njs->edge2[branch_id[i]]){
 				new_class_id[n] = 1;
 			} else{
-				fprintf(stderr, "PE: Sequence (%d) is not assigned.\n", n + 1);
+				fprintf_stderr("PE: Sequence (%d) is not assigned.\n", n + 1);
 				new_class_id[n] = -1;
 				return(2);
 			}
@@ -208,7 +208,7 @@ int assign_class_by_njs_branch(int K, nj_struct *njs, int *branch_id, int *class
 				}
 			}
 			if(flag == 0 && k == K){
-				fprintf(stderr, "PE: Classes are over assigned.\n");
+				fprintf_stderr("PE: Classes are over assigned.\n");
 				return(3);
 			}
 		}

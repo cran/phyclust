@@ -29,15 +29,15 @@ int Maximize_logpL(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array
 void Update_Mu_given_QA_full(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);
 void Update_Mu_given_QA_skip_non_seg(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);
 /* QA_H != QA */
-void Update_Mu_given_QA_full_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);
-void Update_Mu_given_QA_skip_non_seg_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);
+void Update_Mu_given_QA_full_gap(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);
+void Update_Mu_given_QA_skip_non_seg_gap(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);
 
 
 /* For update the function R(). */
 /* QA_H unused */
 double Compute_R(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);
 /* QA_H != QA */
-double Compute_R_missing(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);
+double Compute_R_gap(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA_H);
 
 
 /* ----- For debug. ----- */

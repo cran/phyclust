@@ -5,7 +5,7 @@
 
 
 //WCC:add
-#include "R_paml.h"
+#include "paml.h"
 
 
 extern char BASEs[], *EquateBASE[], AAs[], BINs[], CODONs[][4], nChara[], CharaMap[][64];
@@ -127,7 +127,8 @@ int PopupComment(FILE *fseq)
       ch=fgetc(fseq);
       if(ch==EOF) error2("expecting ]");
       if(ch==comment1) break;
-      if(noisy) putchar(ch);
+//WCC      if(noisy) putchar(ch);
+      if(noisy) fprintf(R_paml_baseml_file_pointer, "%c", (char) ch);
    }
    return(0);
 }
@@ -169,13 +170,14 @@ int ReadSeq (FILE *fout, FILE *fseq, int cleandata)
       puts("\n\nAmbiguity character definition table:\n");
       for(i=0; i<(int)strlen(BASEs); i++) {
          nb = strlen(EquateBASE[i]);
-/*
+/*WCC
          printf("%c (%d): ", BASEs[i], nb);
          for(j=0; j<nb; j++)  printf("%c ", EquateBASE[i][j]);
+         FPN(F0);
 */
          fprintf(R_paml_baseml_file_pointer, "%c (%d): ", BASEs[i], nb);
          for(j=0; j<nb; j++)  fprintf(R_paml_baseml_file_pointer, "%c ", EquateBASE[i][j]);
-         FPN(F0);
+         FPN(R_paml_baseml_file_pointer);
       }
    }
    GetSeqFileType(fseq, &format);
@@ -286,8 +288,11 @@ int ReadSeq (FILE *fout, FILE *fseq, int cleandata)
             for(i=0,k=0; i<com.ngene; i++) 
                k += com.lgene[i];
             if(k!=com.ls/n31) {
+/*WCC
                matIout(F0, com.lgene, 1, com.ngene);
-//WCC               printf("\n%6d != %d", com.ls/n31, k);
+               printf("\n%6d != %d", com.ls/n31, k);
+*/
+               matIout(R_paml_baseml_file_pointer, com.lgene, 1, com.ngene);
                fprintf(R_paml_baseml_file_pointer, "\n%6d != %d", com.ls/n31, k);
                puts("\nOption G: total length over genes is not correct");
                if(com.seqtype==1) {
@@ -989,7 +994,8 @@ int PatternWeight (void)
 
       }     /* for (h)  */
    }        /* for (ig) */
-   if(noisy) FPN(F0);
+//WCC   if(noisy) FPN(F0);
+   if(noisy) FPN(R_paml_baseml_file_pointer);
 
    /* (B) count pattern frequencies and collect pose[] */
    com.posG[com.ngene] = com.npatt;
@@ -1587,8 +1593,11 @@ double SeqDivergence (double x[], int model, double alpha, double *kappa)
    double small=1e-10/com.ls,largek=999, larged=9;
 
    if (testXMat(x)) {
+/*WCC
       matout(F0, x, 4, 4);
-//WCC      printf("\nfrequency matrix error, setting distance to large d");
+      printf("\nfrequency matrix error, setting distance to large d");
+*/
+      matout(R_paml_baseml_file_pointer, x, 4, 4);
       fprintf(R_paml_baseml_file_pointer, "\nfrequency matrix error, setting distance to large d");
       return(larged);
    }
@@ -2049,7 +2058,8 @@ int DistanceMatNG86 (FILE *fout, FILE*fds, FILE*fdn, FILE*ft, double alpha)
 //WCC      if(noisy>1 && com.ns>10)  printf(" %3d", is+1);
       if(noisy>1 && com.ns>10)  fprintf(R_paml_baseml_file_pointer, " %3d", is+1);
    }    /* for(is) */
-   FPN(F0); 
+//WCC   FPN(F0); 
+   FPN(R_paml_baseml_file_pointer); 
    if(fout) FPN(fout);
    if(status) fprintf (fout, "NOTE: -1 means that NG86 is inapplicable.\n");
    return (0);
@@ -2209,11 +2219,13 @@ int LSDistance (double *ss,double x[],int (*testx)(double x[],int np))
    int i;
 
    if ((*testx)(x, com.ntime)) {
-      matout (F0, x, 1, com.ntime);
+//WCC      matout (F0, x, 1, com.ntime);
+      matout (R_paml_baseml_file_pointer, x, 1, com.ntime);
       puts ("initial err in LSDistance()");
    }
    SetAncestor();
-   i = nls2((com.ntime>20&&noisy>=3?F0:NULL),
+//WCC   i = nls2((com.ntime>20&&noisy>=3?F0:NULL),
+   i = nls2((com.ntime>20&&noisy>=3?R_paml_baseml_file_pointer:NULL),
       ss,x,com.ntime,fun_LS,NULL,testx,com.ns*(com.ns-1)/2,1e-6);
 
    return (i);
@@ -2274,9 +2286,12 @@ int GroupDistances()
 
    for(j=0;j<ngroup;j++) Ningroup[j]=0;
    for(j=0;j<com.ns; j++) Ningroup[group[j]-1]++;
-//WCC   printf("\n# sequences in group:");
-   fprintf(R_paml_baseml_file_pointer, "\n# sequences in group:");
+/*WCC
+   printf("\n# sequences in group:");
    matIout(F0,Ningroup,1,ngroup);
+*/
+   fprintf(R_paml_baseml_file_pointer, "\n# sequences in group:");
+   matIout(R_paml_baseml_file_pointer,Ningroup,1,ngroup);
    if(ancestor==NULL) {
       newancestor=1;
       ancestor=(int*)realloc(ancestor, com.ns*(com.ns-1)/2*sizeof(int));
@@ -2401,7 +2416,8 @@ int ReadTreeB (FILE *ftree, int popline)
    if(tree.root==-1) error2("root err");
    for(i=0; i<com.ns; i++)
       if(nodemark[i]==0) {
-         matIout(F0,nodemark,1,com.ns);
+//WCC         matIout(F0,nodemark,1,com.ns);
+         matIout(R_paml_baseml_file_pointer,nodemark,1,com.ns);
          error2("branch specification of tree");
       }
 
@@ -3081,10 +3097,16 @@ void printtree (int timebranches)
       fprintf(R_paml_baseml_file_pointer, "%7d: ", nodes[i].nson);
       FOR(j,nodes[i].nson) fprintf(R_paml_baseml_file_pointer, " %2d", nodes[i].sons[j]);
    }
+/*WCC
    FPN(F0); 
    OutTreeN(F0,0,0); FPN(F0); 
    OutTreeN(F0,1,0); FPN(F0); 
    OutTreeN(F0,1,1); FPN(F0); 
+*/
+   FPN(R_paml_baseml_file_pointer); 
+   OutTreeN(R_paml_baseml_file_pointer,0,0); FPN(R_paml_baseml_file_pointer); 
+   OutTreeN(R_paml_baseml_file_pointer,1,0); FPN(R_paml_baseml_file_pointer); 
+   OutTreeN(R_paml_baseml_file_pointer,1,1); FPN(R_paml_baseml_file_pointer); 
 }
 
 
@@ -3388,7 +3410,7 @@ int GetInitialsTimes (double x[])
          if(com.nbtype<=1) error2("use clock = 1 or add branch rate labels in tree");
 
          for(i=0; i<tree.nbranch; i++) 
-            fprintf(R_paml_baseml_file_pointer, "%3.0f",nodes[tree.branches[i][1]].label); FPN(F0);
+            fprintf(R_paml_baseml_file_pointer, "%3.0f",nodes[tree.branches[i][1]].label); FPN(R_paml_baseml_file_pointer);
 //WCC            printf("%3.0f",nodes[tree.branches[i][1]].label); FPN(F0);
       }
    }
@@ -3557,7 +3579,8 @@ int readx(double x[], int *fromfile)
       { fprintf(R_paml_baseml_file_pointer, "err at #%d. Edit or remove it.\n",i+1); exit(-25); }
 //WCC      { printf("err at #%d. Edit or remove it.\n",i+1); exit(-1); }
    if(com.runmode>0) {
-      matout(F0,xin,1,npin);
+//WCC      matout(F0,xin,1,npin);
+      matout(R_paml_baseml_file_pointer,xin,1,npin);
       puts("Those are fixed for tree search.  Stop if wrong.");
    }
    return(0);
@@ -3753,10 +3776,11 @@ int Perturbation(FILE* fout, int initialMP, double space[])
       if(ReadTreeN(ftree, &i, &j, 0, 1)) error2("err tree..");
       fclose(ftree);
    }
-   if (noisy) { FPN (F0);  OutTreeN(F0,0,0);  FPN(F0); }
+//WCC   if (noisy) { FPN (F0);  OutTreeN(F0,0,0);  FPN(F0); }
+   if (noisy) { FPN (R_paml_baseml_file_pointer);  OutTreeN(R_paml_baseml_file_pointer,0,0);  FPN(R_paml_baseml_file_pointer); }
    tree.lnL=TreeScore(x, space);
 //WCC   if (noisy) { OutTreeN(F0,0,1);  printf("\n lnL = %.4f\n",-tree.lnL); }
-   if (noisy) { OutTreeN(F0,0,1);  fprintf(R_paml_baseml_file_pointer, "\n lnL = %.4f\n",-tree.lnL); }
+   if (noisy) { OutTreeN(R_paml_baseml_file_pointer,0,1);  fprintf(R_paml_baseml_file_pointer, "\n lnL = %.4f\n",-tree.lnL); }
    OutTreeN(fout,1,1);  fprintf(fout, "\n lnL = %.4f\n",-tree.lnL);
    if (com.np>com.ntime) {
       fprintf(fout, "\tparameters:"); 
@@ -3771,12 +3795,15 @@ int Perturbation(FILE* fout, int initialMP, double space[])
          tree=treebest.tree; memcpy (nodes, treebest.nodes, sizetree);
          NeighborNNI (ineighb);
          if(noisy) {
-//WCC            printf("\nTrying tree # %d (%d move[s]) \n", ++ntree,nmove);
-            fprintf(R_paml_baseml_file_pointer, "\nTrying tree # %d (%d move[s]) \n", ++ntree,nmove);
+/*WCC
+            printf("\nTrying tree # %d (%d move[s]) \n", ++ntree,nmove);
             OutTreeN(F0,0,0);  FPN(F0);
+*/
+            fprintf(R_paml_baseml_file_pointer, "\nTrying tree # %d (%d move[s]) \n", ++ntree,nmove);
+            OutTreeN(R_paml_baseml_file_pointer,0,0);  FPN(R_paml_baseml_file_pointer);
          }
          tree.lnL=TreeScore(x, space);
-/* WCC
+/*WCC
          if (noisy) { OutTreeN(F0,1,1); printf("\n lnL = %.4f\n",-tree.lnL);}
          if (noisy && com.np>com.ntime) {
             printf("\tparameters:"); 
@@ -3784,11 +3811,11 @@ int Perturbation(FILE* fout, int initialMP, double space[])
             FPN(F0);
          }
 */
-         if (noisy) { OutTreeN(F0,1,1); fprintf(R_paml_baseml_file_pointer, "\n lnL = %.4f\n",-tree.lnL);}
+         if (noisy) { OutTreeN(R_paml_baseml_file_pointer,1,1); fprintf(R_paml_baseml_file_pointer, "\n lnL = %.4f\n",-tree.lnL);}
          if (noisy && com.np>com.ntime) {
             fprintf(R_paml_baseml_file_pointer, "\tparameters:"); 
             for(i=com.ntime; i<com.np; i++) fprintf(R_paml_baseml_file_pointer, "%9.5f", x[i]);
-            FPN(F0);
+            FPN(R_paml_baseml_file_pointer);
          }
 
          if (tree.lnL<=treebest.tree.lnL) {
@@ -3813,10 +3840,13 @@ int Perturbation(FILE* fout, int initialMP, double space[])
    }
    tree=treebest.tree;  memcpy (nodes, treebest.nodes, sizetree);
    if (noisy) {
-//WCC      printf("\n\nBest tree found:\n");
-      fprintf(R_paml_baseml_file_pointer, "\n\nBest tree found:\n");
+/*WCC
+      printf("\n\nBest tree found:\n");
       OutTreeN(F0,0,0);  FPN(F0);  OutTreeN(F0,1,1);  FPN(F0); 
-//WCC      printf("\nlnL = %.4f\n", tree.lnL);
+      printf("\nlnL = %.4f\n", tree.lnL);
+*/
+      fprintf(R_paml_baseml_file_pointer, "\n\nBest tree found:\n");
+      OutTreeN(R_paml_baseml_file_pointer,0,0);  FPN(R_paml_baseml_file_pointer);  OutTreeN(R_paml_baseml_file_pointer,1,1);  FPN(R_paml_baseml_file_pointer); 
       fprintf(R_paml_baseml_file_pointer, "\nlnL = %.4f\n", tree.lnL);
    }
    if (fout) {
@@ -3844,8 +3874,8 @@ int StepwiseAdditionMP (double space[])
    _U0=(int*)malloc(com.npatt*_mnnode*sizeof(int));
    _step0=(int*)malloc(com.npatt*_mnnode*sizeof(int));
    if (noisy>2) 
-//WCC     printf("\n%9ld bytes for MP (U0 & N0)\n", 2*com.npatt*_mnnode*sizeof(int));
 //WCC     fprintf(R_paml_baseml_file_pointer, "\n%9lu bytes for MP (U0 & N0)\n", (unsigned long) 2*com.npatt*_mnnode*sizeof(int));
+//WCC     printf("\n%9ld bytes for MP (U0 & N0)\n", 2*com.npatt*_mnnode*sizeof(int));
    if (_U0==NULL || _step0==NULL) error2("oom U0&step0");
 
 //WCC   FOR (i,ns0)  z0[i]=com.z[i];
@@ -3881,7 +3911,7 @@ printf(" Add sp %d (ns=%d) at branch %d, score %.0f\n", is+1,com.ns,j+1,score);
       score=MPScoreStepwiseAddition(is, space, 1);
 
       if (noisy)
-       { fprintf(R_paml_baseml_file_pointer, "\r  Added %d [%5.0f steps]",is+1,-bestscore); fflush(F0);}
+       { fprintf(R_paml_baseml_file_pointer, "\r  Added %d [%5.0f steps]",is+1,-bestscore); fflush(R_paml_baseml_file_pointer);}
 //WCC       { printf("\r  Added %d [%5.0f steps]",is+1,-bestscore); fflush(F0);}
    }
 //WCC   if (noisy>2) printf("  %d stages with ties, ", tie);
@@ -4009,7 +4039,7 @@ int StepwiseAddition (FILE* fout, double space[])
          AddSpecies(is,j);
          score=TreeScore(x, space);
          if (noisy>1)
-            { fprintf(R_paml_baseml_file_pointer, "\n "); OutTreeN(F0, 0, 0); fprintf(R_paml_baseml_file_pointer, "%12.3f",-score); }
+            { fprintf(R_paml_baseml_file_pointer, "\n "); OutTreeN(R_paml_baseml_file_pointer, 0, 0); fprintf(R_paml_baseml_file_pointer, "%12.3f",-score); }
 //WCC            { printf("\n "); OutTreeN(F0, 0, 0); printf("%12.3f",-score); }
 
          if (j==0 || score<bestscore || (score==bestscore&&rndu()<.2)) {
@@ -4023,15 +4053,21 @@ int StepwiseAddition (FILE* fout, double space[])
       com.ns=is+1;
 
       if (noisy) {
-//WCC         printf("\n\nAdded sp. %d, %s [%.3f]\n",is+1,com.spname[is],-bestscore);
-         fprintf(R_paml_baseml_file_pointer, "\n\nAdded sp. %d, %s [%.3f]\n",is+1,com.spname[is],-bestscore);
+/*WCC
+         printf("\n\nAdded sp. %d, %s [%.3f]\n",is+1,com.spname[is],-bestscore);
          OutTreeN(F0,0,0);  FPN(F0);  OutTreeN(F0,1,0);  FPN(F0);
+*/
+         fprintf(R_paml_baseml_file_pointer, "\n\nAdded sp. %d, %s [%.3f]\n",is+1,com.spname[is],-bestscore);
+         OutTreeN(R_paml_baseml_file_pointer,0,0);  FPN(R_paml_baseml_file_pointer);  OutTreeN(R_paml_baseml_file_pointer,1,0);  FPN(R_paml_baseml_file_pointer);
          if (com.np>com.ntime) {
-//WCC            printf("\tparameters:"); 
-            fprintf(R_paml_baseml_file_pointer, "\tparameters:"); 
-//WCC            for(i=com.ntime; i<com.np; i++) printf("%9.5f", x[i]);
-            for(i=com.ntime; i<com.np; i++) fprintf(R_paml_baseml_file_pointer, "%9.5f", x[i]);
+/*WCC
+            printf("\tparameters:"); 
+            for(i=com.ntime; i<com.np; i++) printf("%9.5f", x[i]);
             FPN(F0);
+*/
+            fprintf(R_paml_baseml_file_pointer, "\tparameters:"); 
+            for(i=com.ntime; i<com.np; i++) fprintf(R_paml_baseml_file_pointer, "%9.5f", x[i]);
+            FPN(R_paml_baseml_file_pointer);
          }
       }
       if (fout) {
@@ -4085,7 +4121,7 @@ int StarDecomposition (FILE *fout, double space[])
       BranchToNode ();
    }
 //WCC   if (noisy) { printf("\n\nstage 0: ");       OutTreeN(F0,0,0); }
-   if (noisy) { fprintf(R_paml_baseml_file_pointer, "\n\nstage 0: ");       OutTreeN(F0,0,0); }
+   if (noisy) { fprintf(R_paml_baseml_file_pointer, "\n\nstage 0: ");       OutTreeN(R_paml_baseml_file_pointer,0,0); }
    if (fsum) { fprintf(fsum,"\n\nstage 0: ");  OutTreeN(fsum,0,0); }
    if (fout) { fprintf(fout,"\n\nstage 0: ");  OutTreeN(fout,0,0); }
 
@@ -4116,7 +4152,7 @@ int StarDecomposition (FILE *fout, double space[])
             printf("\n\nbest tree: ");  OutTreeN(F0,0,0);
             printf("   lnL:%14.6f\n", -tree.lnL);
 */
-            fprintf(R_paml_baseml_file_pointer, "\n\nbest tree: ");  OutTreeN(F0,0,0);
+            fprintf(R_paml_baseml_file_pointer, "\n\nbest tree: ");  OutTreeN(R_paml_baseml_file_pointer,0,0);
             fprintf(R_paml_baseml_file_pointer, "   lnL:%14.6f\n", -tree.lnL);
          }
          if (fsum) {
@@ -4133,9 +4169,12 @@ int StarDecomposition (FILE *fout, double space[])
       treestar=treebest;  memcpy(nodes,treestar.nodes,sizetree);
 
       if (collaps && stage) { 
-//WCC         printf ("\ncollapsing nodes\n");
-         fprintf(R_paml_baseml_file_pointer, "\ncollapsing nodes\n");
+/*WCC
+         printf ("\ncollapsing nodes\n");
          OutTreeN(F0, 1, 1);  FPN(F0);
+*/
+         fprintf(R_paml_baseml_file_pointer, "\ncollapsing nodes\n");
+         OutTreeN(R_paml_baseml_file_pointer, 1, 1);  FPN(R_paml_baseml_file_pointer);
 
          tree=treestar.tree;  memcpy(nodes, treestar.nodes, sizetree);
          for (i=com.ns,j=0; i<tree.nnode; i++)
@@ -4148,9 +4187,12 @@ int StarDecomposition (FILE *fout, double space[])
             OutTreeN(fout, 1, 1);  FPN(fout);
          }
          if (noisy) {
-//WCC            printf ("\n%d node(s) collapsed\n", j);
-            fprintf(R_paml_baseml_file_pointer, "\n%d node(s) collapsed\n", j);
+/*
+            printf ("\n%d node(s) collapsed\n", j);
             OutTreeN(F0, 1, 1);  FPN(F0);
+*/
+            fprintf(R_paml_baseml_file_pointer, "\n%d node(s) collapsed\n", j);
+            OutTreeN(R_paml_baseml_file_pointer, 1, 1);  FPN(R_paml_baseml_file_pointer);
 /*            if (j) getchar (); */
          }
       }
@@ -4160,11 +4202,15 @@ int StarDecomposition (FILE *fout, double space[])
       com.ntime++;  com.np++;
 
       if (noisy) {
-//WCC         printf ("\n\nstage %d:%6d trees, ntime:%3d  np:%3d\nstar tree: ",
-         fprintf(R_paml_baseml_file_pointer, "\n\nstage %d:%6d trees, ntime:%3d  np:%3d\nstar tree: ",
+/*WCC
+         printf ("\n\nstage %d:%6d trees, ntime:%3d  np:%3d\nstar tree: ",
             stage, ntreet, com.ntime, com.np);
          OutTreeN(F0, 0, 0);
-//WCC         printf ("  lnL:%10.3f\n", -treestar.tree.lnL);
+         printf ("  lnL:%10.3f\n", -treestar.tree.lnL);
+*/
+         fprintf(R_paml_baseml_file_pointer, "\n\nstage %d:%6d trees, ntime:%3d  np:%3d\nstar tree: ",
+            stage, ntreet, com.ntime, com.np);
+         OutTreeN(R_paml_baseml_file_pointer, 0, 0);
          fprintf(R_paml_baseml_file_pointer, "  lnL:%10.3f\n", -treestar.tree.lnL);
       }
       if (fsum) {
@@ -4194,9 +4240,12 @@ int StarDecomposition (FILE *fout, double space[])
             for (i=1,x[0]=max2(x[0],.01); i<com.ntime; i++)  x[i]=.5;
 
          if (noisy) {
-//WCC            printf("\nS=%d:%3d/%d  T=%4d  ", stage,itree+1,ntreet,ntree+1);
-            fprintf(R_paml_baseml_file_pointer, "\nS=%d:%3d/%d  T=%4d  ", stage,itree+1,ntreet,ntree+1);
+/*
+            printf("\nS=%d:%3d/%d  T=%4d  ", stage,itree+1,ntreet,ntree+1);
             OutTreeN(F0, 0, 0);
+*/
+            fprintf(R_paml_baseml_file_pointer, "\nS=%d:%3d/%d  T=%4d  ", stage,itree+1,ntreet,ntree+1);
+            OutTreeN(R_paml_baseml_file_pointer, 0, 0);
          }
          if (fsum) {
          fprintf(fsum, "\nS=%d:%3d/%d  T=%4d  ", stage,itree+1,ntreet,ntree+1);
@@ -4361,7 +4410,8 @@ void printSeqsMgenes (void)
    int n31=(com.seqtype==CODONseq||com.seqtype==CODON2AAseq?3:1);
 
    puts("Separating sites in genes into different files.\n");
-   for (ig=0, FPN(F0); ig<com.ngene; ig++) {
+//WCC   for (ig=0, FPN(F0); ig<com.ngene; ig++) {
+   for (ig=0, FPN(R_paml_baseml_file_pointer); ig<com.ngene; ig++) {
       for (h=0,lg=0; h<com.ls; h++)
          if(com.pose[h]==ig)
             lg++;
@@ -4421,12 +4471,19 @@ for(ig=0,lg=0; ig<com.ngene; ig++) wantgene[ig]=!wantgene[ig];
 
    if(com.ngene!=44) error2("ngene!=44");
    FOR(h,com.ls) { 
-//WCC      printf("%3d",com.pose[h]); 
-      fprintf(R_paml_baseml_file_pointer, "%3d",com.pose[h]); 
+/*WCC
+      printf("%3d",com.pose[h]); 
       if((h+1)%20==0) FPN(F0); if((h+1)%500==0) getchar();
+*/
+      fprintf(R_paml_baseml_file_pointer, "%3d",com.pose[h]); 
+      if((h+1)%20==0) FPN(R_paml_baseml_file_pointer); if((h+1)%500==0) getchar();
    }
+/*WCC
    matIout(F0,com.lgene,1,com.ngene);
    matIout(F0,wantgene,1,com.ngene);
+*/
+   matIout(R_paml_baseml_file_pointer,com.lgene,1,com.ngene);
+   matIout(R_paml_baseml_file_pointer,wantgene,1,com.ngene);
 
    for(ig=0,lg=0; ig<com.ngene; ig++) 
       if(wantgene[ig]) { ngenekept++; lg+=com.lgene[ig]; }
@@ -4831,15 +4888,16 @@ int BootstrapSeq (char* seqf)
       for(j=1; j<com.ngene; j++) com.lgene[j] += com.lgene[j-1];
 
       if(noisy && com.ngene>1) {
-/*
+/*WCC
          printf("Bootstrap uses stratefied sampling for %d partitions.",com.ngene);
          printf("\nnumber of sites in each partition: ");
          FOR(ig,com.ngene) printf(" %4d", lg[ig]);
+         FPN(F0);
 */
          fprintf(R_paml_baseml_file_pointer, "Bootstrap uses stratefied sampling for %d partitions.",com.ngene);
          fprintf(R_paml_baseml_file_pointer, "\nnumber of sites in each partition: ");
          FOR(ig,com.ngene) fprintf(R_paml_baseml_file_pointer, " %4d", lg[ig]);
-         FPN(F0);
+         FPN(R_paml_baseml_file_pointer);
       }
 
       for(h=0; h<com.ls; h++) {     /* create gmark[] */
@@ -4955,7 +5013,7 @@ int rell (FILE*flnf, FILE*fout, int ntree)
    s = ntree*(com.npatt+nr+5)*sizeof(double);
    if(com.sspace < s) {
 //WCC      if(noisy) printf("resetting space to %lu bytes in rell.\n",s);
-      if(noisy) fprintf(R_paml_baseml_file_pointer, "resetting space to %lu bytes in rell.\n", (unsigned long) s);
+//WCC      if(noisy) fprintf(R_paml_baseml_file_pointer, "resetting space to %lu bytes in rell.\n", (unsigned long) s);
       com.sspace = s;
       if((com.space=(double*)realloc(com.space,com.sspace))==NULL)
          error2("oom space");
@@ -5090,7 +5148,8 @@ for(j=0;j<ntree;j++) if(j!=mltree) fprintf(frst1,"%9.6f",pSH[j]);
    fputs("pSH: P value with multiple-comparison correction (MC in table 1 of Shimodaira & Hasegawa 1999)\n",fout);
    if(status) fputs("(-1 for P values means N/A)\n",fout);
 
-   FPN(F0);
+//WCC   FPN(F0);
+   FPN(R_paml_baseml_file_pointer);
    free(lnLmSH);
    return(0);
 }
@@ -5840,7 +5899,7 @@ void UpPassPPSG2000 (int inode, int igene, double x[])
    for(i=0,ncomb=1; i<nson; i++)
       ncomb *= (nBestScore[i] = (nodes[nodes[inode].sons[i]].nson>0 ? NBESTANC : 1));
    if(debug) {
-/* WCC
+/*WCC
       printf("\n\nNode %2d has sons ", inode+1);
       for(i=0; i<nson; i++) printf(" %2d", nodes[inode].sons[i]+1);
       printf("  ncomb=%2d: ", ncomb);
@@ -5849,7 +5908,7 @@ void UpPassPPSG2000 (int inode, int igene, double x[])
       fprintf(R_paml_baseml_file_pointer, "\n\nNode %2d has sons ", inode+1);
       for(i=0; i<nson; i++) fprintf(R_paml_baseml_file_pointer, " %2d", nodes[inode].sons[i]+1);
       fprintf(R_paml_baseml_file_pointer, "  ncomb=%2d: ", ncomb);
-      for(i=0; i<nson; i++) fprintf(R_paml_baseml_file_pointer, " %2d", nBestScore[i]);  FPN(F0);
+      for(i=0; i<nson; i++) fprintf(R_paml_baseml_file_pointer, " %2d", nBestScore[i]);  FPN(R_paml_baseml_file_pointer);
    }
 
    if(inode!=tree.root) {    /* calculate log{P(t)} from father to inode */
@@ -5916,10 +5975,10 @@ void UpPassPPSG2000 (int inode, int igene, double x[])
          }  /* for(icomb) */
 
 //WCC         if(debug) { printf("score "); for(i=0;i<n*ncomb; i++) printf(" %4.1f",combScore[i]); FPN(F0); }
-         if(debug) { fprintf(R_paml_baseml_file_pointer, "score "); for(i=0;i<n*ncomb; i++) fprintf(R_paml_baseml_file_pointer, " %4.1f",combScore[i]); FPN(F0); }
+         if(debug) { fprintf(R_paml_baseml_file_pointer, "score "); for(i=0;i<n*ncomb; i++) fprintf(R_paml_baseml_file_pointer, " %4.1f",combScore[i]); FPN(R_paml_baseml_file_pointer); }
          indexing(combScore, n*ncomb, combIndex, 0, combIndex+n*ncomb);
 //WCC         if(debug) { printf("index "); for(i=0;i<n*ncomb; i++) printf(" %4d",combIndex[i]); FPN(F0); }
-         if(debug) { fprintf(R_paml_baseml_file_pointer, "index "); for(i=0;i<n*ncomb; i++) fprintf(R_paml_baseml_file_pointer, " %4d",combIndex[i]); FPN(F0); }
+         if(debug) { fprintf(R_paml_baseml_file_pointer, "index "); for(i=0;i<n*ncomb; i++) fprintf(R_paml_baseml_file_pointer, " %4d",combIndex[i]); FPN(R_paml_baseml_file_pointer); }
 
 
          /* print out reconstructions at the site if inode is root. */
@@ -6253,7 +6312,8 @@ void InitializeNodeScale(void)
          for(i=0; i<tree.nnode; i++)
             if(com.nodeScale[i]) fprintf(R_paml_baseml_file_pointer, " %2d",i+1);
 //WCC            if(com.nodeScale[i]) printf(" %2d",i+1);
-         FPN(F0);
+//WCC         FPN(F0);
+         FPN(R_paml_baseml_file_pointer);
       }
    }
 }
@@ -6558,10 +6618,14 @@ double lfunAdG (double x[], int np)
          fh=sum(b1,com.ncatG);
          if(fh<1e-90) {
             if(!FPE) {
-//WCC               FPE=1; printf ("h,fh%6d %12.4e\n", h+1,fh);
-               FPE=1; fprintf(R_paml_baseml_file_pointer, "h,fh%6d %12.4e\n", h+1,fh);
+/*WCC
+               FPE=1; printf ("h,fh%6d %12.4e\n", h+1,fh);
                print1site(F0,h);
                FPN(F0);
+*/
+               FPE=1; fprintf(R_paml_baseml_file_pointer, "h,fh%6d %12.4e\n", h+1,fh);
+               print1site(R_paml_baseml_file_pointer,h);
+               FPN(R_paml_baseml_file_pointer);
             }
             fh=1e-300;
          }
@@ -6724,11 +6788,16 @@ double lfundG (double x[], int np)
             fh += com.freqK[ir]*com.fhK[ir*com.npatt+h];
          if(fh<=0) {
             if(!FPE) {
+/*WCC
                FPE=1;  matout(F0,x,1,np);
-//WCC               printf("\nlfundG: h=%4d  fhK=%9.6e\ndata: ", h+1, fh);
-               fprintf(R_paml_baseml_file_pointer, "\nlfundG: h=%4d  fhK=%9.6e\ndata: ", h+1, fh);
+               printf("\nlfundG: h=%4d  fhK=%9.6e\ndata: ", h+1, fh);
                print1site(F0, h);
                FPN(F0);
+*/
+               FPE=1;  matout(R_paml_baseml_file_pointer,x,1,np);
+               fprintf(R_paml_baseml_file_pointer, "\nlfundG: h=%4d  fhK=%9.6e\ndata: ", h+1, fh);
+               print1site(R_paml_baseml_file_pointer, h);
+               FPN(R_paml_baseml_file_pointer);
             }
             fh = 1e-300;
          }
@@ -6812,14 +6881,21 @@ int fx_r (double x[], int np)
                fh += com.pi[i]*nodes[tree.root].conP[h*com.ncode+i];
             if (fh<=0) {
                if(fh<-1e-10 /* && !FPE */) { /* note that 0 may be o.k. here */
+/*WCC
                   FPE=1; matout(F0,x,1,np);
-//WCC                  printf("\nfx_r: h = %d  r = %d fhK = %.5e ", h+1,ir+1,fh);
+                  printf("\nfx_r: h = %d  r = %d fhK = %.5e ", h+1,ir+1,fh);
+*/
+                  FPE=1; matout(R_paml_baseml_file_pointer,x,1,np);
                   fprintf(R_paml_baseml_file_pointer, "\nfx_r: h = %d  r = %d fhK = %.5e ", h+1,ir+1,fh);
                   if(com.seqtype==0||com.seqtype==2) {
-//WCC                     printf("Data: ");
-                     fprintf(R_paml_baseml_file_pointer, "Data: ");
+/*WCC
+                     printf("Data: ");
                      print1site(F0, h);
                      FPN(F0);
+*/
+                     fprintf(R_paml_baseml_file_pointer, "Data: ");
+                     print1site(R_paml_baseml_file_pointer, h);
+                     FPN(R_paml_baseml_file_pointer);
                   }
                }
                fh = 1e-300;
@@ -6869,11 +6945,16 @@ double lfun (double x[], int np)
                exit(-26);
             }
             if(!FPE) {
+/*WCC
                FPE=1;  matout(F0,x,1,np);
-//WCC               printf("lfun: h=%4d  fh=%9.6e\nData: ", h+1,fh);
-               fprintf(R_paml_baseml_file_pointer, "lfun: h=%4d  fh=%9.6e\nData: ", h+1,fh);
+               printf("lfun: h=%4d  fh=%9.6e\nData: ", h+1,fh);
                print1site(F0, h);
                FPN(F0);
+*/
+               FPE=1;  matout(R_paml_baseml_file_pointer,x,1,np);
+               fprintf(R_paml_baseml_file_pointer, "lfun: h=%4d  fh=%9.6e\nData: ", h+1,fh);
+               print1site(R_paml_baseml_file_pointer, h);
+               FPN(R_paml_baseml_file_pointer);
             }
             fh = 1e-80;
          }
@@ -6962,9 +7043,9 @@ int minB (FILE*fout, double *lnL,double x[],double xb[][2],double e0, double spa
 /*
          printf("\n%lu bytes in space, %lu bytes needed\n", com.sspace, s);
          printf("minB: reallocating memory for working space.\n");
-*/
          fprintf(R_paml_baseml_file_pointer, "\n%lu bytes in space, %lu bytes needed\n", (unsigned long) com.sspace, (unsigned long) s);
          fprintf(R_paml_baseml_file_pointer, "minB: reallocating memory for working space.\n");
+*/
          com.space = (double*)realloc(com.space, s);
          if(com.space==NULL) error2("oom space");
          com.sspace = s;
@@ -6994,7 +7075,7 @@ int minB (FILE*fout, double *lnL,double x[],double xb[][2],double e0, double spa
             FPN(F0); FOR(i,npcom) printf(" %11.6f", xcom[i]);
             printf("%8s%s\n", "", printtime(timestr));
 */
-            FPN(F0); FOR(i,npcom) fprintf(R_paml_baseml_file_pointer, " %11.6f", xcom[i]);
+            FPN(R_paml_baseml_file_pointer); FOR(i,npcom) fprintf(R_paml_baseml_file_pointer, " %11.6f", xcom[i]);
             fprintf(R_paml_baseml_file_pointer, "%8s%s\n", "", printtime(timestr));
          }
       }
@@ -7413,9 +7494,12 @@ int lfuntdd(double t, int a, int b, double xcom[], double *l, double*dl, double*
             ddfh += piqi*ddpqj;
          }
          if(noisy && fh<1e-250) {
-            fprintf(R_paml_baseml_file_pointer, "too small: fh[%d] = %10.6e\n",h,fh);
-//WCC            printf("too small: fh[%d] = %10.6e\n",h,fh);
+/*WCC
+            printf("too small: fh[%d] = %10.6e\n",h,fh);
             OutTreeN(F0,0,1);
+*/
+            fprintf(R_paml_baseml_file_pointer, "too small: fh[%d] = %10.6e\n",h,fh);
+            OutTreeN(R_paml_baseml_file_pointer,0,1);
          }
          *l -= log(fh)*com.fpatt[h];
          for(i=0; i<com.NnodeScale; i++)
@@ -7925,7 +8009,8 @@ int ReadTreeSeqs (FILE*fout)
       if(nodes[i].label<0) nodes[i].label = 0;  /* change -1 into 0 */
 
    /* OutTreeN(F0,0,0); FPN(F0); */
-   OutTreeN(F0,1,0); FPN(F0);
+//WCC   OutTreeN(F0,1,0); FPN(F0);
+   OutTreeN(R_paml_baseml_file_pointer,1,0); FPN(R_paml_baseml_file_pointer);
    /* OutTreeN(F0,1,1); FPN(F0); */
    /* copy master tree into sptree */
    if(tree.nnode != 2*com.ns-1) 
@@ -8107,6 +8192,9 @@ void printGtree (int printBlength)
       printf ("\n%7d%7d   (%2d) %7d  ",
          nodes[i].father+1, i+1, nodes[i].ipop+1, nodes[i].nson);
       for(j=0; j<nodes[i].nson; j++) printf (" %2d", nodes[i].sons[j]+1);
+   }
+   FPN(F0); OutTreeN(F0,0,0); FPN(F0); OutTreeN(F0,1,0); FPN(F0); 
+   if(printBlength) { OutTreeN(F0,1,1); FPN(F0); }
 */
    fprintf(R_paml_baseml_file_pointer, "\nns = %d  nnode = %d", com.ns, tree.nnode);
    fprintf(R_paml_baseml_file_pointer, "\n%7s%7s %8s %7s%7s","father","node","(ipop)","nson:","sons");
@@ -8115,8 +8203,8 @@ void printGtree (int printBlength)
          nodes[i].father+1, i+1, nodes[i].ipop+1, nodes[i].nson);
       for(j=0; j<nodes[i].nson; j++) fprintf(R_paml_baseml_file_pointer, " %2d", nodes[i].sons[j]+1);
    }
-   FPN(F0); OutTreeN(F0,0,0); FPN(F0); OutTreeN(F0,1,0); FPN(F0); 
-   if(printBlength) { OutTreeN(F0,1,1); FPN(F0); }
+   FPN(R_paml_baseml_file_pointer); OutTreeN(R_paml_baseml_file_pointer,0,0); FPN(R_paml_baseml_file_pointer); OutTreeN(R_paml_baseml_file_pointer,1,0); FPN(R_paml_baseml_file_pointer); 
+   if(printBlength) { OutTreeN(R_paml_baseml_file_pointer,1,1); FPN(R_paml_baseml_file_pointer); }
 }
 
 
@@ -8179,14 +8267,18 @@ void printSptree (void)
       if(sptree.nodes[i].nson)
          printf("  (%2d %2d)", sptree.nodes[i].sons[0]+1, sptree.nodes[i].sons[1]+1);
       printf("\n");
+   }
+   copySptree();
+   FPN(F0); OutTreeN(F0,0,0); FPN(F0); OutTreeN(F0,1,0);  FPN(F0); 
+   OutTreeN(F0,1,1); FPN(F0);
 */
       if(sptree.nodes[i].nson)
          fprintf(R_paml_baseml_file_pointer, "  (%2d %2d)", sptree.nodes[i].sons[0]+1, sptree.nodes[i].sons[1]+1);
       fprintf(R_paml_baseml_file_pointer, "\n");
    }
    copySptree();
-   FPN(F0); OutTreeN(F0,0,0); FPN(F0); OutTreeN(F0,1,0);  FPN(F0); 
-   OutTreeN(F0,1,1); FPN(F0);
+   FPN(R_paml_baseml_file_pointer); OutTreeN(R_paml_baseml_file_pointer,0,0); FPN(R_paml_baseml_file_pointer); OutTreeN(R_paml_baseml_file_pointer,1,0);  FPN(R_paml_baseml_file_pointer); 
+   OutTreeN(R_paml_baseml_file_pointer,1,1); FPN(R_paml_baseml_file_pointer);
 }
 
 
@@ -8313,10 +8405,14 @@ int GetUVRoot_codeml (void)
             xtoy(data.pi[locus], com.pi, nc);
          EigenQaa(NULL, _Root[locus], _UU[locus], _VV[locus], NULL);
 
-//WCC printf("Protein # %2d uses %-20s\n", locus+1,data.daafile[locus]);
-fprintf(R_paml_baseml_file_pointer, "Protein # %2d uses %-20s\n", locus+1,data.daafile[locus]);
+/*WCC
+printf("Protein # %2d uses %-20s\n", locus+1,data.daafile[locus]);
 matout(F0, com.pi, 1, nc);
 matout(F0, _Root[locus], 1, nc);
+*/
+fprintf(R_paml_baseml_file_pointer, "Protein # %2d uses %-20s\n", locus+1,data.daafile[locus]);
+matout(R_paml_baseml_file_pointer, com.pi, 1, nc);
+matout(R_paml_baseml_file_pointer, _Root[locus], 1, nc);
       }
    }
    else if(com.seqtype==1 && com.fix_kappa & com.fix_omega) {
@@ -8475,10 +8571,11 @@ void GetMemBC (void)
 /*
             printf("\n%d node(s) used for scaling at locus %d: \n",com.NnodeScale,locus+1);
             FOR(j,tree.nnode) if(com.nodeScale[j]) printf(" %2d",j+1);
+            FPN(F0);
 */
             fprintf(R_paml_baseml_file_pointer, "\n%d node(s) used for scaling at locus %d: \n",com.NnodeScale,locus+1);
             FOR(j,tree.nnode) if(com.nodeScale[j]) fprintf(R_paml_baseml_file_pointer, " %2d",j+1);
-            FPN(F0);
+            FPN(R_paml_baseml_file_pointer);
          }
       }
       if(maxsizeScale) {
@@ -8702,9 +8799,9 @@ int GetInitialsClock6Step1 (double x[], double xb[][2])
       for(i=0; i<com.np; i++) printf(" %10.5f", xb[i][1]);  FPN(F0);
 */
       fprintf(R_paml_baseml_file_pointer, "\nInitials (np=%d)\n", com.np);
-      for(i=0; i<com.np; i++) fprintf(R_paml_baseml_file_pointer, " %10.5f", x[i]);      FPN(F0);
-      for(i=0; i<com.np; i++) fprintf(R_paml_baseml_file_pointer, " %10.5f", xb[i][0]);  FPN(F0);
-      for(i=0; i<com.np; i++) fprintf(R_paml_baseml_file_pointer, " %10.5f", xb[i][1]);  FPN(F0);
+      for(i=0; i<com.np; i++) fprintf(R_paml_baseml_file_pointer, " %10.5f", x[i]);      FPN(R_paml_baseml_file_pointer);
+      for(i=0; i<com.np; i++) fprintf(R_paml_baseml_file_pointer, " %10.5f", xb[i][0]);  FPN(R_paml_baseml_file_pointer);
+      for(i=0; i<com.np; i++) fprintf(R_paml_baseml_file_pointer, " %10.5f", xb[i][1]);  FPN(R_paml_baseml_file_pointer);
    }
    return (0);
 }
@@ -8944,10 +9041,10 @@ exit(0);
          for(i=0; i<com.np; i++)  printf(" %10.5f", xb[i][1]);  FPN(F0);
 */
       for(i=0; i<com.np; i++) 
-         { fprintf(R_paml_baseml_file_pointer, " %10.5f", x[i]); if(i==com.ntime-2) FPN(F0); }  FPN(F0);
+         { fprintf(R_paml_baseml_file_pointer, " %10.5f", x[i]); if(i==com.ntime-2) FPN(R_paml_baseml_file_pointer); }  FPN(R_paml_baseml_file_pointer);
       if(com.np<200) {
-         for(i=0; i<com.np; i++)  fprintf(R_paml_baseml_file_pointer, " %10.5f", xb[i][0]);  FPN(F0);
-         for(i=0; i<com.np; i++)  fprintf(R_paml_baseml_file_pointer, " %10.5f", xb[i][1]);  FPN(F0);
+         for(i=0; i<com.np; i++)  fprintf(R_paml_baseml_file_pointer, " %10.5f", xb[i][0]);  FPN(R_paml_baseml_file_pointer);
+         for(i=0; i<com.np; i++)  fprintf(R_paml_baseml_file_pointer, " %10.5f", xb[i][1]);  FPN(R_paml_baseml_file_pointer);
       }
    }
 
@@ -8963,9 +9060,12 @@ exit(0);
 
    if(finStep2) {
       puts("read MLEs from step 2 from file");
-//WCC      for(i=0; i<com.np; i++) fscanf(finStep2,"%lf",&x[i]);
-      for(i=0; i<com.np; i++) tmp = fscanf(finStep2,"%lf",&x[i]);
+/*WCC
+      for(i=0; i<com.np; i++) fscanf(finStep2,"%lf",&x[i]);
       matout(F0,x,1,com.np);
+*/
+      for(i=0; i<com.np; i++) tmp = fscanf(finStep2,"%lf",&x[i]);
+      matout(R_paml_baseml_file_pointer,x,1,com.np);
    }
    else {
       j = ming2(frub, &f, funSS_AHRS, NULL, x, xb, space, 1e-9, com.np);
@@ -9101,13 +9201,17 @@ if(j) {
 fprintf(R_paml_baseml_file_pointer, "\n\n%d times, %d timerates from AHRS:\n", com.ntime-1,k0);
 fprintf(fout,"\n\n%d times, %d timerates from AHRS\n", com.ntime-1,k0);
 for(i=0; i<k0; i++) {
-//WCC   printf("%12.6f", x[i]);
-   fprintf(R_paml_baseml_file_pointer, "%12.6f", x[i]);
+/*WCC
+   printf("%12.6f", x[i]);
    if(i==com.ntime-2) FPN(F0);
+*/
+   fprintf(R_paml_baseml_file_pointer, "%12.6f", x[i]);
+   if(i==com.ntime-2) FPN(R_paml_baseml_file_pointer);
    fprintf(fout,"%12.6f", x[i]);
    if(i==com.ntime-2) FPN(fout);
 }
-FPN(F0);  FPN(fout);
+//WCC FPN(F0);  FPN(fout);
+FPN(R_paml_baseml_file_pointer);  FPN(fout);
 
    for(i=0; i<k0; i++) x[i]*=0.9+0.2*rndu(); 
    
@@ -9228,7 +9332,7 @@ if(com.clock==6) {
       printf("\nlnL0 = %12.6f\n",-lnL);
 */
       fprintf(R_paml_baseml_file_pointer, "\nntime & nrate & np:%6d%6d%6d\n",com.ntime-1,com.nrate,com.np);
-      matout(F0,x,1,np);
+      matout(R_paml_baseml_file_pointer,x,1,np);
       fprintf(R_paml_baseml_file_pointer, "\nlnL0 = %12.6f\n",-lnL);
    }
 

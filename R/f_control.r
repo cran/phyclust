@@ -23,7 +23,7 @@
     max.init.iter = 50,
     init.procedure = .init.procedure[1],
     init.method = .init.method[1],
-    substitution.model = .substitution$model[1],
+    substitution.model = .substitution.model$model[1],
     edist.model = .edist.model[1],
     identifier = .identifier[1],
     code.type = .code.type[1],

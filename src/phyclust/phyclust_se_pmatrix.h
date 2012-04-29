@@ -19,9 +19,9 @@ struct _SE_P_matrix{
 	/* Define code type. */
 	int	code_type;						/* NUCLEOTIDE/SNP. */
 	int	ncode;							/* = NN. */
-	int	ncode_wimissing;					/* = NNG. */
-	int	missing_index;						/* = NNG or NSNPG, indicates the missing index. */
-	int	missing_flag;						/* = 0 or 1 for data without missing or with missing. */
+	int	ncode_wigap;					/* = NNG. */
+	int	gap_index;						/* = NNG or NSNPG, indicates the gap index. */
+	int	gap_flag;						/* = 0 or 1 for data without gap or with gap. */
 	/* Configuration of P. */	
 	int	se_model;						/* Sequencing error model. */
 	int	n_param;						/* Number of parameters in f_err. */
@@ -39,14 +39,14 @@ struct _SE_P_matrix{
 	double  upper_bound_diag;					/* uper bound of diagonal parameters, default 1 - 1e-16. */
 
 /* Dynamical variables, used in copy functions only. */
-	double	**f_err;						/* Sequencing error probabilities, dim = ncode * ncode_wimissing. */
+	double	**f_err;						/* Sequencing error probabilities, dim = ncode * ncode_wigap. */
 	int	check_param;						/* 0, fail. 1, reasonable parameter. */
 
 	int	K;							/* Temporary storage for K. */
 	double  ***log_conv;						/* Temporary storage for log of convolution. */
 };
 
-SE_P_matrix* initialize_SE_P_matrix(int code_type, int se_model, double se_constant, int missing_flag, int K);
+SE_P_matrix* initialize_SE_P_matrix(int code_type, int se_model, double se_constant, int gap_flag, int K);
 void free_SE_P_matrix(SE_P_matrix *SE_P);
 SE_P_matrix* duplicate_SE_P_matrix(SE_P_matrix *org_SE_P);
 void assign_FP_to_SE_P_matrix(SE_P_matrix *SE_P);
@@ -55,24 +55,24 @@ void initialize_f_err(SE_P_matrix *SE_P);
 
 /* These functions check vectors. */
 void Check_param_f_err_se_convolution(SE_P_matrix *SE_P);
-void Check_param_f_err_se_convolution_missing(SE_P_matrix *SE_P);
+void Check_param_f_err_se_convolution_gap(SE_P_matrix *SE_P);
 
 /* These functions convert a vector to parameters. */
 void Convert_vect_to_f_err_se_convolution(double *vect, SE_P_matrix *SE_P);
-void Convert_vect_to_f_err_se_convolution_missing(double *vect, SE_P_matrix *SE_P);
+void Convert_vect_to_f_err_se_convolution_gap(double *vect, SE_P_matrix *SE_P);
 
 /* These functions convert parameters to a vector. */
 void Convert_f_err_to_vect_se_convolution(SE_P_matrix *SE_P, double *vect);
-void Convert_f_err_to_vect_se_convolution_missing(SE_P_matrix *SE_P, double *vect);
+void Convert_f_err_to_vect_se_convolution_gap(SE_P_matrix *SE_P, double *vect);
 
 /* These functions print f_err matrix. */
 void Print_f_err_common(SE_P_matrix *SE_P);
-void Print_f_err_common_missing(SE_P_matrix *SE_P);
+void Print_f_err_common_gap(SE_P_matrix *SE_P);
 
 
 /* ----- For copy and dynamic update. ----- */
 void Copy_f_err_common(SE_P_matrix *SE_P_from, SE_P_matrix *SE_P_to);
-void Copy_f_err_common_missing(SE_P_matrix *SE_P_from, SE_P_matrix *SE_P_to);
+void Copy_f_err_common_gap(SE_P_matrix *SE_P_from, SE_P_matrix *SE_P_to);
 
 void copy_SE_P_matrix(SE_P_matrix *SE_P_from, SE_P_matrix *SE_P_to);
 void reset_SE_P_matrix(SE_P_matrix *SE_P);

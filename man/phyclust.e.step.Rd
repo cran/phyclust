@@ -44,7 +44,7 @@ phyclust.e.step(X, ret.phyclust = NULL, K = NULL, Eta = NULL,
   clustering.
 }
 \value{
-  This function return a \eqn{Z_{nk}}{Z_nk} matrix with dimension =
+  This function returns a \eqn{Z_{nk}}{Z_nk} matrix with dimension =
   \eqn{N\times K}{N*K}. The values is dependent on \code{Z.state}, and
   they are either posterior probabilities if TRUE or transition
   probabilities otherwise.

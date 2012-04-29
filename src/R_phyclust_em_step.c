@@ -298,7 +298,7 @@ SEXP R_phyclust_m_step(SEXP R_N_X_org, SEXP R_L, SEXP R_X, SEXP R_K,
 		}
 	}
 	assign_class(pcs);
-	assign_Mu_by_class(pcs->N_X_org, pcs->K, pcs->L, pcs->ncode, pcs->missing_index, pcs->class_id, pcs->X_org, pcs->Mu);
+	assign_Mu_by_class(pcs->N_X_org, pcs->K, pcs->L, pcs->ncode, pcs->gap_index, pcs->class_id, pcs->X_org, pcs->Mu);
 	update_phyclust_struct(pcs);
 
 	/* Assign labels. */

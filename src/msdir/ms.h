@@ -1,7 +1,3 @@
-//WCC:add
-#include "R_ms.h"
-
-
 #ifndef __MS_
 #define __MS_
 
@@ -39,21 +35,6 @@ struct params {
 	struct m_params mp;
 	int commandlineseedflag ;
 	};
-
-
-
-
-//WCC:add
-#ifdef __HAVE_R_
-#include <R.h>
-#include <Rinternals.h>
-#undef printf
-#define printf Rprintf
-#undef exit
-#define exit(a) error("%d\n", a)
-#endif
-
-FILE *temp_file_pointer;
 
 /* In "ms.c". */
 #define SITESINC 10
@@ -118,12 +99,8 @@ int isseg(int start, int c, int *psg);
 void pick2_chrom(int pop, int config[], int *pc1, int *pc2);
 int links(int c);
 
-/* In "ms_main.c". */
-const char *temp_file_name;
-void ms_main(int argc, char *argv[]);
-
-/* In "R_rand.c". */
-double ran1();
-
 #endif
+
+//WCC:add
+#include "R_ms.h"
 
