@@ -1,7 +1,12 @@
 useDynLib(phyclust)
 
 exportPattern("^[[:alpha:]]+")
-exportPattern("^[\\.]")
+# exportPattern("^[\\.]")
+
+export(
+.EMControl,
+.show.option
+)
 
 S3method(print, ms)
 S3method(print, phyclust)

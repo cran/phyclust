@@ -1,18 +1,19 @@
-.First.lib <- function(lib, pkg)
-{
-#  library(ape)
-  library.dynam("phyclust", pkg, lib)
-} # End of .First.lib()
+### Lastest load into a package.
 
-.Last.lib <- function(libpath)
-{
-#  ret <- .dynLibs()
-#  for(dynlib in ret){
-#    if(dynlib[1] == "phyclust"){
-#      phyclust.libpath <- gsub("/libs/phyclust\\..*", "", dynlib[2])
-#      library.dynam.unload("phyclust", phyclust.libpath)
-#    }
-#  }
+### Export Namespace does not use .First.lib() and .Last.lib(), but use
+### .onLoad() and .onUnload().
+# .First.lib <- function(lib, pkg){
+# } # End of .First.lib().
 
+# .Last.lib <- function(libpath){
+# } # End of .Last.lib().
+
+.onLoad <- function(libname, pkgname){
+  library.dynam("phyclust", pkgname, libname)
+  invisible()
+} # End of .onLoad().
+
+.onUnload <- function(libpath){
   library.dynam.unload("phyclust", libpath)
-} # End of .Last.lib()
+  invisible()
+} # End of .onUnload().

@@ -6,10 +6,6 @@ plotdots <- function(X, X.class = NULL, Mu = NULL, code.type = .code.type[1],
     with.gap = FALSE, xlim = NULL, ylim = NULL,
     main = "Dots Plot", xlab = "Sites", ylab = "Sequences",
     missing.col = "gray95", ...){
-  if(! is.matrix(X)){
-    stop("X is not a matrix.")
-  }
-
   if(sum(code.type %in% .code.type) != 1){
     stop("The code.type is not found.")
   }

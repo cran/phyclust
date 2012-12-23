@@ -8,7 +8,7 @@
   Shannon information content.
 }
 \usage{
-getcut.fun(pp.org, nn = 2 * nhap, plot = 0)
+getcut.fun(pp.org, nn, plot = 0)
 }
 \arguments{
   \item{pp.org}{frequency of haplotypes, sorted in decreasing order.}

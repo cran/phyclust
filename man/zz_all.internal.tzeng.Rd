@@ -1,4 +1,5 @@
 \name{all.internal.tzeng}
+\alias{.tzengEnv}
 \alias{chkdim.Add.fun}
 \alias{chkdim.Multiply.fun}
 \alias{construct.bigB.dPI}
@@ -11,7 +12,6 @@
 \alias{get.fullBB.fun}
 \alias{get.I.fun}
 \alias{get.ini.possHap.hapReserv.fun}
-\alias{get.matD.matEI.fun}
 \alias{get.medBB.skip.fun}
 \alias{get.preBB.skip.fun}
 \alias{get.step.mut.fun}
@@ -20,7 +20,6 @@
 \alias{getI13.fun}
 \alias{getPIstar.fun}
 \alias{haplo.phase.known}
-\alias{haplo.score.RD.unphased.fun}
 \alias{I33Inv.fun}
 \alias{index.k.fun}
 \alias{zero.mat.fun}
@@ -40,7 +39,6 @@
   \code{get.fullBB.fun}, \cr
   \code{get.I.fun},
   \code{get.ini.possHap.hapReserv.fun}, \cr
-  \code{get.matD.matEI.fun},
   \code{get.medBB.skip.fun}, \cr
   \code{get.preBB.skip.fun},
   \code{get.step.mut.fun}, \cr
@@ -49,7 +47,6 @@
   \code{getI13.fun},
   \code{getPIstar.fun}, \cr
   \code{haplo.phase.known},
-  \code{haplo.score.RD.unphased.fun}, \cr
   \code{I33Inv.fun},
   \code{index.k.fun}, \cr
   \code{zero.mat.fun}.

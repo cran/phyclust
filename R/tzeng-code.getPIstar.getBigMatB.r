@@ -106,7 +106,8 @@ get.subPI.fun<-function(em, mut.mat){
   }
   return(subPI.lst)
 }
-get.preBB.skip.fun<-function(subPI.lst=subPI.cs, loci, digit, mmle.cscn){
+#WCC get.preBB.skip.fun<-function(subPI.lst=subPI.cs, loci, digit, mmle.cscn){
+get.preBB.skip.fun<-function(subPI.lst, loci, digit, mmle.cscn){
   preBB.lst<-list(); indexBB.lst<-list()
   len      <-length(subPI.lst)
   preBB.lst[[1]]  <-diag(rep(1, length(subPI.lst[[1]])));  dimnames(preBB.lst[[1]])<-list(names(subPI.lst[[1]]),names(subPI.lst[[1]]))
@@ -152,7 +153,8 @@ get.preBB.skip.fun<-function(subPI.lst=subPI.cs, loci, digit, mmle.cscn){
 ##  subPI.lst<-subPI.cs[[j]][[ii]];preBB.lst<-preBB.cs[[j]][[ii]];indexBB.lst<-indexBB.cs[[j]][[ii]]
 ##  rm(medBB.lst, subPI.lst, preBB.lst, indexBB.lst, len, rr, ss,tt,tmp, tmp1, tmp0, rowsum.tmp,pos,sstop, chk, prechk)
 
-get.medBB.skip.fun<-function(subPI.lst=subPI.cn, preBB.lst=preBB.cn, indexBB.lst=indexBB.cn,loci, digit, mmle.cscn){
+#WCC get.medBB.skip.fun<-function(subPI.lst=subPI.cn, preBB.lst=preBB.cn, indexBB.lst=indexBB.cn,loci, digit, mmle.cscn){
+get.medBB.skip.fun<-function(subPI.lst, preBB.lst, indexBB.lst, loci, digit, mmle.cscn){
   ## if some hap couldn't find a direct 1-step ancestor, then need to use medBB to construct matB
   medBB.lst<-list()
   medBB.lst[[1]]<-list()
@@ -231,7 +233,8 @@ get.medBB.skip.fun<-function(subPI.lst=subPI.cn, preBB.lst=preBB.cn, indexBB.lst
 
 
 
-get.fullBB.fun<-function(medBB.lst=medBB.cs,subPI.lst=subPI.cs)
+#WCC get.fullBB.fun<-function(medBB.lst=medBB.cs,subPI.lst=subPI.cs)
+get.fullBB.fun<-function(medBB.lst,subPI.lst)
 {
   name.lst <-lapply(subPI.lst, names)
   dim.vec  <-sapply(subPI.lst, length)
@@ -384,7 +387,8 @@ get.allpossROUTE.fun<-function()
       }
 
 
-      chkdim.Add.fun<-function(mat, ncolShouldBe=RRstar){
+#WCC      chkdim.Add.fun<-function(mat, ncolShouldBe=RRstar){
+      chkdim.Add.fun<-function(mat, ncolShouldBe){
         if(length(mat)==0)
           {
             chk1=chk2=0
@@ -395,7 +399,8 @@ get.allpossROUTE.fun<-function()
         return(chk1*chk2)
       }
 
-getBigMatB.fun<-function(BB.lst=BB.cs, subPI.lst=subPI.cs){
+#WCC getBigMatB.fun<-function(BB.lst=BB.cs, subPI.lst=subPI.cs){
+getBigMatB.fun<-function(BB.lst, subPI.lst){
    ## modified on Apr 6, 2005; now check for the compatibility of dimensionality before adding or mulitplying	
    ## see ****** part. functions used:  chkdim.Multiply.fun, and  chkdim.Add.fun
     mmat         <-get.allpossROUTE.fun()
@@ -511,7 +516,8 @@ getBigMatB.fun<-function(BB.lst=BB.cs, subPI.lst=subPI.cs){
 
 
 ##rm(BB.lst, subPI.lst, prePIstar.lst, mmat, r.ele, cumsum.r, lenPI, lenBB, lenROUTE, mat.route, pi.ele, PI,bb, BB, kk, jj,PIstar)
-getPIstar.fun<-function(BB.lst=BB.cs, subPI.lst=subPI.cs)
+#WCC getPIstar.fun<-function(BB.lst=BB.cs, subPI.lst=subPI.cs)
+getPIstar.fun<-function(BB.lst, subPI.lst)
   {
     mmat         <-get.allpossROUTE.fun()
     r.ele        <-c( 1,1,2,4,8,16,32,64,128,256)

@@ -51,7 +51,8 @@ haplo.post.prob <- function(X, ploidy = 2, skip.haplo = 1e-7, K = NULL){
       pcscn  <-rev(sort(Pcscn))
 
       if(is.null(K)){
-        pos    <-getcut.fun(pcscn,nhap, plot=0)
+        #WCC pos    <-getcut.fun(pcscn,nhap, plot=0)
+        pos    <-getcut.fun(pcscn, 2*nhap, plot=0)
       } else{
         tl.K <- length(pcscn)
         if(K < 1 || K > (tl.K - 1)){

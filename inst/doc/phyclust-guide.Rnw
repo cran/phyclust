@@ -29,14 +29,14 @@
 %\Large
 %Oak Ridge, TN, USA
 } %\\ \today}
-\title{Model-Based Phylogenetic Clustering}
+\title{A Quick Guide for the \pkg{phyclust} Package}
 %\\
 %\vspace{0.2cm} \large (Based on Version 0.1-2)}
 
 %% for pretty printing and a nice hypersummary also set:
 \Plainauthor{Wei-Chen Chen} %% comma-separated
-\Plaintitle{Model-Based Phylogenetic Clustering} %% without formatting
-\Shorttitle{Model-Based Phylogenetic Clustering} %% a short title (if necessary)
+\Plaintitle{Quick Guide for phyclust} %% without formatting
+\Shorttitle{Quick Guide for phyclust} %% a short title (if necessary)
 
 %% an abstract and keywords
 %\Abstract{
@@ -71,7 +71,7 @@
   Computer Science and Mathematics Division\\ Oak Ridge National Laboratory\\
   PO Box 2008 MS6367\\
   Oak Ridge, TN 37831-6367, USA\\
-  E-mail: \email{phyclust@gmail.com}\\
+  E-mail: \email{wccsnow@gmail.com}\\
   URL: \url{http://thirteen-01.stat.iastate.edu/snoweye/phyclust/}
 }
 %% It is also possible to add a telephone and fax number

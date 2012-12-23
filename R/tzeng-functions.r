@@ -54,7 +54,8 @@ I33Inv.fun = function(subPI.lst, Xt.mat)
 }
 
        
-getI13.fun = function(t1=y, Xt.mat, bigB.dPI) {
+#WCC getI13.fun = function(t1=y, Xt.mat, bigB.dPI) {
+getI13.fun = function(t1, Xt.mat, bigB.dPI) {
   ## This function returns the I_{13} matrix
   ## Modified Apr3,2005; change y-ybar to t1, where t1= (y - mean(y))/a for phased data
   ##                                                t1= rep((y-mu)/a, nreps) * post for unphased data
@@ -215,7 +216,8 @@ index.k.fun<-function(len.subPI = 6) {
         return(list("chk1"=chk1,"chk2"=chk2, "chk3"=chk3))
       }
 
-      chkdim.Add.fun<-function(mat, ncolShouldBe=RRstar){
+#WCC      chkdim.Add.fun<-function(mat, ncolShouldBe=RRstar){
+      chkdim.Add.fun<-function(mat, ncolShouldBe){
         if(length(mat)==0)
           {
             chk1=chk2=0
@@ -227,7 +229,8 @@ index.k.fun<-function(len.subPI = 6) {
       }
 
 
-get.deriBigMatB.fun<-function(BB.deri, subPI.lst, subPi.num=k)
+#WCC get.deriBigMatB.fun<-function(BB.deri, subPI.lst, subPi.num=k)
+get.deriBigMatB.fun<-function(BB.deri, subPI.lst, subPi.num)
   { 
     ## modified on Apr 8 2005, add the compatability check of dimensionalith when getting
     ## preBigBB.deri and BigMatB, see "*******".
