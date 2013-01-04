@@ -8,12 +8,13 @@
   neutral model.
 }
 \usage{
-ms(nsam = NULL, nreps = 1, opts = NULL)
+ms(nsam = NULL, nreps = 1, opts = NULL, temp.file = NULL)
 }
 \arguments{
   \item{nsam}{number of samples/coalescent trees, usually greater than 2.}
   \item{nreps}{number of replications.}
   \item{opts}{options as the standalone version.}
+  \item{temp.file}{temporary file for ms output.}
 }
 \details{
   This function directly reuses the C code of \code{ms} by arguments
@@ -28,6 +29,12 @@ ms(nsam = NULL, nreps = 1, opts = NULL)
   These will return trees in a NEWICK format which can be read by the
   \code{read.tree} of \pkg{ape} and passed to \code{seqgen} to generate
   sequences. 
+
+  \code{temp.file} allows users to specify ms output file themselves, but
+  this file will not be deleted nor converted into R after the call to
+  \code{ms}. Users should take care the readings. By default, \code{ms}
+  uses a system temp file to store the output which is converted into R
+  after the call and is deleted after converting.
 }
 \value{
   This function returns a vector, and each element stores one line of STDOUT
@@ -62,6 +69,8 @@ ms(nsam = NULL, nreps = 1, opts = NULL)
 }
 \examples{
 \dontrun{
+library(phyclust, quiet = TRUE)
+
 ms()
 
 # an ancestral tree
