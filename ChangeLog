@@ -1,3 +1,31 @@
+2015-11-25: Ver. 0.1-16
+  * Change "gasdev(m,v)" in "src/msdir/ms.c" to avoid different outcomes from
+    the same seed. (static int is not supposed to act like that)
+    Bug is found by Paul Staab.
+  * Modify "ms()" by adding "tbs" to "opts", and "tbs.matrix" for assigning
+    values of "tbs".
+    This is suggested by Mark Beaumont.
+
+2015-01-02: Ver. 0.1-16
+  * Fix Update_Eta_given_Z_ADJUST renormalizing problems.
+
+2014-12-26: Ver. 0.1-16
+  * Fix phyclust_qmatrix_array.c line 102 and 125.
+
+2014-12-16: Ver. 0.1-16
+  * Fix *total_sum potential overflow problem.
+
+2014-12-11: Ver. 0.1-16
+  * Fix R_phyclust_e_step to manually copy Z_modifiled to Z_normalized for
+    storing back to R.
+
+2014-10-03: Ver. 0.1-16
+  * Fix inst/doc/*.html to fit HTML5.
+  * Get rid of jss.*
+
+2014-01-31: Ver. 0.1-16
+  * Add opts = -u to seqgen() man page.
+
 2013-12-14: Ver. 0.1-15
   * Move vignettes.
 

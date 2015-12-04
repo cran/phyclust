@@ -16,13 +16,13 @@
    = pi_k * L_k(X_n) / sum_i(pi_i * L_i(X_n))
    = 1 / sum_i(pi_i * L_i(X_n) / (pi_k * L_k))
    = 1 / sum_i(exp(log(pi_i) + log(L_i(X_n)) - log(pi_k) - log(L_k(X_n))))
-   This function return stable exponential values with a scale exponeitial value and flag.
-   If flag = 1, scale_exp will be used to adjuste results eveywhere. Otherwise scale_exp = 0.
+   This function return stable exponential values with a scale exponential value and flag.
+   If flag = 1, scale_exp will be used to adjust results everywhere. Otherwise scale_exp = 0.
    *total_sum is for logL_observed.
 */
 void e_step_with_stable_exp(int *K, double *a_Z_normalized, double *total_sum, double *scale_exp, int *flag_out_range){
 	int k;
-	double tmp_exp, max_exp;
+	double tmp_exp, max_exp, tmp_exp_K, K_double;
 
 	*total_sum = 0.0;
 	*scale_exp = 0.0;
@@ -54,13 +54,16 @@ void e_step_with_stable_exp(int *K, double *a_Z_normalized, double *total_sum, d
 	}
 */
 	tmp_exp = exp(max_exp);
-	if(tmp_exp == HUGE_VAL || tmp_exp == 0.0){
+	K_double = (double) *K;
+	tmp_exp_K = tmp_exp * K_double;	/* Worst case of *total_sum. */
+	if(tmp_exp == HUGE_VAL || tmp_exp == 0.0 || tmp_exp_K == HUGE_VAL){
 		*flag_out_range = 1;
 		*scale_exp = (tmp_exp == HUGE_VAL) ? max_exp : -max_exp;
 		do{
 			*scale_exp *= 0.5;
 			tmp_exp = exp(*scale_exp);
-		} while(tmp_exp == HUGE_VAL);
+			tmp_exp_K = tmp_exp * K_double;
+		} while(tmp_exp == HUGE_VAL || tmp_exp_K == HUGE_VAL);
 		*scale_exp = max_exp - *scale_exp;
 		/* The *scale_exp is always greater than 0.
 		 * If max_exp > 0 and too large, then shift all to left and computable.
@@ -299,8 +302,8 @@ int M_step_ACM(em_phyclust_struct *empcs, Q_matrix_array *QA, Q_matrix_array *QA
 
 
 int Update_Eta_given_Z_ADJUST(em_phyclust_struct *empcs, em_control *EMC){
-	int n_X, k;
-	double total_sum = 0.0;
+	int n_X, k, check_Eta[empcs->K], flag_out_range = 0;
+	double total_sum = 0.0, tmp_sum_in_range = 0.0, tmp_sum_out_range = 0.0;
 
 	for(k = 0; k < empcs->K; k++){
 		empcs->Eta[k] = 0.0;
@@ -313,16 +316,39 @@ int Update_Eta_given_Z_ADJUST(em_phyclust_struct *empcs, em_control *EMC){
 		}
 		total_sum += empcs->Eta[k];
 	}
+
 	for(k = 0; k < empcs->K; k++){
 		empcs->Eta[k] /= total_sum;
-		empcs->log_Eta[k] = log(empcs->Eta[k]);
-	}
-	for(k = 0; k < empcs->K; k++){
+
+		/* Double check if out range occurs and set to boundary if any. */
 		if(empcs->Eta[k] < EMC->Eta_lower_bound){
 			empcs->Eta[k] = EMC->Eta_lower_bound;
+			tmp_sum_out_range += empcs->Eta[k];
+			check_Eta[k] = 1;
+			flag_out_range |= 1;
 		} else if(empcs->Eta[k] > EMC->Eta_upper_bound){
 			empcs->Eta[k] = EMC->Eta_upper_bound;
+			tmp_sum_out_range += empcs->Eta[k];
+			check_Eta[k] = 1;
+			flag_out_range |= 1;
+		} else{
+			tmp_sum_in_range += empcs->Eta[k];
+			check_Eta[k] = 0;
 		}
+	}
+
+	/* Normalize in range part to constrained total if out range occurs. */
+	if(flag_out_range == 1){
+		for(k = 0; k < empcs->K; k++){
+			if(check_Eta[k] == 0){
+				empcs->Eta[k] *= (1.0 - tmp_sum_out_range) / tmp_sum_in_range;
+			}
+		}
+	}
+
+	/* Update log_Eta before return. */
+	for(k = 0; k < empcs->K; k++){
+		empcs->log_Eta[k] = log(empcs->Eta[k]);
 	}
 
 	#if (EMDEBUG & 4) == 4
