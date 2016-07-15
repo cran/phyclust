@@ -1,6 +1,6 @@
 d791728a073bc009b4ffaf00b7599855 *COPYING
-fe7c9268570d8ef853dbded5b08900df *ChangeLog
-f0297799955f1875e9a353b5452faf67 *DESCRIPTION
+1c31f5b7822aaaf9d8a6dcb0452b020b *ChangeLog
+36c7df9ce407558485d21cbaec113f38 *DESCRIPTION
 1b58af01ee17e7a7eccc7ddd6030f036 *NAMESPACE
 0b2fd16f1f4d043c2b27cfead0255fdb *R/000_globalVariables.r
 80ff561db2b1d9ae6bb47ee5274121ed *R/b_seq.r
@@ -10,7 +10,7 @@ e8a483d522ac7571a7b2b354482f9acc *R/f_base.r
 c5bd382b92d7ffc8885ef01d130c8a79 *R/f_file.r
 a8c755f41b6734ef57db7e73684dc4c0 *R/f_file_fasta.r
 1c652716424f41f9bde1c8eba0a37b16 *R/f_file_paml.r
-4ffc80c5b0b4592afd19b7101b6f74b8 *R/f_file_phylip.r
+7907a347c2155ae1cdddc2bd1d34f1cf *R/f_file_phylip.r
 52bd3c9246c70615dfc6d57dad901ce7 *R/f_file_seqgen.r
 84348f7de0762992f77ebbfeb46ae809 *R/f_find_best.r
 1d048a9567f8b14fd6880455c6af36f2 *R/f_find_consensus.r
@@ -43,6 +43,7 @@ d41f195f281c982315d6a859f6de428a *R/tzeng-functions.r
 036fb69959ff2efc7fb281598363e70f *R/tzeng-main.functions.forRDscoreTest.public.r
 3b61c74b985002d0edbf53eb0a5d18a0 *R/tzeng-modified.r
 36653558cc30aabc68ab3d0453470e67 *R/zzz.r
+468dd1b980b6f9ec67810e40d48fe9f6 *README.md
 03631d897f31da0d1930615f21cd3603 *cleanup
 15a5b092f462e19a4741be1af354ce5a *data/EMC.rda
 a6d60d6243c73b03d2388c39088d07cd *data/color.r
@@ -76,7 +77,7 @@ bd479c9845f4eab8fcf2046b56eaf20e *inst/Documents/seq-gen-Readme.txt
 9e4e6372f1ec441ae155a5f5d84969c7 *inst/Documents/tzeng-Readme.txt
 6812c9a8b22c6b182044c91b463f5a5c *inst/doc/index_doc.html
 7d513dec500e47b4efa369f8ec26ec5b *inst/doc/phyclust-guide.Rnw
-1dceab0df5007a2c88a3e35923ad0ed2 *inst/doc/phyclust-guide.pdf
+a24114eab5e6ad26687728ae0437f2e7 *inst/doc/phyclust-guide.pdf
 ccf21e60059d607b31945e33e6ce209d *inst/test/test.r
 45ae368d30e3e9ff0877cd1d83dae99a *man/00_phyclust-package.Rd
 bad0b26e9fbc7d970cc4878dfb63f151 *man/11_d.Color.Rd
@@ -255,7 +256,7 @@ f6d842e80da5a59d66a6e5ab11741dd5 *src/seq-gen/twister.c
 9cf6224089f7be05494f75ab16e41c35 *vignettes/build_pdf.sh
 6812c9a8b22c6b182044c91b463f5a5c *vignettes/index_doc.html
 7d513dec500e47b4efa369f8ec26ec5b *vignettes/phyclust-guide.Rnw
-8d3ee2136f3bd4e328b3c463d5ab601f *vignettes/phyclust-include/01-introduction.tex
+ee386e18f8c6f61d4f5e4598c3561dd8 *vignettes/phyclust-include/01-introduction.tex
 684018cbe525d9bc2439059675008f41 *vignettes/phyclust-include/02-dataio.tex
 e5455c6711edc78c5077f1ecff369265 *vignettes/phyclust-include/03-msseqgen.tex
 bcadfa4e2bdad642269cb181457737e2 *vignettes/phyclust-include/04-phyclust.tex
