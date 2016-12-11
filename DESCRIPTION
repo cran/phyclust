@@ -1,6 +1,6 @@
 Package: phyclust
-Version: 0.1-17
-Date: 2016-07-14
+Version: 0.1-18
+Date: 2016-12-10
 Title: Phylogenetic Clustering (Phyloclustering)
 Authors@R: c(person("Wei-Chen", "Chen", role = c("aut", "cre"), email =
         "wccsnow@gmail.com"), person("Karin", "Dorman", role =
@@ -19,18 +19,22 @@ Description: Phylogenetic clustering (phyloclustering) is an evolutionary
         molecular sequences representative of those subpopulations. It is
         designed in C for performance, interfaced with R for visualization,
         and incorporates other popular open source programs including
-        ms (Hudson 2002), seq-gen (Rambaut and Grassly 1997),
-        Hap-Clustering (Tzeng 2005) and PAML baseml (Yang 1997, 2007), for
-        simulating data, additional analyses, and searching the best tree.
+        ms (Hudson 2002) <doi:10.1093/bioinformatics/18.2.337>,
+        seq-gen (Rambaut and Grassly 1997)
+        <doi:10.1093/bioinformatics/13.3.235>,
+        Hap-Clustering (Tzeng 2005) <doi:10.1002/gepi.20063> and
+        PAML baseml (Yang 1997, 2007) <doi:10.1093/bioinformatics/13.5.555>,
+        <doi:10.1093/molbev/msm088>,
+        for simulating data, additional analyses, and searching the best tree.
         See the phyclust website for more information, documentations and
         examples.
 BugReports: https://github.com/snoweye/phyclust/issues
 License: GPL (>= 2)
-URL: http://thirteen-01.stat.iastate.edu/snoweye/phyclust/
+URL: http://snoweye.github.io/phyclust/
 NeedsCompilation: yes
-Packaged: 2016-07-15 03:29:13 UTC; snoweye
+Packaged: 2016-12-11 01:33:03 UTC; snoweye
 Author: Wei-Chen Chen [aut, cre],
   Karin Dorman [aut]
 Maintainer: Wei-Chen Chen <wccsnow@gmail.com>
 Repository: CRAN
-Date/Publication: 2016-07-15 10:14:34
+Date/Publication: 2016-12-11 12:26:36
