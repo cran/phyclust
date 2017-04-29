@@ -1,6 +1,6 @@
 d791728a073bc009b4ffaf00b7599855 *COPYING
-ade5dc412b262b71eb5b0c2065f8321c *ChangeLog
-dacbf85be08cf96bac0f89d04eaa8414 *DESCRIPTION
+008cf45172e2f03fb429d1b454874255 *ChangeLog
+c2a25a1450408f329e075b1ab9a4a31b *DESCRIPTION
 1b58af01ee17e7a7eccc7ddd6030f036 *NAMESPACE
 0b2fd16f1f4d043c2b27cfead0255fdb *R/000_globalVariables.r
 80ff561db2b1d9ae6bb47ee5274121ed *R/b_seq.r
@@ -147,7 +147,7 @@ b738f073f272107ebe7b68a31487a22b *man/plothist.Rd
 0e7824230fc22c4d7bf7d94bf2ba22ed *src/Makevars
 2deac909295adc8b7498809dc65b528a *src/RRand.c
 647d6e752ac5a21bf0c5ad42e9b18380 *src/R_RRand.c
-20acc3b2831ee90b050574da740d21e2 *src/R_phyclust.c
+1f97ca5d98a0a297db4bd9d9270f705b *src/R_phyclust.c
 9c5f0c21f42dbf95efb7185fea366cb0 *src/R_phyclust.h
 66a975213940b4897d304492ca3d9d06 *src/R_phyclust_edist.c
 2f8b38a93b9575187ad56f007dc96364 *src/R_phyclust_em_step.c
@@ -156,7 +156,7 @@ f20f9693967e147a115481cffebe30c8 *src/R_phyclust_label.c
 e65d7591eac95b8813b8ee31651275fe *src/R_phyclust_logL.c
 e6b2346f3f8af926e6feab909db178e4 *src/R_phyclust_logPt.c
 4cc1cce55a6dfcc6b947a9b8d8d4e22b *src/R_phyclust_qmatrix.c
-510ae89fe44a5114981fe545bff1cc06 *src/R_phyclust_se.c
+84fc66a87dd981698e9e85038d9dc7a5 *src/R_phyclust_se.c
 b9b82cd021c6744c1c746a9d2230803c *src/R_phyclust_se.h
 6e2bf6f73f232f91ba47dc9352e1ea9f *src/R_phyclust_se_update.c
 6af24996c1b2e4926c504a937179223e *src/R_phyclust_struct.c
@@ -165,7 +165,7 @@ a20dbd1db2a14acdc7a723c005e40d6d *src/make/inc.msdir
 fcbc56a3173fa97c6ba5cd97ae47cec7 *src/make/inc.paml_baseml
 f00af82d33e8e8bf6de0536d24f38ed2 *src/make/inc.phyclust
 6fe0145410f19dfbed8726812b1db125 *src/make/inc.seq-gen
-cf384cb73723bb1acb7c3713f8760ff6 *src/make/inc.src
+07e57e87bb9a5be004cf385c7eb4be6f *src/make/inc.src
 7037812db4250ba2454d6eb868ee2b3c *src/msdir/R_ms.h
 542643a6b7ec22f754eb006647359173 *src/msdir/R_ms_main.c
 080e65d3c84e9febb2356f1d016906e0 *src/msdir/R_rand.c
@@ -253,6 +253,8 @@ b64b02b43f1393a1515c046f842112a9 *src/seq-gen/model.c
 aca0c3bbeae42818ded52ac6bf7bbd56 *src/seq-gen/treefile.h
 f6d842e80da5a59d66a6e5ab11741dd5 *src/seq-gen/twister.c
 95793f24757e4d1adc13a64b3d627bd6 *src/seq-gen/twister.h
+f06e62f89cd6cda2496b2f02ff931c3a *src/zzz.c
+c1dda1cfab741803beda3e5c05414683 *src/zzz.h
 9cf6224089f7be05494f75ab16e41c35 *vignettes/build_pdf.sh
 523620b50b60ced9dcffcf89ade164cc *vignettes/index_doc.html
 7e3547e9056079ea57e327e6b9846891 *vignettes/phyclust-guide.Rnw
