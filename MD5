@@ -1,6 +1,6 @@
 d791728a073bc009b4ffaf00b7599855 *COPYING
 8505a0cc04016b78a4353a8c9473ba1d *ChangeLog
-7e591c944fc16f9ad1665ad6f49c4383 *DESCRIPTION
+fe67b6be2b116499f63e2d0d3c273304 *DESCRIPTION
 1b58af01ee17e7a7eccc7ddd6030f036 *NAMESPACE
 0b2fd16f1f4d043c2b27cfead0255fdb *R/000_globalVariables.r
 80ff561db2b1d9ae6bb47ee5274121ed *R/b_seq.r
@@ -207,7 +207,7 @@ e2cebc06ef5a819189ca11881ac33aae *src/phyclust/phyclust_init_procedure.h
 ffb52d33ed4004d21ad952272b525de7 *src/phyclust/phyclust_label.h
 05b92df76634e19cfce06b0b6cccee44 *src/phyclust/phyclust_logpL.c
 09ce9b9d9e2b675533a34b6783919026 *src/phyclust/phyclust_logpL.h
-9ca55aebc8c7393ef1ab93e67f9961d9 *src/phyclust/phyclust_optim_nmmin.c
+fad38c027fecd2c23372502d248992e1 *src/phyclust/phyclust_optim_nmmin.c
 8c233a14848f9e0ef22bb565ba89e842 *src/phyclust/phyclust_optim_nmmin.h
 c9a9df5342e68f70ed83b660ad5fad2e *src/phyclust/phyclust_pam.c
 05e6f8bd416d71d173d1e8bce2123032 *src/phyclust/phyclust_pam_ind_2.h
