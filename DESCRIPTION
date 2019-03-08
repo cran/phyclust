@@ -1,6 +1,6 @@
 Package: phyclust
-Version: 0.1-22
-Date: 2017-12-02
+Version: 0.1-23
+Date: 2019-03-07
 Title: Phylogenetic Clustering (Phyloclustering)
 Authors@R: c(person("Wei-Chen", "Chen", role = c("aut", "cre"), email =
         "wccsnow@gmail.com"), person("Karin", "Dorman", role =
@@ -33,8 +33,8 @@ License: GPL (>= 2)
 URL: http://snoweye.github.io/phyclust/
 NeedsCompilation: yes
 Maintainer: Wei-Chen Chen <wccsnow@gmail.com>
-Packaged: 2017-12-02 19:10:40 UTC; snoweye
+Packaged: 2019-03-07 22:10:56 UTC; snoweye
 Author: Wei-Chen Chen [aut, cre],
   Karin Dorman [aut]
 Repository: CRAN
-Date/Publication: 2017-12-02 19:22:25 UTC
+Date/Publication: 2019-03-08 13:50:03 UTC
