@@ -1,6 +1,6 @@
 d791728a073bc009b4ffaf00b7599855 *COPYING
-7d71221d47b1fba804271b1484c2cb45 *ChangeLog
-911d964a94d4c6d5b774fbfaafe8d221 *DESCRIPTION
+928ac6491f3681e5338ffccd118ee44c *ChangeLog
+d13b877422fff94113ee7c2830d1d8b9 *DESCRIPTION
 1b58af01ee17e7a7eccc7ddd6030f036 *NAMESPACE
 0b2fd16f1f4d043c2b27cfead0255fdb *R/000_globalVariables.r
 80ff561db2b1d9ae6bb47ee5274121ed *R/b_seq.r
@@ -37,7 +37,7 @@ d755ff50ca5ce3cbd336e0d191481d24 *R/p_ms.r
 469f2d3ee3c6c123fa4e453195e25930 *R/p_paml_baseml.r
 93dee2a1367c66255f2a868075c00898 *R/p_seqgen.r
 e39590ab132b759fdcc284266cd982b5 *R/p_tool_seq.r
-f622fee9c0499f8e9711b3c3019dcaab *R/p_tool_star_tree.r
+e9d82d7d9d44ff0b80e433c10344caaf *R/p_tool_star_tree.r
 c642e7bed35226e4bbf013a63f7adab4 *R/tzeng-code.getPIstar.getBigMatB.r
 d41f195f281c982315d6a859f6de428a *R/tzeng-functions.r
 036fb69959ff2efc7fb281598363e70f *R/tzeng-main.functions.forRDscoreTest.public.r
