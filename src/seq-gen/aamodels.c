@@ -57,10 +57,12 @@ double aaVector[NUM_AA];
 double aaRelativeRate[NUM_AA_REL_RATES];
 static double Qij[SQNUM_AA], Cijk[CUNUM_AA], Root[NUM_AA];
 
-void SetupAAMatrix();
+//WCC void SetupAAMatrix();
+void SetupAAMatrix(void);
 void SetRelativeRates(double *inRelativeRates);
 void SetFrequencies(double *inFrequencies);
-void CheckAAFrequencies();
+//WCC void CheckAAFrequencies();
+void CheckAAFrequencies(void);
 
 /* JTT model for amino acid evolution */
 /* D.T. Jones, W.R. Taylor, and J.M. Thornton */
@@ -95,7 +97,7 @@ static double jttFrequencies[NUM_AA] = {
 /* WAG model of amino acid evolution */
 /* Whelan, S. and Goldman, N. (2001) A general empirical model of protein */
 /* evolution derived from multiple protein families using a maximum-likelihood */
-/* approach. Mol. Biol. Evol. 18, 691Ð699. */
+/* approach. Mol. Biol. Evol. 18, 691-699. */
 static double wagRelativeRates[NUM_AA_REL_RATES] = {
 	0.610810, 0.569079, 0.821500, 1.141050, 1.011980, 1.756410, 1.572160, 0.354813, 0.219023, 0.443935, 1.005440, 0.989475, 0.233492, 1.594890, 3.733380, 2.349220, 0.125227, 0.268987, 2.221870, 
 	0.711690, 0.165074, 0.585809, 3.360330, 0.488649, 0.650469, 2.362040, 0.206722, 0.551450, 5.925170, 0.758446, 0.116821, 0.753467, 1.357640, 0.613776, 1.294610, 0.423612, 0.280336, 
@@ -289,7 +291,8 @@ void SetFrequencies(double *inFrequencies)
 	}
 }
 
-void SetupAAMatrix()
+//WCC void SetupAAMatrix()
+void SetupAAMatrix(void)
 {
 	int i,j,k;
 	double mr;
@@ -347,7 +350,8 @@ void SetupAAMatrix()
  * This avoids potential problems later when eigenvalues
  * are computed.
  */
-void CheckAAFrequencies()
+//WCC void CheckAAFrequencies()
+void CheckAAFrequencies(void)
 {
 	int i, j;
 	double diff;
