@@ -1,6 +1,6 @@
 d791728a073bc009b4ffaf00b7599855 *COPYING
-2bb9aa6c58e3b9a95783d652e7c247fb *ChangeLog
-1f4b563d2daa216b535e02c03af8b0a6 *DESCRIPTION
+3da4a720000305b377e0b461522c40e8 *ChangeLog
+03ef08c9d452b7d0136588be45382738 *DESCRIPTION
 1b58af01ee17e7a7eccc7ddd6030f036 *NAMESPACE
 0b2fd16f1f4d043c2b27cfead0255fdb *R/000_globalVariables.r
 80ff561db2b1d9ae6bb47ee5274121ed *R/b_seq.r
@@ -175,11 +175,11 @@ c5e6d2f5b7324af63131f32dfa71b311 *src/msdir/ms_main.c
 e716ec1e1e45ba8adfa84094b5c155d7 *src/msdir/streec.c
 9fc523a0198ea57680584184088e2d61 *src/paml_baseml/R_paml.h
 3c905efcee19017f4ee397cb489f539b *src/paml_baseml/R_paml_baseml_main.c
-babef27e11993ee1e17d4c0d102652ae *src/paml_baseml/baseml.c
-313376f0993c4fd32fa74dd68f93862c *src/paml_baseml/paml.h
-63d02cc7b0073a68fe1917ddfe8b21a6 *src/paml_baseml/tools.c
-4ada379be3d7d9fbaf09f61970930460 *src/paml_baseml/treespace.c
-8a676603389322a7a3e62a9e0d759ae3 *src/paml_baseml/treesub.c
+6a0926d2d59902b0c1de9246b4f45fe0 *src/paml_baseml/baseml.c
+374d466283934d699830915c826c734f *src/paml_baseml/paml.h
+aecc232358f2ebfef5715ade9b1060a0 *src/paml_baseml/tools.c
+43408b91bb0099c5d1db0e55f0686404 *src/paml_baseml/treespace.c
+1ca74dd58f126a74a12bac03b2d79606 *src/paml_baseml/treesub.c
 55d7eb4bc1cdac38822c9db00b6e3f5b *src/phyclust/phyclust.h
 26586f2cc728c4b9d30a7bde8ac4f1b7 *src/phyclust/phyclust_ape_nj.c
 a5596c36c274370039e77117459aaa75 *src/phyclust/phyclust_ape_nj.h
@@ -207,7 +207,7 @@ e2cebc06ef5a819189ca11881ac33aae *src/phyclust/phyclust_init_procedure.h
 34bdd811a239043907984427f4891d93 *src/phyclust/phyclust_label.h
 05b92df76634e19cfce06b0b6cccee44 *src/phyclust/phyclust_logpL.c
 09ce9b9d9e2b675533a34b6783919026 *src/phyclust/phyclust_logpL.h
-fad38c027fecd2c23372502d248992e1 *src/phyclust/phyclust_optim_nmmin.c
+4c154da21f8afe748a014afb2a6b004c *src/phyclust/phyclust_optim_nmmin.c
 8c233a14848f9e0ef22bb565ba89e842 *src/phyclust/phyclust_optim_nmmin.h
 c9a9df5342e68f70ed83b660ad5fad2e *src/phyclust/phyclust_pam.c
 05e6f8bd416d71d173d1e8bce2123032 *src/phyclust/phyclust_pam_ind_2.h
@@ -239,7 +239,7 @@ bc9a754eae43421dfa037781f5923c20 *src/seq-gen/eigen.c
 8a86afc6f7430b36796fb45a68906eef *src/seq-gen/eigen.h
 fe23e8dad3837f2c47f2b95e48dc96b1 *src/seq-gen/evolve.c
 f5e1957dddeeed15f401b6735ddb3f1b *src/seq-gen/evolve.h
-53b9b1ec950dd9744968d3f3d3db4c66 *src/seq-gen/gamma.c
+007187c6cd82d1bb38d8a36e95e24a87 *src/seq-gen/gamma.c
 787210ca24c50d7793d1a12dbf82169e *src/seq-gen/gamma.h
 cd3908e7ab28c32a58e010b43acdd20a *src/seq-gen/global.c
 1172679dfb550d040962a7eb799a65df *src/seq-gen/global.h
@@ -249,7 +249,7 @@ ff139d2160c254936b81c347a92085a0 *src/seq-gen/nucmodels.c
 4851669caa315ff0d32f526c74139361 *src/seq-gen/nucmodels.h
 1339cf08a546b430eb722ee545a78969 *src/seq-gen/seq-gen.c
 7a5a4c98c6dc5b72997fde4b569d58ea *src/seq-gen/tree.h
-25c2c5287fbdd280056be84f3fbca410 *src/seq-gen/treefile.c
+538fc6b390d5a4e591c6bcd20f497e13 *src/seq-gen/treefile.c
 4b7a1d3458126ffff21865cc2ae55e59 *src/seq-gen/treefile.h
 41cfb09e635dec72ed1bcd769c10124d *src/seq-gen/twister.c
 95793f24757e4d1adc13a64b3d627bd6 *src/seq-gen/twister.h

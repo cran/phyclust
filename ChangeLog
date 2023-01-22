@@ -1,3 +1,12 @@
+2023-01-14: Ver. 0.1-33
+  * Fix "seq-gen/gamma.c:45:5: warning: use of unary operator that may be
+    intended as compound assignment (-=)".
+  * Fix "Found ‘__sprintf_chk’, possibly from ‘sprintf’ (C)
+    ‘phyclust/phyclust_optim_nmmin.o’, ‘seq-gen/treefile.o’,
+    ‘paml_baseml/baseml.o’, ‘paml_baseml/tools.o’".
+  * Fix "paml_baseml/tools.c:653:28: warning: argument 6 of type ‘double[4]’
+    with mismatched bound [-Warray-parameter=]".
+
 2022-10-24: Ver. 0.1-32
   * Fix more "(theta^(mut.step - ss)) %*% diag(poolPI)" errors in the
     haplo.post.prob() function.

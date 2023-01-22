@@ -650,7 +650,7 @@ int PMatTN93 (double P[], double a1t, double a2t, double bt, double pi[])
 
 
 int EvolveHKY85 (char source[], char target[], int ls, double t,
-    double rates[], double pi[4], double kappa, int isHKY85)
+    double rates[], double pi[], double kappa, int isHKY85)
 {
 /* isHKY85=1 if HKY85,  =0 if F84
    Use NULL for rates if rates are identical among sites.
@@ -1066,7 +1066,8 @@ void starttimer (void)
    time_start=time(NULL);
 }
 
-char* printtime (char timestr[])
+//WCC char* printtime (char timestr[])
+char* printtime (char timestr[], int n_timestr)
 {
 /* print time elapsed since last call to starttimer()
 */
@@ -1077,8 +1078,10 @@ char* printtime (char timestr[])
    h = (int)t/3600;
    m = (int)(t%3600)/60;
    s = (int)(t-(t/60)*60);
-   if(h)  sprintf(timestr,"%d:%02d:%02d", h,m,s);
-   else   sprintf(timestr,"%2d:%02d", m,s);
+//WCC   if(h)  sprintf(timestr,"%d:%02d:%02d", h,m,s);
+//WCC   else   sprintf(timestr,"%2d:%02d", m,s);
+   if(h)  snprintf(timestr, n_timestr, "%d:%02d:%02d", h,m,s);
+   else   snprintf(timestr, n_timestr, "%2d:%02d", m,s);
    return(timestr);
 }
 
@@ -5038,7 +5041,7 @@ int density1d (FILE* fout, double y[], int n, int nbin, double minx,
          }
          G+=log(lambda[k]);
          if((k+1)%1000==0)
-            fprintf(R_paml_baseml_file_pointer, "\r\tGetting weights: %2d/%d  %d terms  %s", k+1,n,nused,printtime(timestr));
+            fprintf(R_paml_baseml_file_pointer, "\r\tGetting weights: %2d/%d  %d terms  %s", k+1,n,nused,printtime(timestr, 32));
 //WCC            printf("\r\tGetting weights: %2d/%d  %d terms  %s", k+1,n,nused,printtime(timestr));
 
       }
@@ -5116,7 +5119,7 @@ int density2d (FILE* fout, double y1[], double y2[], int n, int nbin,
       }
       G += log(lambda[k]);
       if((k+1)%1000==0)
-         fprintf(R_paml_baseml_file_pointer, "\r\tGetting weights: %2d/%d  %s", k+1,n,printtime(timestr));
+         fprintf(R_paml_baseml_file_pointer, "\r\tGetting weights: %2d/%d  %s", k+1,n,printtime(timestr, 32));
 //WCC         printf("\r\tGetting weights: %2d/%d  %s", k+1,n,printtime(timestr));
    }
    G = exp(G/n);
@@ -5276,7 +5279,7 @@ int DescriptiveStatistics (FILE *fout, char infile[], int nbin, int nrho, int pr
 
    /* variance-covariance matrix */
 //WCC   printf(" %10s\n(2) variance-covariance matrix", printtime(timestr));
-   fprintf(R_paml_baseml_file_pointer, " %10s\n(2) variance-covariance matrix", printtime(timestr));
+   fprintf(R_paml_baseml_file_pointer, " %10s\n(2) variance-covariance matrix", printtime(timestr, 32));
    rewind(fin);
 //WCC   if(ReadHeader) fgets(line, lline, fin);
    if(ReadHeader) tmp_c = fgets(line, lline, fin);
@@ -5294,7 +5297,7 @@ int DescriptiveStatistics (FILE *fout, char infile[], int nbin, int nrho, int pr
 
    /* sorting to get median and percentiles */
 //WCC   printf("%10s\n(3) median, percentiles & serial correlation",printtime(timestr));
-   fprintf(R_paml_baseml_file_pointer, "%10s\n(3) median, percentiles & serial correlation",printtime(timestr));
+   fprintf(R_paml_baseml_file_pointer, "%10s\n(3) median, percentiles & serial correlation",printtime(timestr, 32));
    y=(double*)malloc((n*(2+(nf2d>0))+nbin*nbin*3)*sizeof(double));
 //WCC   if(y==NULL) { printf("not enough mem for %d variables\n",n); exit(-1); }
    if(y==NULL) { fprintf(R_paml_baseml_file_pointer, "not enough mem for %d variables\n",n); exit(-109); }
@@ -5366,7 +5369,7 @@ int DescriptiveStatistics (FILE *fout, char infile[], int nbin, int nrho, int pr
 return(0);
 */
 //WCC   printf(" %10s\n(4) Histograms and 1-D densities\n",printtime(timestr));
-   fprintf(R_paml_baseml_file_pointer, " %10s\n(4) Histograms and 1-D densities\n",printtime(timestr));
+   fprintf(R_paml_baseml_file_pointer, " %10s\n(4) Histograms and 1-D densities\n",printtime(timestr, 32));
    fprintf(fout, "\n(D) Histograms and 1-D densities\n");
    for(jj=SkipColumn; jj<p; jj++) {
       rewind(fin);
@@ -5394,7 +5397,7 @@ return(0);
       density1d(fout, y, n, nbin, minx[jj], gap[jj], h, space, propternary);
 
 //WCC      printf("    variable %2d/%d (%s): %s%30s\r", jj+1,p,varstr[jj], printtime(timestr),"");
-      fprintf(R_paml_baseml_file_pointer, "    variable %2d/%d (%s): %s%30s\r", jj+1,p,varstr[jj], printtime(timestr),"");
+      fprintf(R_paml_baseml_file_pointer, "    variable %2d/%d (%s): %s%30s\r", jj+1,p,varstr[jj], printtime(timestr, 32),"");
    }
 
    /* 2-D histogram and density */
@@ -5430,7 +5433,7 @@ return(0);
    }
    fclose(fin); free(x); free(y); free(line);
 //WCC   printf("\n%10s used\n", printtime(timestr));
-   fprintf(R_paml_baseml_file_pointer, "\n%10s used\n", printtime(timestr));
+   fprintf(R_paml_baseml_file_pointer, "\n%10s used\n", printtime(timestr, 32));
    return(0);
 }
 
@@ -5490,7 +5493,7 @@ int DescriptiveStatisticsSimple (FILE *fout, char infile[], int nbin, int nrho, 
 
    /* sorting to get median and percentiles */
 //WCC   printf("%10s\n   Collecting median, percentiles",printtime(timestr));
-   fprintf(R_paml_baseml_file_pointer, "%10s\n   Collecting median, percentiles",printtime(timestr));
+   fprintf(R_paml_baseml_file_pointer, "%10s\n   Collecting median, percentiles",printtime(timestr, 32));
    y=(double*)malloc(n*sizeof(double));
    if(y==NULL) error2("oom for y");
    for(jj=SkipColumn; jj<p; jj++) {

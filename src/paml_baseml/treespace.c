@@ -139,9 +139,10 @@ int ListTrees (FILE* fout, int ns, int rooted)
    }
 
    if(com.ns<=26) {
-      for (i=0; i<com.ns; i++)
+      for (i=0; i<com.ns; i++) {
 //WCC         sprintf(com.spname[i], "%d", i+1);
-         sprintf((char*) com.spname[i], "%d", i+1);
+         snprintf((char*) com.spname[i], strlen((char*) com.spname[i]), "%d", i+1);
+      }
    }
 
    for (i=0;i<nM;i++) Ib[i]=0;
