@@ -864,6 +864,9 @@ void AllPatterns (FILE* fout)
 //WCC      com.spname[j] = (char*)realloc(com.spname[j], 11*sizeof(char));
       com.spname[j] = (unsigned char*)realloc(com.spname[j], 11*sizeof(char));
 //WCC      sprintf(com.spname[j], "%c ", 'a'+j);
+
+      /* R-devel on around Dec. 24, 2022 starting to warn the line below. */
+      // sprintf((char*) com.spname[j], "%c ", 'a'+j);
       snprintf((char*) com.spname[j], 11, "%c ", 'a'+j);
    }
    for(j=0; j<com.ns; j++) 
@@ -924,7 +927,7 @@ int PatternWeight (void)
       Use p2s to map patterns to sites in zt to avoid copying.
    */
 //WCC   if(noisy) printf("Counting site patterns.. %s\n", printtime(timestr));
-   if(noisy) fprintf(R_paml_baseml_file_pointer, "Counting site patterns.. %s\n", printtime(timestr, 36));
+   if(noisy) fprintf(R_paml_baseml_file_pointer, "Counting site patterns.. %s\n", printtime(timestr));
 
    if((com.seqtype==1 && com.ns<5) || (com.seqtype!=1 && com.ns<7))
       maxnpatt = (int)(pow(nc, (double)com.ns) + 0.5) * com.ngene;
@@ -988,7 +991,7 @@ int PatternWeight (void)
          }
          if(noisy && ((h+1)%10000==0 || h+1==com.ls))
             fprintf(R_paml_baseml_file_pointer, "\r%12d patterns at %8d / %8d sites (%.1f%%), %s", 
-               com.npatt, h+1, com.ls, (h+1.)*100/com.ls, printtime(timestr, 36));
+               com.npatt, h+1, com.ls, (h+1.)*100/com.ls, printtime(timestr));
 //WCC            printf("\r%12d patterns at %8d / %8d sites (%.1f%%), %s", 
 //WCC               com.npatt, h+1, com.ls, (h+1.)*100/com.ls, printtime(timestr));
 
@@ -4417,7 +4420,8 @@ void printSeqsMgenes (void)
       for (h=0,lg=0; h<com.ls; h++)
          if(com.pose[h]==ig)
             lg++;
-//WCC      sprintf(seqf, "Gene%d.seq", ig+1);
+      /* R-devel on around Dec. 24, 2022 starting to warn the line below. */
+      // sprintf(seqf, "Gene%d.seq", ig+1);
       snprintf(seqf, 20, "Gene%d.seq", ig+1);
       if((fseq=fopen(seqf,"w"))==NULL) error2("file creation err.");
 //WCC      printf("%d sites in gene %d go to file %s\n", lg, ig+1,seqf);
@@ -5058,7 +5062,7 @@ int rell (FILE*flnf, FILE*fout, int ntree)
 
    /* calculates SEs (vdl) by sitewise comparison */
 
-   printtime(timestr, 64);
+   printtime(timestr);
 //WCC   printf("\r\tCalculating SEs by sitewise comparison");
    fprintf(R_paml_baseml_file_pointer, "\r\tCalculating SEs by sitewise comparison");
    FOR(itree,ntree) {
@@ -5071,7 +5075,7 @@ int rell (FILE*flnf, FILE*fout, int ntree)
       vdl[itree]=sqrt(vdl[itree]);
    }
 //WCC   printf(", %s\n", printtime(timestr));
-   fprintf(R_paml_baseml_file_pointer, ", %s\n", printtime(timestr, 64));
+   fprintf(R_paml_baseml_file_pointer, ", %s\n", printtime(timestr));
 
    /* bootstrap resampling */
    for(ig=0; ig<com.ngene; ig++)
@@ -5107,7 +5111,7 @@ int rell (FILE*flnf, FILE*fout, int ntree)
          pRELL[btrees[j]]+=1./(nr*nbtree);
       if(nr>100 && (ir+1)%(nr/100)==0) 
 //WCC         printf("\r\tRELL Bootstrapping.. replicate: %6d / %d %s",ir+1,nr, printtime(timestr));
-         fprintf(R_paml_baseml_file_pointer, "\r\tRELL Bootstrapping.. replicate: %6d / %d %s",ir+1,nr, printtime(timestr, 64));
+         fprintf(R_paml_baseml_file_pointer, "\r\tRELL Bootstrapping.. replicate: %6d / %d %s",ir+1,nr, printtime(timestr));
 
    }
    free(fpattB);
@@ -7079,7 +7083,7 @@ int minB (FILE*fout, double *lnL,double x[],double xb[][2],double e0, double spa
             printf("%8s%s\n", "", printtime(timestr));
 */
             FPN(R_paml_baseml_file_pointer); FOR(i,npcom) fprintf(R_paml_baseml_file_pointer, " %11.6f", xcom[i]);
-            fprintf(R_paml_baseml_file_pointer, "%8s%s\n", "", printtime(timestr, 64));
+            fprintf(R_paml_baseml_file_pointer, "%8s%s\n", "", printtime(timestr));
          }
       }
       noisy_minbranches = noisy;
@@ -7092,7 +7096,7 @@ int minB (FILE*fout, double *lnL,double x[],double xb[][2],double e0, double spa
          if(i != tree.root) 
             x[nodes[i].ibranch] = nodes[i].branch;
 //WCC      if(noisy>2) printf("\n%s\n", printtime(timestr));
-      if(noisy>2) fprintf(R_paml_baseml_file_pointer, "\n%s\n", printtime(timestr, 64));
+      if(noisy>2) fprintf(R_paml_baseml_file_pointer, "\n%s\n", printtime(timestr));
 
       if((dl=fabs(*lnL-lnL0))<e0 && e<=0.02) break;
       if(dl<small_improvement) small_times++;
@@ -8990,7 +8994,7 @@ exit(0);
 //WCC      printf("   Locus %d: %d sequences, %d blengths, lnL = %15.6f mr=%.5f%10s\n", 
 //WCC         locus+1, com.ns, com.np-1,-lnL,mr[locus], printtime(timestr));
       fprintf(R_paml_baseml_file_pointer, "   Locus %d: %d sequences, %d blengths, lnL = %15.6f mr=%.5f%10s\n", 
-         locus+1, com.ns, com.np-1,-lnL,mr[locus], printtime(timestr, 32));
+         locus+1, com.ns, com.np-1,-lnL,mr[locus], printtime(timestr));
       fprintf(fout,"\nlnL = %.6f\n\n", -lnL);
       OutTreeB(fout);  FPN(fout);
       for(i=0; i<com.np; i++) fprintf(fout," %8.5f",x[i]); FPN(fout);
@@ -9235,7 +9239,7 @@ FPN(R_paml_baseml_file_pointer);  FPN(fout);
    fclose(fdist);
    fflush(fout);
 //WCC   printf(" %10s\n", printtime(timestr));
-   fprintf(R_paml_baseml_file_pointer, " %10s\n", printtime(timestr, 32));
+   fprintf(R_paml_baseml_file_pointer, " %10s\n", printtime(timestr));
 
    if(finStep1) fclose(finStep1);
    if(finStep2) fclose(finStep2);
@@ -9410,7 +9414,7 @@ if(com.clock==6) {
    FPN(fout);
    FreeMemBC();
 //WCC   printf("\nTime used: %s\n", printtime(timestr));
-   fprintf(R_paml_baseml_file_pointer, "\nTime used: %s\n", printtime(timestr, 64));
+   fprintf(R_paml_baseml_file_pointer, "\nTime used: %s\n", printtime(timestr));
    exit(0);
 }
 

@@ -172,8 +172,7 @@ int PtoPi (double P[], double pi[], int n, double *space);
 int PtoX (double P1[], double P2[], double pi[], double X[]);
 
 void starttimer(void);
-//WCC char* printtime(char timestr[]);
-char* printtime(char timestr[], int n_timestr);
+char* printtime(char timestr[]);
 void sleep2(int wait);
 char *strc (int n, int c);
 int printdouble(FILE*fout, double a);

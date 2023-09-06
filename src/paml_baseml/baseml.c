@@ -374,7 +374,7 @@ exit(0);
       FPN(frst1); fflush(frst1);
       free(nodes);
 //WCC      printf("\nTime used: %s\n", printtime(timestr));
-      fprintf(R_paml_baseml_file_pointer, "\nTime used: %s\n", printtime(timestr, 64));
+      fprintf(R_paml_baseml_file_pointer, "\nTime used: %s\n", printtime(timestr));
 
    }   /* for(idata) */
    if(com.ndata>1 && fseq) fclose(fseq);
